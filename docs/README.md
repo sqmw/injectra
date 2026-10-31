@@ -12,5 +12,6 @@
 | 豆包、真实产品、Chromium接入 | [豆包兼容性](compatibility/doubao.md) |
 | 任务与执行 | [TODO](TODO.md)、[STEPS](STEPS.md) |
 | 长期约束与取舍 | [决策](DECISIONS.md) |
+| MVP验收、版本与源码映射 | [交付记录](releases.md) |
 
 `make doc-check`检查本地链接、显式锚点和文档可达性；任务结构通过全局project-tracking-check单独校验。历史从任务关闭索引进入，不默认加载。

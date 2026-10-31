@@ -2,6 +2,8 @@
 
 面向桌面 Web UI 的可插拔个性化工具。首个核心版本为 **Rust CLI + macOS Electron/CDP**：向显式开放本地调试端口的单个页面注入 CSS、HTML、JS，再移除受管理改动。当前不提供图形管理器。
 
+**MVP 已于 2026-10-31 经用户亲自验证通过**，交付版本为 `v0.1.0-mvp`。版本范围与证据见[交付记录](docs/releases.md)。项目采用 [Apache-2.0 许可证](LICENSE)。
+
 ## 快速入口
 
 工具版本由 [mise.toml](mise.toml) 声明：Rust 1.93.0、Node 24.6.0。已有匹配工具可直接使用；Node 只用于开发验证，编译后的 CLI 不依赖 Node。Rust 与测试依赖分别由 Cargo.lock、tests/package-lock.json 锁定。

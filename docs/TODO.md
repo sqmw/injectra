@@ -2,6 +2,46 @@
 
 main 分支为唯一权威来源；Parent 为当前 Codex 主窗口，single-writer。
 
+## 当前任务
+
+<a id="t-004"></a>
+### T-004 · MVP 验收收口与仓库推送
+
+```tracking-task
+{
+  "id": "T-004",
+  "name": "MVP 验收收口与仓库推送",
+  "version": "v1",
+  "mode": "lightweight",
+  "status": "in_progress",
+  "goal": "记录用户已完成MVP验收，整理可追溯交付提交并推送用户建立的远端仓库。",
+  "scope": "验收与版本映射文档、现有工作区和历史审阅、必要检查、提交和Git推送；无产品功能扩展。",
+  "acceptance": "用户验收结论已落盘；review与检查通过；提交及MVP版本标识可追溯；远端目标正确且推送成功，确认远端提交与本地一致。",
+  "execution_ref": "TODO.md#t-004",
+  "acceptance_evidence": [],
+  "unplanned_reason": "用户确认MVP通过并要求整理提交推送。"
+}
+```
+
+```tracking-execution
+{
+  "id": "T-004/E-001",
+  "name": "整理验收记录并提交推送",
+  "task_id": "T-004",
+  "task_version": "v1",
+  "status": "running",
+  "authorization": "2026-10-31 用户表示自己验证无问题、MVP通过，已建立仓库，要求整理提交并推送。",
+  "scope": "验收与版本映射文档、现有工作区和历史审阅、必要检查、提交和Git推送；无产品功能扩展。",
+  "steps": [],
+  "evidence": [
+    "起始bc4bff9，main工作区干净，无Git remote配置；后定位到用户公开仓库sqmw/injectra，并配置origin。"
+  ],
+  "stop_reason": ""
+}
+```
+
+恢复上下文r2：2026-10-31，当前主窗口Parent，main/single-writer，起始bc4bff9；origin为sqmw/injectra；远端LICENSE初始化历史已合入。make check与tracking检查通过，review确认仅验收文档与许可证合并。当前动作：提交验收文档、标记v0.1.0-mvp并推送核验。
+
 ## 已关闭任务
 
 <a id="t-003"></a>

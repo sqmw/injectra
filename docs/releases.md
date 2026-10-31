@@ -1,0 +1,13 @@
+# 版本与交付映射
+
+## v0.1.0-mvp · 2026-10-31
+
+- 状态：用户已亲自验证并确认MVP通过；本次交付为源码与Git版本标识，无安装包或GitHub Release附件。
+- 仓库：[sqmw/injectra](https://github.com/sqmw/injectra)。
+- 精确源码映射：Git tag `v0.1.0-mvp`。用 `git rev-list -n 1 v0.1.0-mvp` 获取该交付提交；不因main后续演进而移动既有标识。
+- 核心实现：`ba1e003`；真实豆包兼容性与验证命令：`bc4bff9`；用户验收与仓库初始化历史在交付tag中一并保留。
+- 远端原初始化提交 `5ba11c2` 的Apache-2.0许可证已保留并合入，没有覆盖远端历史。
+- 功能：显式本地CDP页面发现、共享CSS/HTML/JS注入、相同ID更新、受管理清理、macOS标准Electron启动规划。
+- 证据：[自动验证与用户验收](validation.md)、[豆包2.33.5实机报告](compatibility/doubao.md)。
+- 边界：豆包为定制Chromium147，不计作标准Electron覆盖；自动重注入、GUI及WebKit适配未实现；任意JS副作用无法保证完全回滚。
+- 恢复：源码可检出上述tag；运行页面改动使用remove清理；调试启动的应用应正常退出后无参数重启。Git回退本身不撤销正在运行页面中的副作用。
