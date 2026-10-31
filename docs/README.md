@@ -1,13 +1,15 @@
 # 文档导航
 
-默认读取链：根 [AGENTS](../AGENTS.md) → [任务入口](TODO.md) → 当前需要的专题。
+默认读取链：[项目AGENTS](../AGENTS.md) → [任务入口](TODO.md) → 当前需要的一至两个专题 → [代码地图](architecture/code-map.md)。
 
 | 关键词 | 权威文档 |
 | --- | --- |
-| 需求、MVP、分享链接、待确认 | [需求证据](requirements.md) |
-| 分层、插件、设计模式、接口边界 | [架构边界](architecture/boundaries.md) |
-| 模块路径、测试归属、代码导航 | [代码地图](architecture/code-map.md) |
-| 任务、执行、恢复、验收 | [TODO](TODO.md) |
-| 已确定的长期约束 | [决策记录](DECISIONS.md) |
+| 需求、MVP、分享来源、非目标 | [需求](requirements.md) |
+| 分层、插件、设计模式、契约 | [架构](architecture/boundaries.md) |
+| 模块、测试、符号检索 | [代码地图](architecture/code-map.md) |
+| 构建、使用、Bundle、运行数据、恢复 | [开发说明](dev.md) |
+| 验收、兼容性、review、测试边界 | [验证证据](validation.md) |
+| 任务与执行 | [TODO](TODO.md)、[STEPS](STEPS.md) |
+| 长期约束与取舍 | [决策](DECISIONS.md) |
 
-当前没有产品源码。源码出现后同步更新代码地图；可用 `rg --files` 与按关键词的 `rg -n` 定位，不批量读取整个项目。
+`make doc-check`检查本地链接、显式锚点和文档可达性；任务结构通过全局project-tracking-check单独校验。历史从任务关闭索引进入，不默认加载。

@@ -1,23 +1,43 @@
 # Injectra
 
-面向多平台、多种 Web 宿主体系的可插拔注入项目。首个 MVP 聚焦 **macOS 上的 Electron 应用**，各适配复用同一份 Web 注入代码。
+面向桌面 Web UI 的可插拔个性化工具。首个核心版本为 **Rust CLI + macOS Electron/CDP**：向显式开放本地调试端口的单个页面注入 CSS、HTML、JS，再移除受管理改动。当前不提供图形管理器。
 
-当前交付为 Git 与项目文档骨架；尚无可运行产品。分享需求正文尚未取得，注入后实现什么功能、首批应用、注入方式及技术栈均待核对。项目目录位于 Rust 学习路径不构成技术栈决策。
+## 快速入口
 
-## 入口
-
-- [需求与证据边界](docs/requirements.md)
-- [架构边界与模式映射](docs/architecture/boundaries.md)
-- [文档导航](docs/README.md)
-- [任务与恢复上下文](docs/TODO.md)
-
-## 当前检查
-
-前置工具：Git、Make。无需安装产品运行时或依赖。
+工具版本由 [mise.toml](mise.toml) 声明：Rust 1.93.0、Node 24.6.0。已有匹配工具可直接使用；Node 只用于开发验证，编译后的 CLI 不依赖 Node。Rust 与测试依赖分别由 Cargo.lock、tests/package-lock.json 锁定。
 
 ```sh
-make check
+make build
+make run ARGS="--help"
+make run ARGS="targets --port 9222"
 ```
 
-该命令仅执行差异空白检查；真实构建、测试、启动命令在技术栈和 MVP 合同确定后补齐。
-当前未设置 Git 远端、未发布、未修改任何目标应用。没有大型数据集、模型或运行数据需要恢复。
+`targets` 需要目标应用已开放 `127.0.0.1:9222` 的页面调试入口。确认输出中的页面身份后，把下面的 `TARGET_ID` 替换为对应 ID：
+
+```sh
+make run ARGS="apply --port 9222 --target TARGET_ID --bundle examples/accent/manifest.json"
+make run ARGS="remove --port 9222 --target TARGET_ID --id injectra.accent"
+```
+
+示例会添加右下角缩放按钮；再次 apply 替换同 ID 的已有内容；remove 删除拥有的节点并执行脚本登记的清理回调。CLI 成功输出 JSON，失败退出码为 1，参数错误为 2。
+
+## 验证与源码导航
+
+```sh
+make setup-tests   # 安装锁定的测试依赖到仓库外
+make check         # 格式、clippy、Rust/Web 测试、文档与差异检查
+make test-electron # 启动并退出独立 Electron fixture，验证真实注入链路
+```
+
+- [开发与使用](docs/dev.md)：启动规划、脚本约定、缓存及验证边界。
+- [需求与范围](docs/requirements.md)：已核对的分享需求和本轮 MVP 边界。
+- [架构](docs/architecture/boundaries.md) · [代码地图](docs/architecture/code-map.md)。
+- [验收证据](docs/validation.md) · [任务](docs/TODO.md) · [文档入口](docs/README.md)。
+
+## 当前限制
+
+仅连接指定的回环端口与精确页面 ID；不扫描进程、不自动启动/结束用户应用、不改应用包。页面刷新或窗口重建后需重新选择目标并 apply；自动重注入、持久化配置、文件监听、iframe/Shadow DOM 定向适配、WebKit/Tauri 适配尚未实现。
+
+载荷是受信任的本地代码，具有目标页面允许的权限，并非沙箱。任意 JS 副作用只有脚本显式登记清理时才可能撤销；清理失败会报错。更新是先移除旧内容再应用新内容，失败不会自动恢复旧版本。超时/断线表示执行结果不确定，不自动重试。
+
+默认缓存根为 `${XDG_CACHE_HOME:-$HOME/.cache}/injectra`，可用 `INJECTRA_CACHE_DIR` 覆盖。构建、测试依赖、fixture profile/日志放仓库外；仓库只保存源码、锁文件和小样例。没有大型数据集、模型权重或远端部署。

@@ -1,0 +1,114 @@
+use injectra_core::Result;
+use serde::Deserialize;
+use std::{fs, path::Path};
+
+const LIMIT: u64 = 1024 * 1024;
+
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+struct Manifest {
+    version: u32,
+    id: String,
+    css: Option<String>,
+    html: Option<String>,
+    js: Option<String>,
+}
+
+pub struct Bundle {
+    pub id: String,
+    pub css: String,
+    pub html: String,
+    pub js: String,
+}
+
+pub fn validate_id(id: &str) -> Result<()> {
+    if id.is_empty()
+        || id.len() > 80
+        || !id
+            .bytes()
+            .all(|c| c.is_ascii_alphanumeric() || b"._-".contains(&c))
+    {
+        return Err(
+            "bundle id must be 1..80 ASCII letters, digits, dots, underscores or hyphens".into(),
+        );
+    }
+    Ok(())
+}
+
+fn read_small(path: &Path) -> Result<String> {
+    use std::io::Read;
+    let mut text = String::new();
+    fs::File::open(path)?
+        .take(LIMIT + 1)
+        .read_to_string(&mut text)?;
+    if text.len() as u64 > LIMIT {
+        return Err("bundle file exceeds 1 MiB".into());
+    }
+    Ok(text)
+}
+
+impl Bundle {
+    pub fn load(path: &Path) -> Result<Self> {
+        let path = path.canonicalize()?;
+        let manifest: Manifest = serde_json::from_str(&read_small(&path)?)?;
+        if manifest.version != 1 {
+            return Err("unsupported bundle version (expected 1)".into());
+        }
+        validate_id(&manifest.id)?;
+        let root = path.parent().ok_or("bundle has no parent directory")?;
+        let read = |name: Option<String>| -> Result<String> {
+            match name {
+                None => Ok(String::new()),
+                Some(name) => {
+                    if Path::new(&name).is_absolute() {
+                        return Err("bundle assets must be relative paths".into());
+                    }
+                    let asset = root.join(name).canonicalize()?;
+                    if !asset.starts_with(root) {
+                        return Err("bundle asset escapes its directory".into());
+                    }
+                    read_small(&asset)
+                }
+            }
+        };
+        let bundle = Self {
+            id: manifest.id,
+            css: read(manifest.css)?,
+            html: read(manifest.html)?,
+            js: read(manifest.js)?,
+        };
+        if bundle.css.is_empty() && bundle.html.is_empty() && bundle.js.is_empty() {
+            return Err("bundle must contain CSS, HTML or JavaScript".into());
+        }
+        Ok(bundle)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn validates_ids_before_source_generation() {
+        for id in ["", "a/b", "x');throw 1;//", "空"] {
+            assert!(validate_id(id).is_err());
+        }
+        assert!(validate_id("theme.dark-v1").is_ok());
+    }
+
+    #[test]
+    fn shared_bundle_loads_from_repository_example() {
+        let path =
+            Path::new(env!("CARGO_MANIFEST_DIR")).join("../../examples/accent/manifest.json");
+        assert_eq!(Bundle::load(&path).unwrap().id, "injectra.accent");
+    }
+
+    #[test]
+    fn rejects_escaped_assets_and_unknown_versions() {
+        let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../tests/bundles");
+        let escape = Bundle::load(&root.join("escape.json")).err().unwrap();
+        assert!(escape.to_string().contains("escapes"));
+        let version = Bundle::load(&root.join("version.json")).err().unwrap();
+        assert!(version.to_string().contains("unsupported bundle version"));
+    }
+}

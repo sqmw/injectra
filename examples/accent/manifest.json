@@ -1,0 +1,7 @@
+{
+  "version": 1,
+  "id": "injectra.accent",
+  "css": "theme.css",
+  "html": "panel.html",
+  "js": "behavior.js"
+}

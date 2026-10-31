@@ -1,0 +1,11 @@
+{
+  "name": "injectra-validation",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=24" },
+  "devDependencies": {
+    "electron": "45.2.1",
+    "jsdom": "26.1.0"
+  }
+}
