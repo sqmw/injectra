@@ -4,6 +4,30 @@ main 分支为唯一权威来源；Parent 为当前 Codex 主窗口，single-wri
 
 ## 已关闭任务
 
+<a id="t-003"></a>
+### T-003 · 豆包 Electron 兼容性验证
+
+```tracking-task
+{
+  "id": "T-003",
+  "name": "豆包 Electron 兼容性验证",
+  "version": "v1",
+  "mode": "lightweight",
+  "status": "done",
+  "goal": "以本机已安装豆包验证Injectra核心链路，并如实识别其宿主和接入边界。",
+  "scope": "应用版本/宿主识别、调试入口探测、真实页面CSS/HTML/JS注入与清理、兼容性记录；优先独立profile，不改包或账号操作。",
+  "acceptance": "给出有证据的宿主类型和CDP可达性结论；可达则验证发现、注入、交互、重复应用与清理；不可达保留失败证据及具体阻塞；记录运行副作用和恢复状态。",
+  "execution_ref": "archive/T-003.md#t-003",
+  "acceptance_evidence": [
+    "已识别为豆包2.33.5定制Chromium147，非标准Electron；现有CLI真实页面注入、交互、更新与清理通过，原调试端口关闭并恢复正常豆包。详见compatibility/doubao.md及归档执行。"
+  ],
+  "unplanned_reason": "用户指定真实豆包兼容性验证。"
+}
+```
+
+名称沿用任务建立时的用户目标；实测宿主已纠正为定制Chromium，不计作标准Electron。
+[实测报告](compatibility/doubao.md) · [执行记录](archive/T-003.md#t-003)
+
 <a id="t-002"></a>
 ### T-002 · macOS Electron 注入核心 MVP
 

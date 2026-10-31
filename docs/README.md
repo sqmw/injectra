@@ -9,6 +9,7 @@
 | 模块、测试、符号检索 | [代码地图](architecture/code-map.md) |
 | 构建、使用、Bundle、运行数据、恢复 | [开发说明](dev.md) |
 | 验收、兼容性、review、测试边界 | [验证证据](validation.md) |
+| 豆包、真实产品、Chromium接入 | [豆包兼容性](compatibility/doubao.md) |
 | 任务与执行 | [TODO](TODO.md)、[STEPS](STEPS.md) |
 | 长期约束与取舍 | [决策](DECISIONS.md) |
 

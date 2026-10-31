@@ -1,4 +1,4 @@
-.PHONY: help check build test test-web test-electron setup-tests run fmt doc-check
+.PHONY: help check build test test-web test-electron verify-live setup-tests run fmt doc-check
 
 help:
 	@printf '%s\n' 'make setup-tests: install locked test tools outside the repository' 'make check: format, lint, Rust/Web tests and docs' 'make build: build CLI' 'make test-electron: isolated macOS Electron smoke test' 'make run ARGS="--help": run CLI'
@@ -25,6 +25,9 @@ setup-tests:
 
 test-electron: build
 	node scripts/electron-smoke.mjs
+
+verify-live: build
+	node scripts/verify-live.mjs $(ARGS)
 
 run:
 	sh scripts/cargo.sh run --locked -p injectra-cli -- $(ARGS)

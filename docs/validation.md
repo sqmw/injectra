@@ -15,7 +15,8 @@
 
 - 真实注入发生在本项目启动的独立Electron fixture，未修改或接入用户正在使用的应用。
 - 地址/能力拒绝与部分异常路径来自测试替身；不冒充所有真实应用都已验证。
-- 没有跨引擎、其他OS、第三方应用版本、复杂iframe/Shadow DOM、受限CSP、导航重注入或长期会话证据。
+- 追加真实产品证据：[豆包2.33.5兼容性](compatibility/doubao.md)，定制Chromium 147真实chat页面通过；不计作标准Electron覆盖。
+- 没有WebKit、其他OS、复杂iframe/Shadow DOM、受限CSP、导航重注入或长期会话证据。
 - 单元测试和文档检查不证明任意JS完全可回滚；生命周期与结果未知边界见[开发说明](dev.md)。
 
 ## 调整与review记录

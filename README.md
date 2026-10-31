@@ -33,6 +33,7 @@ make test-electron # 启动并退出独立 Electron fixture，验证真实注入
 - [需求与范围](docs/requirements.md)：已核对的分享需求和本轮 MVP 边界。
 - [架构](docs/architecture/boundaries.md) · [代码地图](docs/architecture/code-map.md)。
 - [验收证据](docs/validation.md) · [任务](docs/TODO.md) · [文档入口](docs/README.md)。
+- [豆包真实应用实测](docs/compatibility/doubao.md)：2.33.5定制Chromium宿主通过CLI注入与清理；现有核心无需修改。
 
 ## 当前限制
 

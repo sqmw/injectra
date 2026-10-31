@@ -15,4 +15,5 @@
 | 示例载荷 | [manifest](../../examples/accent/manifest.json)、[behavior](../../examples/accent/behavior.js) | Web页面与清理回调 | 同上 |
 | 工程入口 | [Makefile](../../Makefile)、[cargo.sh](../../scripts/cargo.sh)、[测试环境](../../scripts/test-env.mjs) | 外部缓存，不污染同步工作区 | make check；[开发](../dev.md) |
 | 测试工具 | [setup-tests](../../scripts/setup-tests.mjs)、[锁文件](../../tests/package-lock.json)、[fixture](../../tests/electron/main.cjs) | 自有测试进程与profile | make test-electron；[验证](../validation.md) |
+| 真实应用验证 | [verify-live](../../scripts/verify-live.mjs)：精确目标上的CLI注入、断言、自有面板截图与清理 | 不管理用户进程，只接入显式端口/页面 | make verify-live；[豆包实测](../compatibility/doubao.md) |
 | 文档检查 | [check-docs](../../scripts/check-docs.mjs) | 相对链接/显式锚点/可达性 | make doc-check，不证明业务正确性 |
