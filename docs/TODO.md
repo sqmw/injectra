@@ -4,6 +4,29 @@ main 分支为唯一权威来源；Parent 为当前 Codex 主窗口，single-wri
 
 ## 已关闭任务
 
+<a id="t-006"></a>
+### T-006 · Xmind 架构图排版演示
+
+```tracking-task
+{
+  "id": "T-006",
+  "name": "Xmind 架构图排版演示",
+  "version": "v1",
+  "mode": "lightweight",
+  "status": "done",
+  "goal": "在用户打开的Xmind中，以保留原图的方式演示可读的模块结构与runtime注入路径。",
+  "scope": "通过Xmind界面新建或复制演示画布并排版；仅新增副本/演示，不覆盖原图，不改产品代码。",
+  "acceptance": "原画布保留；演示画布可见、结构及当前执行路径可读；核对界面结果并记录保存状态。",
+  "execution_ref": "archive/T-006.md#t-006",
+  "acceptance_evidence": [
+    "已通过Xmind界面制作01·模块结构（22主题、六层逻辑图）及02·runtime路径（7主题、5条直线箭头）；原画布40主题保留；另存演示文件，UI无Edited标识且文件存在；review、文档及任务检查通过。"
+  ],
+  "unplanned_reason": "用户明确要求直接操作当前打开的Xmind进行演示。"
+}
+```
+
+[界面操作与review证据](archive/T-006.md#t-006)
+
 <a id="t-005"></a>
 ### T-005 · runtime 注入产品边界校准
 
