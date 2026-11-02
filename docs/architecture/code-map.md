@@ -7,7 +7,7 @@
 | 核心契约 | [core](../../crates/core/src/lib.rs)：Engine/Session/Target/Capability | 不依赖具体适配；只编排能力检查 | 内联假Session测试；[架构](boundaries.md) |
 | 载荷加载 | [bundle.rs](../../crates/payload/src/bundle.rs)：版本、路径和资源限制 | 本地manifest → Bundle | 内联loader测试、[负例](../../tests/bundles/escape.json)；[使用](../dev.md) |
 | 程序生成 | [payload](../../crates/payload/src/lib.rs)：共享runtime嵌入、数据序列化 | Bundle → JS程序 | Electron端到端测试 |
-| Web生命周期 | [runtime.js](../../web/runtime.js)：拥有节点、清理、重复/并发注入 | 只用Web能力，无平台判断 | [runtime.test.mjs](../../tests/runtime.test.mjs) |
+| 共享注入执行 | [runtime.js](../../web/runtime.js)：拥有节点、清理、重复/并发注入 | 单次注入及既有辅助行为；无平台判断或导航恢复 | [runtime.test.mjs](../../tests/runtime.test.mjs) |
 | CDP发现 | [discovery.rs](../../crates/cdp/src/discovery.rs)：本地HTTP发现 | CDP页面 → 核心Target | Electron发现实测 |
 | CDP连接执行 | [session.rs](../../crates/cdp/src/session.rs)、[Engine](../../crates/cdp/src/lib.rs) | WebSocket/CDP → Session | 内联地址/关联/错误测试；Electron实测 |
 | macOS平台 | [platform-macos](../../crates/platform-macos/src/lib.rs)：.app启动规划 | 路径 → LaunchPlan；无进程管理 | Electron.app规划实测 |

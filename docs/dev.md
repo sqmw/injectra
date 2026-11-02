@@ -1,5 +1,7 @@
 # 开发与核心使用
 
+当前仅提供runtime注入能力，完整职责见[产品边界](requirements.md)。使用者编写载荷并处理应用控件、重渲染覆盖和再次注入；本页的remove及清理回调是既有辅助接口，不是任意JS撤销或一键回滚承诺。
+
 ## 环境与构建
 
 版本入口：[mise.toml](../mise.toml)。已有匹配Rust/Node即可运行；使用mise管理时先按其正常信任与安装流程准备工具。`make build`构建debug CLI，`make run ARGS="--help"`显示命令。交付二进制无需Node；Node与Electron只服务开发测试。
@@ -21,7 +23,7 @@ Electron官方列出了[remote-debugging-port](https://www.electronjs.org/docs/l
 
 [示例manifest](../examples/accent/manifest.json)包含`version:1`、唯一`id`和可选`css`/`html`/`js`相对文件名，至少一个非空。ID限1–80个ASCII字母、数字、点、下划线或连字符；未知字段、未知版本、绝对资源路径、解析后逃出manifest目录的路径/符号链接均拒绝。单文件上限1 MiB。
 
-JS文件作为async函数体执行，可使用`context.root`访问本bundle插入的HTML容器，通过`context.onCleanup(callback)`登记清理。没有HTML时root为null。先登记清理，再执行可撤销副作用；回调按逆序执行。HTML中的script标签不作为脚本加载机制，行为代码放JS文件；HTML事件属性等仍属于受信任代码，不进行净化。
+JS文件作为async函数体执行，可使用`context.root`访问本bundle插入的HTML容器；没有HTML时root为null。可选的既有接口`context.onCleanup(callback)`由载荷作者登记清理，回调按逆序执行；需要使用时先登记，再执行对应副作用，不要求所有脚本可撤销。HTML中的script标签不作为脚本加载机制，行为代码放JS文件；HTML事件属性等仍属于受信任代码，不进行净化。
 
 CSS/HTML以JSON数据嵌入共享程序，任意引号不应改变生成程序结构；JS作为显式执行源码。本版本不是沙箱，不允许把未知来源载荷当成安全主题。CSS也可能发起资源请求或影响其他模块；不同ID的所有权分离不等于样式隔离。
 
@@ -31,7 +33,7 @@ CSS/HTML以JSON数据嵌入共享程序，任意引号不应改变生成程序�
 - remove移除拥有的节点并调用登记回调；任意网络、持久化、第三方状态变化不能自动撤销。
 - cleanup报错仍尝试其余回调并移除节点，但已经失败的清理不自动重试。必须按错误核对页面，不能把下一次`absent`视为所有副作用已撤销。
 - 超时/断线时执行结果未知，脚本可能仍在运行；不自动重放。重新核对页面状态后再决定清理或重载。
-- 页面刷新或重建需手动重注入；React/Vue更新可能覆盖节点，当前没有自动DOM守护。
+- 页面刷新或重建后，由使用者决定并手动重注入；React/Vue更新覆盖节点等应用行为由载荷作者处理，自动DOM守护不属当前职责。
 
 ## 测试与运行数据
 

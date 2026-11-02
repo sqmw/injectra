@@ -4,6 +4,27 @@ main 分支为唯一权威来源；Parent 为当前 Codex 主窗口，single-wri
 
 ## 已关闭任务
 
+<a id="t-005"></a>
+### T-005 · runtime 注入产品边界校准
+
+```tracking-task
+{
+  "id": "T-005",
+  "name": "runtime 注入产品边界校准",
+  "version": "v1",
+  "mode": "lightweight",
+  "status": "done",
+  "goal": "按用户批注与定位图片统一当前产品为代码注入工具／核心，仅交付runtime注入能力。",
+  "scope": "项目定位、需求、架构职责、使用与验收说明、导航及决策记录；不修改源码、命令行为或历史验收证据。",
+  "acceptance": "当前注入合同、使用者责任、后续候选方向明确且跨文档一致；已有清理接口仅记为实现事实；review、文档与任务结构检查通过。",
+  "execution_ref": "archive/T-005.md#t-005",
+  "acceptance_evidence": ["定位、责任及当前验收已统一，D-003记录用户纠正；review、make doc-check、任务结构检查与git diff --check通过；仅Markdown变更。"],
+  "unplanned_reason": "用户纠正产品范围并明确要求同步文档与当前产品边界。"
+}
+```
+
+[产品边界](requirements.md) · [执行与review证据](archive/T-005.md#t-005)
+
 <a id="t-004"></a>
 ### T-004 · MVP 验收收口与仓库推送
 

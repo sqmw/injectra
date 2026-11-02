@@ -10,6 +10,7 @@
 
 ## 项目约束
 
+- 当前定位为代码注入工具／核心，仅做runtime注入：接入正确页面、执行用户提供的JS/HTML/CSS、明确结果与失败。使用者负责载荷及应用界面适配；pre-runtime、管理平台、Agent、自动恢复和任意JS撤销不属当前交付。完整责任边界见[需求](docs/requirements.md)。
 - MVP 首个支持组合是 macOS + Electron 宿主；不据此推定 Injectra 自身使用 Electron 构建。
 - 共享 Web 注入代码保留单一来源；平台、宿主体系、目标应用差异分别隔离，禁止复制成各平台版本。
 - 当前采用Rust CLI + CDP；需求和边界见docs/requirements.md。不得把接口设计或测试替身当成真实应用兼容性证明。

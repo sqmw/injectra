@@ -4,7 +4,7 @@
 
 | 关键词 | 权威文档 |
 | --- | --- |
-| 需求、MVP、分享来源、非目标 | [需求](requirements.md) |
+| 产品定位、runtime/pre-runtime、责任边界、需求来源、非目标 | [需求](requirements.md) |
 | 分层、插件、设计模式、契约 | [架构](architecture/boundaries.md) |
 | 模块、测试、符号检索 | [代码地图](architecture/code-map.md) |
 | 构建、使用、Bundle、运行数据、恢复 | [开发说明](dev.md) |
