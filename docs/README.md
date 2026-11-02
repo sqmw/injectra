@@ -6,6 +6,7 @@
 | --- | --- |
 | 产品定位、runtime/pre-runtime、责任边界、需求来源、非目标 | [需求](requirements.md) |
 | 分层、插件、设计模式、契约 | [架构](architecture/boundaries.md) |
+| 长期路线、仓库结构、扩展障碍、重构时机（候选评估） | [扩展架构评估](architecture/evolution-assessment.md) |
 | 模块、测试、符号检索 | [代码地图](architecture/code-map.md) |
 | 构建、使用、Bundle、运行数据、恢复 | [开发说明](dev.md) |
 | 验收、兼容性、review、测试边界 | [验证证据](validation.md) |

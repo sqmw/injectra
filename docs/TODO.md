@@ -4,6 +4,29 @@ main 分支为唯一权威来源；Parent 为当前 Codex 主窗口，single-wri
 
 ## 已关闭任务
 
+<a id="t-007"></a>
+### T-007 · 长期扩展架构适配评估
+
+```tracking-task
+{
+  "id": "T-007",
+  "name": "长期扩展架构适配评估",
+  "version": "v1",
+  "mode": "lightweight",
+  "status": "done",
+  "goal": "评估当前仓库是否能承接多平台、多Web运行时及未来原生/内存注入，给出有证据的结构调整必要性和时机。",
+  "scope": "现有模块、依赖、接口、构建与测试结构的只读审阅；新增评估报告及任务导航，不实施源码重构或新增后端。",
+  "acceptance": "给出保留项、扩展障碍、调整优先级/触发条件/代价及验收方法；分清已证实结构与未验证兼容性；报告和任务检查通过。",
+  "execution_ref": "archive/T-007.md#t-007",
+  "acceptance_evidence": [
+    "已完成5个crate、共享Web和构建测试入口审阅；offline Cargo metadata证实依赖方向；报告列出A-01至A-05、条件化调整顺序及验收；review和文档/任务检查通过。仅形成候选评估，无源码重构或新增兼容性结论。"
+  ],
+  "unplanned_reason": "用户在明确长期发展路线后要求评估当前仓库结构。"
+}
+```
+
+[评估报告](architecture/evolution-assessment.md) · [执行与review证据](archive/T-007.md#t-007)
+
 <a id="t-006"></a>
 ### T-006 · Xmind 架构图排版演示
 
