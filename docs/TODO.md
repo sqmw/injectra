@@ -4,6 +4,30 @@ main 分支为唯一权威来源；Parent 为当前 Codex 主窗口，single-wri
 
 ## 已关闭任务
 
+<a id="t-011"></a>
+### T-011 · Figma CDP 验证结果归档
+
+```tracking-task
+{
+  "id": "T-011",
+  "name": "Figma CDP 验证结果归档",
+  "version": "v1",
+  "mode": "lightweight",
+  "status": "done",
+  "goal": "将侧会话Figma接入与黑屏排查证据归档，明确仍复用现有CDP注入实现。",
+  "scope": "新增Figma兼容性报告与归档执行，补充导航和验证入口；不改产品代码、安装包、历史普查结果或应用进程，不推送。",
+  "acceptance": "入口条件、外壳注入、在线页面恢复及未验证范围分开记录；根因推断不过度承诺；历史证据保留；完成review、文档和任务校验并独立本地提交。",
+  "execution_ref": "archive/T-011.md#t-011",
+  "acceptance_evidence": [
+    "已核对三个独立run摘要；明确CDP分类、内部开关副作用、首轮实际点击、重开黑屏和代理加重启后的登录页证据；不回填全组基线通过统计。",
+    "自审、make doc-check、project-tracking-check及git diff --check通过；本记录所在独立提交仅含文档，不重跑真实应用或扩大兼容性结论。"
+  ],
+  "unplanned_reason": "2026-11-03用户要求先提交本侧会话结果；本任务只负责归档，保留SIDE-FIGMA-001各次实测身份。"
+}
+```
+
+[兼容性报告](compatibility/figma.md) · [执行及review](archive/T-011.md#t-011)
+
 <a id="t-010"></a>
 ### T-010 · 抖音与双宿主 CDP 接入排查
 
