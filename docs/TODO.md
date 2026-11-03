@@ -2,7 +2,7 @@
 
 main 分支为唯一权威来源；Parent 为当前 Codex 主窗口，single-writer。
 
-## 当前任务
+## 已关闭任务
 
 <a id="t-008"></a>
 ### T-008 · 长期注入架构基础重构
@@ -13,20 +13,20 @@ main 分支为唯一权威来源；Parent 为当前 Codex 主窗口，single-wri
   "name": "长期注入架构基础重构",
   "version": "v1",
   "mode": "staged",
-  "status": "in_progress",
+  "status": "done",
   "goal": "现在建立跨执行域注入基础，迁移现有CDP Web能力，并以原生契约测试证明长期扩展位置。",
   "scope": "core/Web/native/application契约及用例、CDP迁移、平台宿主拆分、兼容回归、架构与任务文档；不实现真实原生后端或跨平台兼容。",
   "acceptance": "公共core无Web/JSON/系统实现依赖；后端实例身份隔离；Web页面与原生内存契约分离；部分操作和执行未知准确；CLI及manifest兼容；make check、Electron及独立构建/依赖检查通过；review与分步提交可追溯。",
   "priority": "P1",
   "unplanned_reason": "用户批准并明确要求实施长期架构基础重构计划。",
-  "execution_ref": "STEPS.md#t-008",
-  "acceptance_evidence": []
+  "execution_ref": "archive/T-008.md#t-008",
+  "acceptance_evidence": [
+    "8 crate长期执行域架构落实；目标身份/能力/错误确定性、独立原生内存契约、平台宿主拆分及兼容迁移完成。16 Rust、5 Web、真实Electron10核心项及兼容断言、独立构建与架构依赖门通过；自审完成，三阶段提交可追溯。原生仅契约与测试缓冲区。"
+  ]
 }
 ```
 
-[恢复上下文](agent-context/tasks/T-008.md) · [步骤与执行](STEPS.md#t-008)
-
-## 已关闭任务
+[验收报告](validation/architecture-foundation.md) · [执行与review证据](archive/T-008.md#t-008) · [关闭上下文](archive/T-008-context.md)
 
 <a id="t-007"></a>
 ### T-007 · 长期扩展架构适配评估

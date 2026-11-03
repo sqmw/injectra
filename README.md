@@ -31,7 +31,7 @@ make run ARGS="remove --port 9222 --target TARGET_ID --id injectra.accent"
 
 ```sh
 make setup-tests   # 安装锁定的测试依赖到仓库外
-make check         # 格式、clippy、Rust/Web 测试、文档与差异检查
+make check         # 格式、clippy、Rust/Web 测试、架构依赖、文档与差异检查
 make test-electron # 启动并退出独立 Electron fixture，验证真实注入链路
 ```
 

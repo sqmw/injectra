@@ -64,6 +64,9 @@ try {
   assert.ok(page, `fixture not ready: ${log}`);
   const discovered = cli(["targets", "--port", String(port)]);
   assert.ok(discovered.some(target => target.id === page.id));
+  for (const target of discovered) assert.deepEqual(Object.keys(target).sort(), ["id", "title", "url"]);
+  assert.match(cli(["targets", "--port", "0"], 1), /^injectra: /);
+  assert.match(cli(["apply"], 2), /--port/);
   socket = new WebSocket(page.webSocketDebuggerUrl);
   await once(socket, "open");
   const flags = ["--port", String(port), "--target", page.id];
@@ -90,6 +93,8 @@ try {
   const appPath = resolve(electron, "../../..");
   const plan = cli(["launch-plan", "--app", appPath, "--port", String(port)]);
   assert.equal(plan.executable, electron);
+  assert.deepEqual(Object.keys(plan).sort(), ["arguments", "executable", "note"]);
+  assert.deepEqual(plan.arguments, [`--remote-debugging-port=${port}`, "--remote-debugging-address=127.0.0.1"]);
   const version = await fetch(`http://127.0.0.1:${port}/json/version`).then(r => r.json());
   const evidence = { passed: true, platform: process.platform, arch: process.arch, electron: requireTool("electron/package.json").version,
     browser: version.Browser, checks: ["discovery", "CSS computed style", "HTML mount", "JS interaction", "replace without duplicates", "cleanup", "absent removal", "missing target rejection", "script failure cleanup", "macOS launch plan"] };

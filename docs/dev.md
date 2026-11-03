@@ -39,7 +39,7 @@ CSS/HTML以JSON数据嵌入共享程序，任意引号不应改变生成程序�
 
 ## 测试与运行数据
 
-`make setup-tests`把tests的锁文件复制到外部测试工具目录，再执行npm ci；`make check`运行静态检查、Rust/Web测试、文档检查；`make test-electron`创建独立隐藏Electron窗口并验证真实UI状态，结束时只退出自己启动的fixture。
+`make setup-tests`把tests的锁文件复制到外部测试工具目录，再执行npm ci；`make architecture-check`通过离线Cargo元数据检查执行域依赖；`make check`运行静态检查、Rust/Web测试、文档检查；`make test-electron`创建独立隐藏Electron窗口并验证真实UI状态，结束时只退出自己启动的fixture。
 
 默认缓存根`${XDG_CACHE_HOME:-$HOME/.cache}/injectra`：`cargo-target/`构建产物，`test-tools/`锁定测试依赖，`runs/electron-*/`每次验证的profile、electron.log和result.json。`INJECTRA_CACHE_DIR`可整体覆盖；`CARGO_TARGET_DIR`可单独覆盖构建位置。覆盖路径仍应选仓库及同步目录之外。
 

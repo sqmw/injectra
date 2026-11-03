@@ -100,6 +100,10 @@ fn identity_capability_and_target_width_reject_before_backend_calls() {
         ErrorKind::Unsupported
     );
     s.caps = vec![MEMORY_READ];
+    let denied = write_memory(&mut s, &target, TargetAddress(0), &[1]).unwrap_err();
+    assert_eq!(denied.error.kind, ErrorKind::Unsupported);
+    assert_eq!(denied.error.certainty, Certainty::NotExecuted);
+    assert!(s.bytes.iter().all(|b| *b == 0));
     assert!(read_memory(&mut s, &target, TargetAddress(1u64 << 32), 1).is_err());
     assert!(read_memory(&mut s, &target, TargetAddress(u32::MAX.into()), 2).is_err());
     assert_eq!(s.calls, 0);

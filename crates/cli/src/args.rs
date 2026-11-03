@@ -4,7 +4,7 @@ use std::path::PathBuf;
 #[derive(Parser)]
 #[command(
     version,
-    about = "Injectra: local Web UI customization for accessible Electron pages"
+    about = "Injectra: runtime Web code injection into accessible pages"
 )]
 pub struct Args {
     #[command(subcommand)]

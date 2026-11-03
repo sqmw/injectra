@@ -1,9 +1,9 @@
-.PHONY: help check build test test-web test-electron verify-live setup-tests run fmt doc-check
+.PHONY: help check build test test-web test-electron verify-live setup-tests run fmt doc-check architecture-check
 
 help:
 	@printf '%s\n' 'make setup-tests: install locked test tools outside the repository' 'make check: format, lint, Rust/Web tests and docs' 'make build: build CLI' 'make test-electron: isolated macOS Electron smoke test' 'make run ARGS="--help": run CLI'
 
-check: doc-check
+check: doc-check architecture-check
 	git diff --check
 	git diff --cached --check
 	sh scripts/cargo.sh fmt --all -- --check
@@ -37,3 +37,6 @@ fmt:
 
 doc-check:
 	node scripts/check-docs.mjs
+
+architecture-check:
+	node scripts/check-architecture.mjs
