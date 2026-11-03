@@ -34,7 +34,10 @@ pub fn launch_plan(app: &Path, port: u16) -> Result<LaunchPlan> {
     if !output.status.success() {
         return Err("cannot read CFBundleExecutable from Info.plist".into());
     }
-    let name = String::from_utf8(output.stdout)?;
+    let name = String::from_utf8(output.stdout).map_err(|e| {
+        injectra_core::Error::prepare(injectra_core::ErrorKind::InvalidInput, e.to_string())
+            .caused_by(e)
+    })?;
     let name = name.trim();
     if name.is_empty() || name.contains('/') || name == "." || name == ".." {
         return Err("invalid bundle executable name".into());

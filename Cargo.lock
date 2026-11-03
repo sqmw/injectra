@@ -345,10 +345,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "injectra-application"
+version = "0.1.0"
+dependencies = [
+ "injectra-core",
+ "injectra-web",
+ "serde_json",
+]
+
+[[package]]
 name = "injectra-cdp"
 version = "0.1.0"
 dependencies = [
  "injectra-core",
+ "injectra-web",
  "serde",
  "serde_json",
  "tungstenite",
@@ -361,10 +371,11 @@ name = "injectra-cli"
 version = "0.1.0"
 dependencies = [
  "clap",
+ "injectra-application",
  "injectra-cdp",
  "injectra-core",
- "injectra-payload",
  "injectra-platform-macos",
+ "injectra-web",
  "serde",
  "serde_json",
 ]
@@ -372,19 +383,6 @@ dependencies = [
 [[package]]
 name = "injectra-core"
 version = "0.1.0"
-dependencies = [
- "serde",
- "serde_json",
-]
-
-[[package]]
-name = "injectra-payload"
-version = "0.1.0"
-dependencies = [
- "injectra-core",
- "serde",
- "serde_json",
-]
 
 [[package]]
 name = "injectra-platform-macos"
@@ -392,6 +390,15 @@ version = "0.1.0"
 dependencies = [
  "injectra-core",
  "serde",
+]
+
+[[package]]
+name = "injectra-web"
+version = "0.1.0"
+dependencies = [
+ "injectra-core",
+ "serde",
+ "serde_json",
 ]
 
 [[package]]

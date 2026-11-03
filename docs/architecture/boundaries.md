@@ -6,37 +6,29 @@ Injectra当前是runtime代码注入工具／核心；产品责任以[需求](..
 
 ## 分层与依赖
 
-实现选择见 [D-002](../DECISIONS.md#d-002)，首发和共享代码约束见 [D-001](../DECISIONS.md#d-001)。当前没有冻结基线。
+长期架构决策见[D-004](../DECISIONS.md#d-004)。T-008分步迁移中，第一阶段已形成以下依赖；原生契约与平台/宿主拆分在后续步骤完成，不宣称已有真实原生支持。
 
 ```text
-CLI（组合入口）
- ├── core：Target / Engine / Session / Capability / execute
- ├── payload：本地Bundle → 共享Web程序
- ├── cdp：Engine/Session的CDP实现 → 本地Electron页面
- └── platform-macos：标准.app识别 → 启动参数规划
-payload ──→ web/runtime.js（同一份JS，编译时嵌入）
-cdp / payload / platform-macos ──→ core
-core 不依赖上述任何实现模块
+CLI -> application / cdp / platform-macos
+application -> web / core
+cdp -> web / core
+web -> core + 唯一web/runtime.js
+core -> 无项目内crate，无serde_json或操作系统实现依赖
 ```
 
-| 边界 | 输入 → 输出 | 替换与限制 |
-| --- | --- | --- |
-| core | 目标身份、脚本源 → 能力检查与执行结果 | 定义窄契约，不识别Electron、OS路径或应用名称 |
-| payload + Web runtime | manifest、CSS/HTML/JS → 一个可执行程序 | 所有未来适配消费同一程序；无需按平台复制 |
-| cdp | 回环端口、页面ID → targets、Session、结果 | 仅实现当前声明的JS执行能力；拒绝浏览器主进程端点和跨地址跳转 |
-| platform-macos | 标准.app路径、端口 → LaunchPlan | 只读规划，不管理用户进程；原生接入与协议能力分离 |
-| CLI | 命令与文件参数 → JSON/退出码 | 仅装配与调用；无业务状态、应用名分支表 |
-| 使用者载荷 | 局部选择器、样式和脚本 → 页面效果 | 由使用者维护；examples只用于示例与验收，不形成应用适配目录 |
-
-未来 WebKit、协作式宿主接口或其他接入方式须实现契约并声明能力。不因“界面是Web”就承诺可连接，也不强迫不同平台实现虚假的同一组能力。
+- core：后端实例身份、目标引用、能力与错误确定性，不包含URL或源码执行方法。
+- web：WebTarget/页面上下文、WebBackend/WebSession与原payload的manifest和程序生成。
+- application：可复用Web注入用例，连接前核对身份，执行前核对会话目标及页面能力；CLI仅装配。
+- cdp：当前唯一真实页面后端；本地端口及页面端点限制保留。
+- platform-macos：第一阶段保留已有只读规划，后续拆开系统解析和宿主规则。
 
 ## 数据表示与单次注入行为
 
 下列内容描述已有实现，不要求扩展自动恢复或任意JS撤销。web/runtime.js是共享注入执行程序；其节点记录与清理逻辑不代表应用生命周期管理平台。
 
-- Target：id/title/url，是用户选择与错误定位依据；CDP WebSocket 地址留在适配器内部。
+- TargetRef：后端实例身份＋目标key；WebTarget另有title/url与页面上下文。CLI仍只输出原有id/title/url，内部身份不进入兼容JSON。
 - Bundle：version/id/相对资源路径；CSS/HTML 以 JSON 编码作为数据，JS 明确作为可执行源码。
-- Session：能力查询与JS执行；当前CLI一次操作建立一次连接，完成后释放。不会自动重试副作用操作。
+- WebSession：页面能力查询与JS执行；当前CLI一次操作建立一次连接，完成后释放。不会自动重试副作用操作。
 - Web runtime：页面内按bundle id记录拥有的DOM节点和清理回调；同ID并发操作拒绝，不同ID分别记录。
 - 更新：清理旧版 → 创建节点 → 执行JS → 登记成功。创建/执行失败时清理本次拥有的节点与已登记回调；不能保证撤销任意JS，不能保证恢复旧版。
 - 超时/断线：结果未知；页面内脚本可能仍在执行，不因错误返回就宣称无副作用。
@@ -47,9 +39,9 @@ core 不依赖上述任何实现模块
 
 | 模式/原则 | 当前落实 | 边界 |
 | --- | --- | --- |
-| Adapter | CdpEngine/CdpSession实现核心契约 | 协议和错误留在适配器；不返回假成功 |
-| Bridge / 依赖倒置 | Web程序与执行宿主解耦，核心只依赖Session | 目前只有一个真实运行时，未来替换成本仍需第二适配验证 |
-| Strategy | Engine作为可替换执行入口 | 当前只有CDP实现，不构造无用的策略注册系统 |
+| Adapter | CdpBackend/CdpSession实现Web域契约 | 协议和错误留在适配器；不返回假成功 |
+| Bridge / 依赖倒置 | Web程序与执行宿主解耦，应用用例只依赖Web契约 | 目前只有一个真实运行时，未来替换成本仍需第二适配验证 |
+| Strategy | WebBackend作为可替换接入入口 | 当前只有CDP实现，不构造无用的策略注册系统 |
 | 组合根 | CLI显式装配适配与载荷 | 不引入全局服务定位器或导入时副作用 |
 | 单一职责 | 按核心、载荷、协议、平台、CLI拆crate | 不把.app识别、manifest或DOM代码塞进核心 |
 

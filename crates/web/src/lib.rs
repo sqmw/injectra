@@ -1,6 +1,8 @@
 //! Bundle loading and compilation share one browser runtime across all engines.
 mod bundle;
+mod contracts;
 pub use bundle::Bundle;
+pub use contracts::{PAGE_EVALUATE, PageContext, WebBackend, WebSession, WebTarget};
 
 use injectra_core::Result;
 use serde_json::json;
@@ -14,7 +16,7 @@ pub fn apply(bundle: &Bundle) -> Result<String> {
     // Never interpolate those data fields into executable JavaScript literals.
     Ok(format!(
         "({RUNTIME})({}, async (context) => {{\n{}\n}})",
-        serde_json::to_string(&request)?,
+        serde_json::to_string(&request).expect("request contains only strings"),
         bundle.js
     ))
 }

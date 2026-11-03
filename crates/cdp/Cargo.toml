@@ -7,6 +7,7 @@ publish.workspace = true
 
 [dependencies]
 injectra-core.workspace = true
+injectra-web.workspace = true
 serde.workspace = true
 serde_json.workspace = true
 tungstenite = { version = "0.30", default-features = false, features = ["handshake"] }

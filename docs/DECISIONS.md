@@ -1,5 +1,33 @@
 # 决策记录
 
+<a id="d-004"></a>
+## D-004 · 长期注入基础与执行域隔离
+
+```tracking-decision
+{
+  "id": "D-004",
+  "date": "2026-11-03",
+  "status": "accepted",
+  "conclusion": "长期扩展边界现在建立：公共core去Web化，Web/native分域，application注入后端，系统与宿主分离；本轮迁移现有CDP并验证原生契约，不实现真实原生后端。",
+  "trigger": "用户否定以暂时目标推迟架构边界，选定骨架与契约验证并明确批准实施完整计划。",
+  "context": "T-008@v1；起始990967b；无冻结基线；D-003当前runtime产品边界继续有效。",
+  "affects": [
+    "core/Web/native/application契约",
+    "适配器和宿主依赖",
+    "架构与验证入口"
+  ],
+  "alternatives": [
+    "等原生后端到来再消除核心Web假设：用户明确不接受",
+    "所有后端共用万能evaluate或内存方法：执行语义不相同",
+    "本轮实现真实Frida/内存注入：超出选定范围"
+  ],
+  "commit": "本条所在提交",
+  "supersedes": []
+}
+```
+
+术语映射：原Engine/Session/Target迁为WebBackend/WebSession/WebTarget；原payload职责归入web；通用目标身份为TargetRef。当前CLI与manifest v1保持兼容；内部Rust API允许迁移。分步提交回退；不覆盖MVP或已有实测证据。
+
 <a id="d-003"></a>
 ## D-003 · runtime 注入工具定位与责任边界
 

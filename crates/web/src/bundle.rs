@@ -1,4 +1,4 @@
-use injectra_core::Result;
+use injectra_core::{Error, ErrorKind, Result};
 use serde::Deserialize;
 use std::{fs, path::Path};
 
@@ -50,7 +50,8 @@ fn read_small(path: &Path) -> Result<String> {
 impl Bundle {
     pub fn load(path: &Path) -> Result<Self> {
         let path = path.canonicalize()?;
-        let manifest: Manifest = serde_json::from_str(&read_small(&path)?)?;
+        let manifest: Manifest = serde_json::from_str(&read_small(&path)?)
+            .map_err(|e| Error::prepare(ErrorKind::InvalidInput, e.to_string()).caused_by(e))?;
         if manifest.version != 1 {
             return Err("unsupported bundle version (expected 1)".into());
         }

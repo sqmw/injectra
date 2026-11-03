@@ -1,38 +1,41 @@
 mod args;
-
 use args::{Args, Command};
 use clap::Parser;
-use injectra_core::{Engine, Result};
+use injectra_core::{Result, TargetRef};
+use injectra_web::WebBackend;
+use serde_json::{Value, json};
 
-fn run(args: Args) -> Result<serde_json::Value> {
+fn run(args: Args) -> Result<Value> {
     match args.command {
-        Command::Targets { port } => Ok(serde_json::to_value(
-            injectra_cdp::CdpEngine::new(port)?.targets()?,
-        )?),
+        Command::Targets { port } => {
+            let backend = injectra_cdp::CdpBackend::new(port)?;
+            let targets = injectra_application::targets(&backend)?;
+            // Preserve the v0.1 CLI wire format, without serializing internal identity.
+            Ok(Value::Array(
+                targets
+                    .into_iter()
+                    .map(|t| json!({"id":t.reference.key(),"title":t.title,"url":t.url}))
+                    .collect(),
+            ))
+        }
         Command::Apply {
             port,
             target,
             bundle,
         } => {
-            let program = injectra_payload::apply(&injectra_payload::Bundle::load(&bundle)?)?;
-            execute(port, &target, &program)
+            let backend = injectra_cdp::CdpBackend::new(port)?;
+            injectra_application::apply(&backend, &TargetRef::new(backend.id(), target), &bundle)
         }
         Command::Remove { port, target, id } => {
-            execute(port, &target, &injectra_payload::remove(&id)?)
+            let backend = injectra_cdp::CdpBackend::new(port)?;
+            injectra_application::remove(&backend, &TargetRef::new(backend.id(), target), &id)
         }
         Command::LaunchPlan { app, port } => Ok(serde_json::to_value(
             injectra_platform_macos::launch_plan(&app, port)?,
-        )?),
+        )
+        .expect("launch plan serializes")),
     }
 }
-
-fn execute(port: u16, target: &str, program: &str) -> Result<serde_json::Value> {
-    // Composition root: this is the only place selecting the concrete runtime adapter.
-    let engine = injectra_cdp::CdpEngine::new(port)?;
-    let mut session = engine.connect(target)?;
-    injectra_core::execute(session.as_mut(), program)
-}
-
 fn main() -> std::process::ExitCode {
     match run(Args::parse()) {
         Ok(value) => {

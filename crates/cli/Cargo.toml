@@ -11,7 +11,8 @@ path = "src/main.rs"
 
 [dependencies]
 injectra-core.workspace = true
-injectra-payload.workspace = true
+injectra-application.workspace = true
+injectra-web.workspace = true
 injectra-cdp.workspace = true
 injectra-platform-macos.workspace = true
 serde.workspace = true

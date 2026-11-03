@@ -4,13 +4,15 @@
 
 | 能力 | 源码入口与职责 | 上下游边界 | 测试与专题 |
 | --- | --- | --- | --- |
-| 核心契约 | [core](../../crates/core/src/lib.rs)：Engine/Session/Target/Capability | 不依赖具体适配；只编排能力检查 | 内联假Session测试；[架构](boundaries.md) |
-| 载荷加载 | [bundle.rs](../../crates/payload/src/bundle.rs)：版本、路径和资源限制 | 本地manifest → Bundle | 内联loader测试、[负例](../../tests/bundles/escape.json)；[使用](../dev.md) |
-| 程序生成 | [payload](../../crates/payload/src/lib.rs)：共享runtime嵌入、数据序列化 | Bundle → JS程序 | Electron端到端测试 |
+| 核心契约 | [core](../../crates/core/src/lib.rs)：BackendId/TargetRef/Capability/Error | 无执行域/JSON依赖；能力检查与错误语义 | 身份隔离测试；[架构](boundaries.md) |
+| Web载荷加载 | [bundle.rs](../../crates/web/src/bundle.rs)：版本、路径和资源限制 | 本地manifest → Bundle | 内联loader测试、[负例](../../tests/bundles/escape.json)；[使用](../dev.md) |
+| 程序生成 | [web](../../crates/web/src/lib.rs)：共享runtime嵌入、数据序列化 | Bundle → JS程序 | Electron端到端测试 |
 | 共享注入执行 | [runtime.js](../../web/runtime.js)：拥有节点、清理、重复/并发注入 | 单次注入及既有辅助行为；无平台判断或导航恢复 | [runtime.test.mjs](../../tests/runtime.test.mjs) |
-| CDP发现 | [discovery.rs](../../crates/cdp/src/discovery.rs)：本地HTTP发现 | CDP页面 → 核心Target | Electron发现实测 |
-| CDP连接执行 | [session.rs](../../crates/cdp/src/session.rs)、[Engine](../../crates/cdp/src/lib.rs) | WebSocket/CDP → Session | 内联地址/关联/错误测试；Electron实测 |
+| CDP发现 | [discovery.rs](../../crates/cdp/src/discovery.rs)：本地HTTP发现 | CDP页面 → WebTarget | Electron发现实测 |
+| CDP连接执行 | [session.rs](../../crates/cdp/src/session.rs)、[WebBackend](../../crates/cdp/src/lib.rs) | WebSocket/CDP → WebSession | 内联地址/关联/错误测试；Electron实测 |
 | macOS平台 | [platform-macos](../../crates/platform-macos/src/lib.rs)：.app启动规划 | 路径 → LaunchPlan；无进程管理 | Electron.app规划实测 |
+| Web执行契约 | [contracts](../../crates/web/src/contracts.rs)：WebBackend/WebSession/页面上下文 | 只声明页面执行，区别于通用JS环境 | [应用合同测试](../../crates/application/tests/web_contract.rs) |
+| 应用用例 | [application](../../crates/application/src/lib.rs)：targets/apply/remove/execute | 注入后端；身份与能力检查，不固定CDP | 同上 |
 | CLI装配 | [main.rs](../../crates/cli/src/main.rs)、[args.rs](../../crates/cli/src/args.rs) | 参数 → 适配/载荷 → JSON | [smoke](../../scripts/electron-smoke.mjs) |
 | 示例载荷 | [manifest](../../examples/accent/manifest.json)、[behavior](../../examples/accent/behavior.js) | Web页面与清理回调 | 同上 |
 | 工程入口 | [Makefile](../../Makefile)、[cargo.sh](../../scripts/cargo.sh)、[测试环境](../../scripts/test-env.mjs) | 外部缓存，不污染同步工作区 | make check；[开发](../dev.md) |
