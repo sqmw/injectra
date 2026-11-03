@@ -1,0 +1,32 @@
+app,app_version,started_at_utc,protocol,status,mode,evidence_dir
+Google Chrome,156.0.8078.80,2026-11-03T07:16:33.281Z,v1-pilot,passed,baseline,cases/Google_Chrome.app
+Microsoft Edge,156.0.4314.58,2026-11-03T07:16:44.764Z,v1-pilot,passed,baseline,cases/Microsoft_Edge.app
+draw.io,30.3.14,2026-11-03T07:16:51.467Z,v1-pilot,passed,baseline,cases/draw.io.app
+Super Productivity,16.5.3,2026-11-03T07:16:55.065Z,v1-pilot,no-ready-page,,cases/Super_Productivity.app
+Super Productivity,16.5.3,2026-11-03T07:19:36.667Z,v2,passed,baseline,cases/Super_Productivity.app-2IxeB1
+Notion,7.35.0,2026-11-03T07:19:46.843Z,v2,passed,baseline,cases/Notion.app-w4B0JE
+Figma,126.5.6,2026-11-03T07:20:03.949Z,v2,cdp-unavailable,,cases/Figma.app-CEZmuN
+Follow,0.3.3-beta.0,2026-11-03T07:20:30.304Z,v2,passed,baseline,cases/Follow.app-WgFp0L
+Logseq,0.10.15,2026-11-03T07:20:36.489Z,v2,passed,baseline,cases/Logseq.app-cIdRL0
+Antigravity,2.24.0,2026-11-03T07:23:26.055Z,v2,passed,baseline,cases/Antigravity.app-3kJ0Bt
+Cursor,3.7.36,2026-11-03T07:23:36.410Z,v2,injection-failed,,cases/Cursor.app-gf6y95
+Devin,3.10.35,2026-11-03T07:23:39.417Z,v2,injection-failed,,cases/Devin.app-BtRdmp
+TRAE SOLO CN,0.1.19,2026-11-03T07:23:50.565Z,v2,passed,baseline,cases/TRAE_SOLO_CN.app-68UMvE
+Trae CN,3.4.11,2026-11-03T07:23:56.656Z,v2,passed,baseline,cases/Trae_CN.app-2nvnOg
+Trae,3.5.73,2026-11-03T07:23:59.295Z,v2,passed,baseline,cases/Trae.app-cJDlEY
+ZCode,3.1.0,2026-11-03T07:24:07.853Z,v2,passed,baseline,cases/ZCode.app-Sjms7I
+Cursor,3.7.36,2026-11-03T07:27:08.486Z,v3,passed,fallback,cases/Cursor.app-mm5xrs
+Devin,3.10.35,2026-11-03T07:27:13.025Z,v3,passed,fallback,cases/Devin.app-wZZ5bq
+CocosCreator,3.8.8,2026-11-03T07:30:02.834Z,v3,cdp-unavailable,,cases/CocosCreator.app-iFYpbf
+CocosDashboard,2.2.1,2026-11-03T07:30:30.960Z,v3,passed,baseline,cases/CocosDashboard.app-AAJHQc
+FlowUs,1.2.1,2026-11-03T07:30:36.043Z,v3,injection-failed,baseline,cases/FlowUs.app-oseBCi
+Manus,1.7.7,2026-11-03T07:30:42.164Z,v3,passed,baseline,cases/Manus.app-FnmeU3
+Mockitt,1.3.6,2026-11-03T07:30:45.094Z,v3,passed,baseline,cases/Mockitt.app-Nu99Ak
+WorkBuddy,5.9.3,2026-11-03T07:30:51.585Z,v3,isolation-unconfirmed,,cases/WorkBuddy.app-vAjfEc
+优酷,9.2.73,2026-11-03T07:30:57.717Z,v3,isolation-unconfirmed,,cases/优酷.app-gxgkU5
+哔哩哔哩,1.14.2,2026-11-03T07:31:07.340Z,v3,passed,baseline,cases/哔哩哔哩.app-phf8UT
+抖音,7.9.0,2026-11-03T07:31:15.063Z,v3,cdp-unavailable,,cases/抖音.app-8AKX0o
+FlowUs,1.2.1,2026-11-03T07:58:45.117Z,v4,injection-failed,baseline,cases/FlowUs.app-xlvC8N
+Quark,7.1.2.956,2026-11-03T07:58:51.823Z,v4,passed,baseline,cases/Quark.app-apL5xF
+wechatwebdevtools,1.06.2412050,2026-11-03T07:59:23.509Z,v4,cdp-unavailable,,cases/wechatwebdevtools.app-6TRdJm
+FlowUs,1.2.1,2026-11-03T08:25:14.788Z,v5,passed,baseline,cases/FlowUs.app-LYUD5U

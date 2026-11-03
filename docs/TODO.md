@@ -4,6 +4,27 @@ main 分支为唯一权威来源；Parent 为当前 Codex 主窗口，single-wri
 
 ## 已关闭任务
 
+<a id="t-009"></a>
+### T-009 · 本机应用 CDP 注入普查结果归档
+
+```tracking-task
+{
+  "id": "T-009",
+  "name": "本机应用 CDP 注入普查结果归档",
+  "version": "v1",
+  "mode": "lightweight",
+  "status": "done",
+  "goal": "将本轮本机应用普查的可复核结果、复验原因与适用边界整理为仓库证据并提交。",
+  "scope": "新增兼容性报告与脱敏尝试清单，更新文档导航、验证入口和任务记录；不改源码、不重跑应用、不提交原始运行数据。",
+  "acceptance": "222个应用包、40个候选、26个尝试应用和31次尝试口径一致；首次与最终结果分开；失败和未测边界明确；review、文档及任务检查通过，形成独立本地提交。",
+  "execution_ref": "archive/T-009.md#t-009",
+  "acceptance_evidence": ["兼容性报告覆盖40个候选及方法边界；31条脱敏尝试与原始结果逐条核对，首次16个、最终20个完整通过的口径保留；自审、make doc-check、任务结构检查及git diff --check通过。仅文档与证据摘要变更，本条所在提交为独立本地归档提交。"],
+  "unplanned_reason": "用户要求将已完成的本机应用CDP注入普查结果整理并提交。"
+}
+```
+
+[普查报告](compatibility/macos-cdp-survey.md) · [逐次尝试](compatibility/macos-cdp-survey-attempts.csv) · [执行与review证据](archive/T-009.md#t-009)
+
 <a id="t-008"></a>
 ### T-008 · 长期注入架构基础重构
 

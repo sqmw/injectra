@@ -12,6 +12,7 @@
 | 构建、使用、Bundle、运行数据、恢复 | [开发说明](dev.md) |
 | 验收、兼容性、review、测试边界 | [验证证据](validation.md) |
 | 豆包、真实产品、Chromium接入 | [豆包兼容性](compatibility/doubao.md) |
+| macOS应用普查、跨应用CDP、Trusted Types、接入限制 | [本机应用普查](compatibility/macos-cdp-survey.md) |
 | 任务与执行 | [TODO](TODO.md)、[STEPS](STEPS.md) |
 | 长期约束与取舍 | [决策](DECISIONS.md) |
 | MVP验收、版本与源码映射 | [交付记录](releases.md) |
