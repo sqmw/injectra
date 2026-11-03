@@ -14,7 +14,7 @@ injectra-core.workspace = true
 injectra-application.workspace = true
 injectra-web.workspace = true
 injectra-cdp.workspace = true
-injectra-platform-macos.workspace = true
+injectra-hosts.workspace = true
 serde.workspace = true
 serde_json.workspace = true
 clap = { version = "4.6", features = ["derive"] }

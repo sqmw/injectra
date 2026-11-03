@@ -9,10 +9,12 @@
 | 程序生成 | [web](../../crates/web/src/lib.rs)：共享runtime嵌入、数据序列化 | Bundle → JS程序 | Electron端到端测试 |
 | 共享注入执行 | [runtime.js](../../web/runtime.js)：拥有节点、清理、重复/并发注入 | 单次注入及既有辅助行为；无平台判断或导航恢复 | [runtime.test.mjs](../../tests/runtime.test.mjs) |
 | CDP发现 | [discovery.rs](../../crates/cdp/src/discovery.rs)：本地HTTP发现 | CDP页面 → WebTarget | Electron发现实测 |
-| CDP连接执行 | [session.rs](../../crates/cdp/src/session.rs)、[WebBackend](../../crates/cdp/src/lib.rs) | WebSocket/CDP → WebSession | 内联地址/关联/错误测试；Electron实测 |
-| macOS平台 | [platform-macos](../../crates/platform-macos/src/lib.rs)：.app启动规划 | 路径 → LaunchPlan；无进程管理 | Electron.app规划实测 |
+| CDP连接执行 | [session.rs](../../crates/cdp/src/session.rs)、[WebBackend](../../crates/cdp/src/lib.rs) | WebSocket/CDP → WebSession | [传输合同测试](../../crates/cdp/src/session/tests.rs)；Electron实测 |
+| macOS平台 | [platform-macos](../../crates/platform-macos/src/lib.rs)：.app元数据 | 路径 → ApplicationInfo；无宿主识别或进程管理 | Electron.app规划实测 |
 | Web执行契约 | [contracts](../../crates/web/src/contracts.rs)：WebBackend/WebSession/页面上下文 | 只声明页面执行，区别于通用JS环境 | [应用合同测试](../../crates/application/tests/web_contract.rs) |
 | 应用用例 | [application](../../crates/application/src/lib.rs)：targets/apply/remove/execute | 注入后端；身份与能力检查，不固定CDP | 同上 |
+| 原生域 | [target](../../crates/native/src/target.rs)、[memory](../../crates/native/src/memory.rs)：原生目标、地址、独立读写端口 | 无Web、无真实后端 | [受控缓冲区测试](../../crates/native/src/memory/tests.rs)、[契约](contracts.md) |
+| 宿主规划 | [hosts/electron](../../crates/hosts/src/electron.rs)：Electron识别与只读规划 | 平台元数据 → LaunchPlan | recipe单测、Electron实测 |
 | CLI装配 | [main.rs](../../crates/cli/src/main.rs)、[args.rs](../../crates/cli/src/args.rs) | 参数 → 适配/载荷 → JSON | [smoke](../../scripts/electron-smoke.mjs) |
 | 示例载荷 | [manifest](../../examples/accent/manifest.json)、[behavior](../../examples/accent/behavior.js) | Web页面与清理回调 | 同上 |
 | 工程入口 | [Makefile](../../Makefile)、[cargo.sh](../../scripts/cargo.sh)、[测试环境](../../scripts/test-env.mjs) | 外部缓存，不污染同步工作区 | make check；[开发](../dev.md) |

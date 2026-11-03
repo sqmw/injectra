@@ -7,4 +7,3 @@ publish.workspace = true
 
 [dependencies]
 injectra-core.workspace = true
-serde.workspace = true

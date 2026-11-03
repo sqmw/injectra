@@ -31,8 +31,10 @@
   "name": "建立原生契约并拆分平台宿主",
   "task_id": "T-008",
   "task_version": "v1",
-  "status": "未开始",
-  "evidence": [],
+  "status": "已完成",
+  "evidence": [
+    "原生目标/地址/独立读写端口与测试缓冲区完成；platform-macos仅输出应用元数据，hosts负责Electron规划；make check通过（16 Rust、5 Web）。review核对地址溢出、只读trait对象、部分进度、Unknown不重放及无真实原生后端；源码测试模块拆分、架构和契约文档同步。"
+  ],
   "number": 2
 }
 ```

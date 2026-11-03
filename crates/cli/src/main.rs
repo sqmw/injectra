@@ -31,7 +31,7 @@ fn run(args: Args) -> Result<Value> {
             injectra_application::remove(&backend, &TargetRef::new(backend.id(), target), &id)
         }
         Command::LaunchPlan { app, port } => Ok(serde_json::to_value(
-            injectra_platform_macos::launch_plan(&app, port)?,
+            injectra_hosts::electron::macos_launch_plan(&app, port)?,
         )
         .expect("launch plan serializes")),
     }

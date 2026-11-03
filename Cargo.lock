@@ -374,7 +374,7 @@ dependencies = [
  "injectra-application",
  "injectra-cdp",
  "injectra-core",
- "injectra-platform-macos",
+ "injectra-hosts",
  "injectra-web",
  "serde",
  "serde_json",
@@ -385,11 +385,26 @@ name = "injectra-core"
 version = "0.1.0"
 
 [[package]]
+name = "injectra-hosts"
+version = "0.1.0"
+dependencies = [
+ "injectra-core",
+ "injectra-platform-macos",
+ "serde",
+]
+
+[[package]]
+name = "injectra-native"
+version = "0.1.0"
+dependencies = [
+ "injectra-core",
+]
+
+[[package]]
 name = "injectra-platform-macos"
 version = "0.1.0"
 dependencies = [
  "injectra-core",
- "serde",
 ]
 
 [[package]]

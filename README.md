@@ -2,6 +2,8 @@
 
 面向桌面 Web UI 的**代码注入工具／核心**：在不修改目标应用源码的情况下，向其 Web 运行环境注入用户提供的 JS、HTML、CSS。长期考虑 runtime / pre-runtime 两类注入时机，**当前仅实现 runtime 注入**。
 
+长期架构已建立执行域隔离：通用核心、Web／原生契约、可复用应用用例及平台／宿主职责分离。原生仅有契约测试，真实原生后端尚未实现，见[架构](docs/architecture/boundaries.md)。
+
 首个核心版本为 **Rust CLI + macOS Electron/CDP**：连接已运行且显式开放本地调试端口的目标，选定单个页面并执行注入，报告结果、失败或结果未知。Injectra负责接入与注入能力；使用者负责脚本内容、选择器、组件适配及渲染覆盖问题。管理平台和Agent属于后续演进方向，见[产品边界](docs/requirements.md)。
 
 **MVP 已于 2026-10-31 经用户亲自验证通过**，交付版本为 `v0.1.0-mvp`。版本范围与证据见[交付记录](docs/releases.md)。项目采用 [Apache-2.0 许可证](LICENSE)。
