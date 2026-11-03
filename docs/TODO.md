@@ -4,6 +4,29 @@ main 分支为唯一权威来源；Parent 为当前 Codex 主窗口，single-wri
 
 ## 已关闭任务
 
+<a id="t-010"></a>
+### T-010 · 抖音与双宿主 CDP 接入排查
+
+```tracking-task
+{
+  "id": "T-010",
+  "name": "抖音与双宿主 CDP 接入排查",
+  "version": "v1",
+  "mode": "lightweight",
+  "status": "done",
+  "goal": "查明抖音、WorkBuddy、优酷此前未完成验证的具体阶段与原因，并在可控条件下复验当前注入核心。",
+  "scope": "定向检查三款应用启动代码、既有日志及必要的新建测试实例；复验现有CLI与自有面板；记录CocosCreator观察线索、Figma后续方向及微信开发者工具跳过决定；不改安装包或注入核心。",
+  "acceptance": "三款应用各有基于证据的根因或明确未决边界；可达页面完成受控注入/交互/更新/清理，无法验证者准确记录停止原因；历史尝试保留，测试进程有清理审计，文档与任务检查通过。",
+  "execution_ref": "archive/T-010.md#t-010",
+  "acceptance_evidence": [
+    "WorkBuddy与优酷经宿主目录/沙箱路径调整后使用原CLI完成整组基线验证；抖音3次新尝试未取得调试入口，具体参数处理机制仍未确认。新增6条脱敏记录，原31次历史保留；53个记录PID的定向清理复查无残留；自审与文档/任务检查通过。"
+  ],
+  "unplanned_reason": "2026-11-03用户要求重点排查抖音、WorkBuddy和优酷；微信开发者工具保留历史并跳过。"
+}
+```
+
+[排查报告](compatibility/macos-cdp-followup.md) · [新增尝试](compatibility/macos-cdp-followup-attempts.csv) · [执行与review](archive/T-010.md#t-010)
+
 <a id="t-009"></a>
 ### T-009 · 本机应用 CDP 注入普查结果归档
 

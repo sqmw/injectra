@@ -1,0 +1,7 @@
+app,app_version,started_at_utc,protocol,status,browser,mode,main_exited,evidence_dir
+WorkBuddy,5.9.3,2026-11-03T10:42:49.886Z,followup-v1,passed,Chrome/138.0.7204.251,baseline,true,WorkBuddy-jOGfJe
+优酷,9.2.73,2026-11-03T10:43:32.083Z,followup-v1,page-endpoint-unavailable,Chrome/93.0.4577.82,,true,优酷-6LL8jk
+优酷,9.2.73,2026-11-03T10:46:07.118Z,followup-v2,passed,Chrome/93.0.4577.82,baseline,true,优酷-kJjJ2h
+抖音,7.9.0,2026-11-03T10:47:16.712Z,followup-v3,page-endpoint-unavailable,,,true,抖音-CQqkQy
+抖音,7.9.0,2026-11-03T10:50:38.931Z,followup-v4,page-endpoint-unavailable,,,true,抖音-4HHTRH
+抖音,7.9.0,2026-11-03T10:54:13.342Z,followup-v5,page-endpoint-unavailable,,,true,抖音-CtgzXJ
