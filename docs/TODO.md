@@ -4,6 +4,29 @@ main 分支为唯一权威来源；Parent 为当前 Codex 主窗口，single-wri
 
 ## 已关闭任务
 
+<a id="t-014"></a>
+### T-014 · 应用平台与内核兼容性总表
+
+```tracking-task
+{
+  "id": "T-014",
+  "name": "应用平台与内核兼容性总表",
+  "version": "v1",
+  "mode": "lightweight",
+  "status": "done",
+  "goal": "用一张当前兼容性总表统一应用、平台、版本、宿主/内核、接入路线与验证状态，替代碎片化状态入口。",
+  "scope": "兼容性矩阵、README/文档导航、旧报告入口及外部REPORT.txt指向；原始历史正文留底，不改尝试/源码/应用状态。",
+  "acceptance": "原40候选无遗漏；合并豆包历史成功、抖音新路线、Figma/双宿主后续证据与分类勘误；不同版本/平台/路线不混算；总表成为默认入口；原REPORT正文可恢复；review、文档与任务检查通过。",
+  "execution_ref": "archive/T-014.md#t-014",
+  "acceptance_evidence": [
+    "当前总表收录41应用名/44版本路线组合，原40候选覆盖检查通过；合并豆包、抖音、Figma、双宿主后续成果与勘误；README/docs导航及旧REPORT收敛到总表，旧正文SHA逐字节留底；review和文档/任务检查通过，仅文档和报告入口改动。"
+  ],
+  "unplanned_reason": "用户明确要求合并每个应用的平台/内核等为一张表，旧碎片入口不再作为当前阅读入口。"
+}
+```
+
+[当前总表](compatibility/current-matrix.md) · [执行与review](archive/T-014.md#t-014)
+
 <a id="t-013"></a>
 ### T-013 · 软件注入参考实现归档
 

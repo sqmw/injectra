@@ -10,12 +10,8 @@
 | 迁移前评估、历史扩展障碍（当前以D-004为准） | [扩展架构评估](architecture/evolution-assessment.md) |
 | 模块、测试、符号检索 | [代码地图](architecture/code-map.md) |
 | 构建、使用、Bundle、运行数据、恢复 | [开发说明](dev.md) |
-| 验收、兼容性、review、测试边界 | [验证证据](validation.md) |
-| 豆包、真实产品、Chromium接入 | [豆包兼容性](compatibility/doubao.md) |
-| macOS应用普查、跨应用CDP、Trusted Types、接入限制 | [本机应用普查](compatibility/macos-cdp-survey.md) |
-| WorkBuddy、优酷沙箱目录、抖音接入、普查勘误 | [后续排查](compatibility/macos-cdp-followup.md) |
-| Figma、FIGMA_TEST、CDP外壳注入、黑窗口与代理证据边界 | [Figma兼容性](compatibility/figma.md) |
-| 抖音非CDP、Gadget、V8桥接、阶段性成功与探针代码入口 | [抖音Gadget实测](compatibility/douyin-gadget.md) |
+| 应用、平台、版本、宿主/内核、CDP/非CDP、当前兼容性 | [兼容性总表（统一入口）](compatibility/current-matrix.md) |
+| 产品验收、review与历史测试证据 | [验证证据](validation.md) |
 | 按软件浏览参考源码、启动样例、共享桥接及代码统计 | [参考实现目录](../references/README.md) |
 | 任务与执行 | [TODO](TODO.md)、[STEPS](STEPS.md) |
 | 长期约束与取舍 | [决策](DECISIONS.md) |
