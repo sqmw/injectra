@@ -1,8 +1,31 @@
 # 任务入口
 
-main 分支为唯一权威来源；Parent 为当前 Codex 主窗口，single-writer。
+本文件为main唯一权威Task状态簿，保留完整定义与验收；默认从[任务索引](tasks.md)进入，按Task ID定向读取，不整读历史。
 
 ## 已关闭任务
+
+<a id="t-015"></a>
+### T-015 · 当前文档精简与历史下沉
+
+```tracking-task
+{
+  "id": "T-015",
+  "name": "当前文档精简与历史下沉",
+  "version": "v1",
+  "mode": "lightweight",
+  "status": "done",
+  "goal": "按用户批准清单减少默认阅读与重复维护，保留独有契约、已关闭任务定义及历史实测证据。",
+  "scope": "任务入口及历史任务目录；架构/契约合并；旧评估和验收正文归档；T-002/T-008关闭上下文合并删除；修复导航与引用。",
+  "acceptance": "已关闭任务及Execution/Step/Decision完整且唯一；契约独有条款保留；历史验收/评估正文可追溯；默认首读明显缩短；删除仅限批准文件；review及文档/任务校验通过。",
+  "execution_ref": "archive/T-015.md#t-015",
+  "acceptance_evidence": [
+    "重复契约/关闭上下文3份已合并删除；旧评估与原验收正文移入归档；默认任务入口改为轻量tasks.md，TODO保留校验器要求的权威状态；40条历史tracking记录逐字段一致，原历史正文/上下文/契约条款保全检查通过；文档和任务校验通过。"
+  ],
+  "unplanned_reason": "用户明确批准文档清理清单，并要求慎重清理。"
+}
+```
+
+[执行证据](archive/T-015.md#t-015)
 
 <a id="t-014"></a>
 ### T-014 · 应用平台与内核兼容性总表
@@ -168,7 +191,7 @@ main 分支为唯一权威来源；Parent 为当前 Codex 主窗口，single-wri
 }
 ```
 
-[验收报告](validation/architecture-foundation.md) · [执行与review证据](archive/T-008.md#t-008) · [关闭上下文](archive/T-008-context.md)
+[验收报告](validation/architecture-foundation.md) · [执行与review证据](archive/T-008.md#t-008) · [关闭上下文](archive/T-008.md#t-008-context)
 
 <a id="t-007"></a>
 ### T-007 · 长期扩展架构适配评估
@@ -191,7 +214,7 @@ main 分支为唯一权威来源；Parent 为当前 Codex 主窗口，single-wri
 }
 ```
 
-[评估报告](architecture/evolution-assessment.md) · [执行与review证据](archive/T-007.md#t-007)
+[评估报告](archive/architecture-evolution-assessment.md) · [执行与review证据](archive/T-007.md#t-007)
 
 <a id="t-006"></a>
 ### T-006 · Xmind 架构图排版演示
@@ -306,7 +329,7 @@ main 分支为唯一权威来源；Parent 为当前 Codex 主窗口，single-wri
 }
 ```
 
-[恢复上下文](archive/T-002-context.md) · [执行与步骤](archive/T-002.md#t-002)
+[恢复上下文](archive/T-002.md#t-002-context) · [执行与步骤](archive/T-002.md#t-002)
 
 <a id="t-001"></a>
 ### T-001 · Injectra 项目初始化

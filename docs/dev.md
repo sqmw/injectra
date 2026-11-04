@@ -8,7 +8,7 @@
 
 构建脚本默认最多2个Cargo编译任务，所有Make入口通过[scripts/cargo.sh](../scripts/cargo.sh)调用。`Cargo.lock`锁定Rust依赖；不要在复现时随意更新锁文件。
 
-架构已迁移为core/Web/native/application/CDP/平台/宿主模块；对外命令兼容。原生接口与测试边界见[执行域契约](architecture/contracts.md)。
+架构已迁移为core/Web/native/application/CDP/平台/宿主模块；对外命令兼容。原生接口与测试边界见[执行域契约](architecture/boundaries.md)。
 
 ## 目标应用接入
 

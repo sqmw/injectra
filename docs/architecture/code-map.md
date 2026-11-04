@@ -13,7 +13,7 @@
 | macOS平台 | [platform-macos](../../crates/platform-macos/src/lib.rs)：.app元数据 | 路径 → ApplicationInfo；无宿主识别或进程管理 | Electron.app规划实测 |
 | Web执行契约 | [contracts](../../crates/web/src/contracts.rs)：WebBackend/WebSession/页面上下文 | 只声明页面执行，区别于通用JS环境 | [应用合同测试](../../crates/application/tests/web_contract.rs) |
 | 应用用例 | [application](../../crates/application/src/lib.rs)：targets/apply/remove/execute | 注入后端；身份与能力检查，不固定CDP | 同上 |
-| 原生域 | [target](../../crates/native/src/target.rs)、[memory](../../crates/native/src/memory.rs)：原生目标、地址、独立读写端口 | 无Web、无真实后端 | [受控缓冲区测试](../../crates/native/src/memory/tests.rs)、[契约](contracts.md) |
+| 原生域 | [target](../../crates/native/src/target.rs)、[memory](../../crates/native/src/memory.rs)：原生目标、地址、独立读写端口 | 无Web、无真实后端 | [受控缓冲区测试](../../crates/native/src/memory/tests.rs)、[契约](boundaries.md) |
 | 宿主规划 | [hosts/electron](../../crates/hosts/src/electron.rs)：Electron识别与只读规划 | 平台元数据 → LaunchPlan | recipe单测、Electron实测 |
 | CLI装配 | [main.rs](../../crates/cli/src/main.rs)、[args.rs](../../crates/cli/src/args.rs) | 参数 → 适配/载荷 → JSON | [smoke](../../scripts/electron-smoke.mjs) |
 | 示例载荷 | [manifest](../../examples/accent/manifest.json)、[behavior](../../examples/accent/behavior.js) | Web页面与清理回调 | 同上 |
@@ -21,5 +21,5 @@
 | 软件参考源码（非产品模块） | [references](../../references/README.md)：apps按软件/路线归档，shared保留Electron/V8桥接及Web程序生成器 | 不加入根workspace；不参与默认构建/测试/发布；不复制Web runtime | make -C references check/stats；[抖音证据](../compatibility/douyin-gadget.md) |
 | 测试工具 | [setup-tests](../../scripts/setup-tests.mjs)、[锁文件](../../tests/package-lock.json)、[fixture](../../tests/electron/main.cjs) | 自有测试进程与profile | make test-electron；[验证](../validation.md) |
 | 真实应用验证 | [verify-live](../../scripts/verify-live.mjs)：精确目标上的CLI注入、断言、自有面板截图与清理 | 不管理用户进程，只接入显式端口/页面 | make verify-live；[豆包实测](../compatibility/doubao.md) |
-| 架构依赖门 | [check-architecture](../../scripts/check-architecture.mjs) | Cargo metadata验证执行域/具体后端方向，core/native独立 | make architecture-check；[契约](contracts.md) |
+| 架构依赖门 | [check-architecture](../../scripts/check-architecture.mjs) | Cargo metadata验证执行域/具体后端方向，core/native独立 | make architecture-check；[契约](boundaries.md) |
 | 文档检查 | [check-docs](../../scripts/check-docs.mjs) | 相对链接/显式锚点/可达性 | make doc-check，不证明业务正确性 |

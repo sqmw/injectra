@@ -1,6 +1,6 @@
 # 长期注入架构基础重构验收
 
-日期：2026-11-03。归属：[T-008](../TODO.md#t-008)；决策：[D-004](../DECISIONS.md#d-004)。起始源码：990967b。当前架构见[边界](../architecture/boundaries.md)及[执行域契约](../architecture/contracts.md)。
+日期：2026-11-03。归属：[T-008](../TODO.md#t-008)；决策：[D-004](../DECISIONS.md#d-004)。起始源码：990967b。当前架构见[边界](../architecture/boundaries.md)及[执行域契约](../architecture/boundaries.md)。
 
 ## 结果
 
