@@ -15,6 +15,7 @@
 | macOS应用普查、跨应用CDP、Trusted Types、接入限制 | [本机应用普查](compatibility/macos-cdp-survey.md) |
 | WorkBuddy、优酷沙箱目录、抖音接入、普查勘误 | [后续排查](compatibility/macos-cdp-followup.md) |
 | Figma、FIGMA_TEST、CDP外壳注入、黑窗口与代理证据边界 | [Figma兼容性](compatibility/figma.md) |
+| 抖音非CDP、Gadget、V8桥接、阶段性成功与探针代码入口 | [抖音Gadget实测](compatibility/douyin-gadget.md) |
 | 任务与执行 | [TODO](TODO.md)、[STEPS](STEPS.md) |
 | 长期约束与取舍 | [决策](DECISIONS.md) |
 | MVP验收、版本与源码映射 | [交付记录](releases.md) |

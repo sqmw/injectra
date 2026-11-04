@@ -40,6 +40,7 @@ make test-electron # 启动并退出独立 Electron fixture，验证真实注入
 - [架构](docs/architecture/boundaries.md) · [代码地图](docs/architecture/code-map.md)。
 - [验收证据](docs/validation.md) · [任务](docs/TODO.md) · [文档入口](docs/README.md)。
 - [豆包真实应用实测](docs/compatibility/doubao.md)：2.33.5定制Chromium宿主通过CLI注入与清理；现有核心无需修改。
+- [抖音非CDP阶段性成果](docs/compatibility/douyin-gadget.md)：8.7.0独立探针通过Gadget→V8/Node→真实页面执行共享载荷；13项受控检查通过，尚未集成为产品后端。
 
 ## 当前限制
 

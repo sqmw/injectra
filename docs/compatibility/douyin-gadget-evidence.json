@@ -1,0 +1,136 @@
+{
+  "schema_version": 1,
+  "recorded_at": "2026-11-04",
+  "classification": "stage-success-in-external-probe",
+  "product_backend_implemented": false,
+  "user_confirmation": "用户确认“这里是成功了”，要求作为阶段性成功整理提交main；不是逐项人工验收声明。",
+  "target": {
+    "platform": "macOS 26.5.1 arm64",
+    "app": "抖音",
+    "version": "8.7.0",
+    "page_url": "https://www.douyin.com/jingxuan",
+    "page_type": "browserView",
+    "page_context": "main frame"
+  },
+  "runtime": {
+    "node": "22.15.1",
+    "electron": "36.4.0-rs.33.release.pgo.0",
+    "chromium": "136.0.7103.59",
+    "v8": "13.6.233.8-electron.0",
+    "frida": "17.25.2",
+    "gadget_code_signing": "required",
+    "gadget_runtime": "qjs"
+  },
+  "route": [
+    "DYLD startup loading",
+    "authenticated loopback Gadget",
+    "native main-queue/libuv callback",
+    "original V8/Node environment",
+    "Electron webContents.executeJavaScript",
+    "shared injectra-web program"
+  ],
+  "verification": {
+    "source_cache_path": "probes/P-DY-GADGET-001/page-verification-1793763712621902000/result.json",
+    "source_sha256": "36be72971f17b752bf661f4143a2e8db178c20b79d3b4456a38d6dd4f2f40b54",
+    "status": "passed",
+    "checks": [
+      {
+        "name": "real click readback",
+        "passed": true
+      },
+      {
+        "name": "page CSS applied",
+        "passed": true
+      },
+      {
+        "name": "no CDP entry or debugger used",
+        "passed": true
+      },
+      {
+        "name": "other page untouched",
+        "passed": true
+      },
+      {
+        "name": "page Promise awaited",
+        "passed": true
+      },
+      {
+        "name": "page exception preserves original diagnostic",
+        "passed": true
+      },
+      {
+        "name": "rejected Promise preserves original diagnostic",
+        "passed": true
+      },
+      {
+        "name": "target URL mismatch refused before page",
+        "passed": true
+      },
+      {
+        "name": "timeout classified Unknown",
+        "passed": true
+      },
+      {
+        "name": "no automatic replay",
+        "passed": true
+      },
+      {
+        "name": "same bundle updates without duplicate",
+        "passed": true
+      },
+      {
+        "name": "remove cleans managed content",
+        "passed": true
+      },
+      {
+        "name": "final reapply succeeds",
+        "passed": true
+      }
+    ],
+    "tested_source_sha256": {
+      "bridge.py": "b863698b995e18476d83e28a237eb87a19a22e5d6892049aff030c7d64864e85",
+      "agent/v8.js": "255955d443ffd95b30aef47f022862774b07190608a61debaf41c3fb87a4048e",
+      "verify_page.py": "1203f1fce684c8ec6fa9c44f53341197bccd878d0f07a00be999c802d60518f8"
+    }
+  },
+  "code_reference": {
+    "repository": "Injectra--probe--douyin-gadget",
+    "branch": "codex/douyin-gadget-probe",
+    "commit": "622fe2e94e10164a083c36e34ff1ae3fdfedbc99",
+    "committed_source_sha256": {
+      "bridge.py": "b863698b995e18476d83e28a237eb87a19a22e5d6892049aff030c7d64864e85",
+      "agent/v8.js": "255955d443ffd95b30aef47f022862774b07190608a61debaf41c3fb87a4048e",
+      "verify_page.py": "f78fd5155c38726e0bd06f82f36d39cf832024fb669b9981ede8b489ad18f321"
+    },
+    "alignment": {
+      "bridge_matches": true,
+      "v8_agent_matches": true,
+      "verifier_matches": false,
+      "verified_only_difference": "helper executable path now supports REFERENCE_CACHE; reconstructing the previous line reproduces the accepted verifier SHA-256"
+    }
+  },
+  "later_repeat": {
+    "source_cache_path": "probes/P-DY-GADGET-001/page-verification-1793764095117105000/result.json",
+    "status": "failed",
+    "completed_checks": 1,
+    "failed_check": "real click readback",
+    "observed_count": "14",
+    "required_initial_count": "1",
+    "attribution": "计数已变化；变化来源未独立追踪，保留失败，不用于覆盖先前受控通过。"
+  },
+  "visual_evidence": {
+    "panel_visible": true,
+    "native_click_page_readback": "0 -> 1",
+    "screenshot_pixel_count": "0 (stale frame)",
+    "screenshot_role": "面板可见效果；不是计数像素已更新到1的证明",
+    "screenshot_cache_path": "probes/P-DY-GADGET-001/run-1793762935787972000/panel-1793763858485215000.png",
+    "final_gui_repeat": "电脑随后锁定，未进一步GUI复验"
+  },
+  "boundaries": [
+    "7.9.0直接attach失败与8.7.0Gadget成功不是同版本对照",
+    "未实施人工改包/重签名或修改系统安全设置；观察到外部版本变化，不能声称包字节全程不变",
+    "必须具备启动加载条件；不是任意已运行进程attach",
+    "不声称所有引擎/OS/应用兼容",
+    "原始profile、token、日志、二进制和截图不入Git"
+  ]
+}

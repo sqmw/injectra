@@ -4,6 +4,31 @@ main 分支为唯一权威来源；Parent 为当前 Codex 主窗口，single-wri
 
 ## 已关闭任务
 
+<a id="t-012"></a>
+### T-012 · 抖音非 CDP 阶段性成果归档
+
+```tracking-task
+{
+  "id": "T-012",
+  "name": "抖音非 CDP 阶段性成果归档",
+  "version": "v1",
+  "mode": "lightweight",
+  "status": "done",
+  "goal": "将用户认可的抖音非CDP阶段性成果采纳到main，形成准确、可复核、可检索的结果与代码来源记录。",
+  "scope": "非CDP实测报告、脱敏证据、导航/验证/决策与本次归档执行；不整体迁入探针代码、不改产品行为、不重写旧实测或普查统计、不推送。",
+  "acceptance": "8.7真实页面成功、7.9失败和后续复验失败分别记录；13项来源及源码差异可复核；阶段性用户认可不扩大为产品交付；review、文档/任务检查通过并独立提交main。",
+  "execution_ref": "archive/T-012.md#t-012",
+  "acceptance_evidence": [
+    "已核对认可run的13项全部通过及8.7运行环境，生成不含凭据/profile/原始日志的证据摘要；完整Probe提交及验证脚本差异可追溯。",
+    "报告、导航、验证与D-005统一记录非CDP阶段性成功，保留版本漂移/旧帧/失败边界；main仍只装配CDP产品后端。",
+    "自审、文档/任务/证据一致性及差异检查通过；本记录所在提交为独立main归档提交，未推送。"
+  ],
+  "unplanned_reason": "2026-11-04用户明确认可本轮抖音成功并要求整理提交main；本任务归档阶段性成果，不额外创建产品发布里程碑。"
+}
+```
+
+[实测报告](compatibility/douyin-gadget.md) · [脱敏证据](compatibility/douyin-gadget-evidence.json) · [执行与review](archive/T-012.md#t-012)
+
 <a id="t-011"></a>
 ### T-011 · Figma CDP 验证结果归档
 
