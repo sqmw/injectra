@@ -10,3 +10,15 @@ CACHE=Path(os.environ.get('INJECTRA_GADGET_CACHE',COMMON_CACHE/'runs/douyin-gadg
 GENERATOR=COMMON_CACHE/'cargo-target/debug/injectra-reference-program'
 GADGET_LIBRARY=COMMON_CACHE/'gadget/FridaGadget.dylib'
 sys.path.insert(0,str(SHARED))
+
+def bundle_manifest():
+    value=os.environ.get('BUNDLE_MANIFEST')
+    if not value:
+        raise RuntimeError('Set BUNDLE_MANIFEST to the douyin-gadget-proof manifest in the external plugin library')
+    result=Path(value).expanduser().resolve()
+    if not result.is_file():
+        raise FileNotFoundError(result)
+    import json
+    if json.loads(result.read_text()).get("id") != "injectra.probe.douyin-gadget":
+        raise ValueError("BUNDLE_MANIFEST must select the external douyin-gadget-proof bundle")
+    return result

@@ -4,6 +4,29 @@
 
 ## 已关闭任务
 
+<a id="t-016"></a>
+### T-016 · 插件集中迁移与注入核心职责隔离
+
+```tracking-task
+{
+  "id": "T-016",
+  "name": "插件集中迁移与注入核心职责隔离",
+  "version": "v1",
+  "mode": "lightweight",
+  "status": "done",
+  "goal": "将全部已识别的Injectra用户插件和可复用插件载荷集中到独立web-ui-plugins库，移除旧位置并禁止核心仓库保存插件。",
+  "scope": "Injectra与统一插件库的插件迁移、论文旧项目删除和Git元数据备份、两组临时定制脚本、测试解耦、引用与边界文档；不操作运行应用，不迁移注入桥接或删除历史run证据。",
+  "acceptance": "迁入文件hash一致且无覆盖；插件目录集中、旧活跃源码位置删除；Injectra无可交付插件包、测试不依赖插件库；两库构建/测试及文档任务检查通过；review、迁移清单和可恢复提交完成。",
+  "execution_ref": "archive/T-016.md#t-016",
+  "acceptance_evidence": [
+    "7项插件集中到指定web-ui-plugins库，53文件迁入前SHA核对，5个旧活跃目录删除且论文Git备份可恢复；统一库67908ba，22插件测试通过；核心无可交付插件Bundle，16 Rust/5 Web、Electron10项及参考离线检查通过；review及文档/任务检查完成。"
+  ],
+  "unplanned_reason": "用户明确要求插件全部集中并在旧位置删除，核心项目不得含插件。"
+}
+```
+
+[迁移与验收](migrations/plugin-boundary.md) · [执行与review证据](archive/T-016.md#t-016)
+
 <a id="t-015"></a>
 ### T-015 · 当前文档精简与历史下沉
 

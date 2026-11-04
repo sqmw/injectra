@@ -21,15 +21,17 @@
       "capture_page.py",
       "recover_bootstrap.py",
       "verify_page.py",
-      "agent/cocoa.js",
-      "payload/behavior.js",
-      "payload/panel.html",
-      "payload/panel.css"
+      "agent/cocoa.js"
     ]
   },
   "shared_dependencies": [
     "shared/electron-v8",
     "shared/web-program"
   ],
-  "source_kind": "relocated-probe-source"
+  "source_kind": "relocated-probe-source",
+  "external_plugin": {
+    "catalog_directory": "plugins/douyin-gadget-proof",
+    "manifest_environment": "BUNDLE_MANIFEST",
+    "ownership": "external web-ui-plugins library; no plugin in injector repository"
+  }
 }

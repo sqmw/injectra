@@ -11,6 +11,8 @@
 
 共享参考：[Electron/V8桥接](shared/electron-v8/README.md) · [Web程序生成器](shared/web-program/README.md) · [现有CDP CLI调用](shared/cdp/README.md)。它们有复用潜力，目前不是跨应用/版本/平台通用实现。
 
+实际插件和受控面板插件已集中到独立web-ui-plugins库；本目录只保留接入/验证源码。人工apply/verify通过`BUNDLE_MANIFEST`显式读取外部插件，离线检查使用专用缓存内临时测试数据，不依赖插件库。历史origin.json保留迁移前出处，当前source_groups不再统计已迁出的插件。
+
 ## 独立检查与依赖
 
 ```sh

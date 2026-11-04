@@ -88,6 +88,13 @@ impl Bundle {
 #[cfg(test)]
 mod tests {
     use super::*;
+    mod fixture {
+        include!(concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/../../tests/support/bundle.rs"
+        ));
+    }
+    use fixture::BundleFixture;
 
     #[test]
     fn validates_ids_before_source_generation() {
@@ -98,18 +105,29 @@ mod tests {
     }
 
     #[test]
-    fn shared_bundle_loads_from_repository_example() {
-        let path =
-            Path::new(env!("CARGO_MANIFEST_DIR")).join("../../examples/accent/manifest.json");
-        assert_eq!(Bundle::load(&path).unwrap().id, "injectra.accent");
+    fn loads_ephemeral_contract_input() {
+        let input = BundleFixture::new();
+        assert_eq!(
+            Bundle::load(&input.manifest).unwrap().id,
+            "injectra.test.contract"
+        );
     }
-
     #[test]
     fn rejects_escaped_assets_and_unknown_versions() {
-        let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../tests/bundles");
-        let escape = Bundle::load(&root.join("escape.json")).err().unwrap();
+        let input = BundleFixture::new();
+        std::fs::write(
+            &input.manifest,
+            r#"{"version":1,"id":"escape","css":"../outside.css"}"#,
+        )
+        .unwrap();
+        let escape = Bundle::load(&input.manifest).err().unwrap();
         assert!(escape.to_string().contains("escapes"));
-        let version = Bundle::load(&root.join("version.json")).err().unwrap();
+        std::fs::write(
+            &input.manifest,
+            r#"{"version":2,"id":"test","js":"script.js"}"#,
+        )
+        .unwrap();
+        let version = Bundle::load(&input.manifest).err().unwrap();
         assert!(version.to_string().contains("unsupported bundle version"));
     }
 }

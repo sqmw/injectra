@@ -4,7 +4,7 @@
 
 ## 源码结构
 
-launch.py与apply_page.py保留软件bundle ID、单实例条件和精选页目标选择。参考路径由reference_paths.py推导；Gadget、V8与Node/Page bridge只在shared/electron-v8保留一份。其余脚本和payload为本次验证辅助，按case.json单独统计。
+launch.py与apply_page.py保留软件bundle ID、单实例条件和精选页目标选择。参考路径由reference_paths.py推导；Gadget、V8与Node/Page bridge只在shared/electron-v8保留一份。其余脚本为验证辅助，按case.json单独统计。原payload已迁入统一插件库的plugins/douyin-gadget-proof，本目录不再保存面板插件。
 
 ## 人工复核入口
 
@@ -14,6 +14,7 @@ make -C references gadget
 # 先经用户授权正常退出原抖音；脚本不会替用户退出。
 make -C references/apps/douyin/gadget-v8 launch APP_PATH="安装位置/抖音.app" PROXY_URL="当前代理URL"
 make -C references/apps/douyin/gadget-v8 node pages
+# 先将外部插件库中douyin-gadget-proof的manifest路径设为BUNDLE_MANIFEST
 make -C references/apps/douyin/gadget-v8 apply capture
 # 实际点击一次面板按钮、确认计数1后：
 make -C references/apps/douyin/gadget-v8 verify capture

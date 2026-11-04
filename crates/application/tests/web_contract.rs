@@ -1,10 +1,15 @@
+mod fixture {
+    include!(concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../tests/support/bundle.rs"
+    ));
+}
 use injectra_application::{apply, execute};
 use injectra_core::{BackendId, Capability, Certainty, Error, ErrorKind, Phase, Result, TargetRef};
 use injectra_web::{PAGE_EVALUATE, WebBackend, WebSession, WebTarget};
 use serde_json::{Value, json};
 use std::{
     cell::{Cell, RefCell},
-    path::Path,
     rc::Rc,
 };
 
@@ -83,9 +88,9 @@ impl WebBackend for Backend {
 fn the_same_bundle_program_is_reused_across_backends() {
     let a = Backend::page();
     let b = Backend::page();
-    let bundle = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../examples/accent/manifest.json");
-    apply(&a, &a.target(), &bundle).unwrap();
-    apply(&b, &b.target(), &bundle).unwrap();
+    let input = fixture::BundleFixture::new();
+    apply(&a, &a.target(), &input.manifest).unwrap();
+    apply(&b, &b.target(), &input.manifest).unwrap();
     assert_eq!(*a.programs.borrow(), *b.programs.borrow());
     assert!(a.programs.borrow()[0].contains("injectraRuntime"));
 }

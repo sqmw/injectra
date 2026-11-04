@@ -11,6 +11,7 @@
 | 应用、平台、版本、宿主/内核、CDP/非CDP、当前兼容性 | [兼容性总表（统一入口）](compatibility/current-matrix.md) |
 | 验收入口、review与历史证据 | [验证证据](validation.md) |
 | 按软件浏览参考源码、启动样例、共享桥接及代码统计 | [参考实现目录](../references/README.md) |
+| 插件归属、集中迁移、测试解耦 | [迁移与边界](migrations/plugin-boundary.md) |
 | 任务与执行 | [任务索引](tasks.md)、[STEPS](STEPS.md) |
 | 长期约束与取舍 | [决策](DECISIONS.md) |
 | MVP验收、版本与源码映射 | [交付记录](releases.md) |

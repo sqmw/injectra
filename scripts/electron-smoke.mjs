@@ -70,17 +70,22 @@ try {
   socket = new WebSocket(page.webSocketDebuggerUrl);
   await once(socket, "open");
   const flags = ["--port", String(port), "--target", page.id];
-  const manifest = resolve(root, "examples/accent/manifest.json");
+  // Minimal, test-owned input; no dependency on the separate plugin library.
+  const manifest = resolve(run, "fixture.json");
+  await writeFile(manifest, JSON.stringify({version:1,id:"injectra.test.fixture",css:"fixture.css",html:"fixture.html",js:"fixture.js"}));
+  await writeFile(resolve(run,"fixture.css"),'[data-injectra] button { background:rgb(91,75,219); }');
+  await writeFile(resolve(run,"fixture.html"),'<button type="button">Fixture</button>');
+  await writeFile(resolve(run,"fixture.js"),'const button=context.root.querySelector("button");const click=()=>document.documentElement.dataset.injectraSmoke="1";button.addEventListener("click",click);context.onCleanup(()=>{button.removeEventListener("click",click);delete document.documentElement.dataset.injectraSmoke;});');
   assert.equal(cli(["apply", ...flags, "--bundle", manifest]).status, "applied");
   assert.equal(await evaluate('document.querySelectorAll("[data-injectra]").length'), 2);
   assert.equal(await evaluate('getComputedStyle(document.querySelector("[data-injectra] button")).backgroundColor'), "rgb(91, 75, 219)");
-  assert.equal(await evaluate('document.querySelector("[data-injectra] button").click(); document.documentElement.style.zoom'), "0.9");
+  assert.equal(await evaluate('document.querySelector("[data-injectra] button").click(); document.documentElement.dataset.injectraSmoke'), "1");
   assert.equal(cli(["apply", ...flags, "--bundle", manifest]).status, "updated");
   assert.equal(await evaluate('document.querySelectorAll("[data-injectra]").length'), 2);
-  assert.equal(await evaluate('document.documentElement.style.zoom'), "");
-  assert.equal(cli(["remove", ...flags, "--id", "injectra.accent"]).status, "removed");
+  assert.equal(await evaluate('document.documentElement.dataset.injectraSmoke ?? null'), null);
+  assert.equal(cli(["remove", ...flags, "--id", "injectra.test.fixture"]).status, "removed");
   assert.equal(await evaluate('document.querySelectorAll("[data-injectra]").length'), 0);
-  assert.equal(cli(["remove", ...flags, "--id", "injectra.accent"]).status, "absent");
+  assert.equal(cli(["remove", ...flags, "--id", "injectra.test.fixture"]).status, "absent");
   assert.match(cli(["apply", "--port", String(port), "--target", "missing-target", "--bundle", manifest], 1), /exactly one/);
 
   await writeFile(resolve(run, "bad.js"), 'context.onCleanup(() => { document.body.removeAttribute("data-test"); }); document.body.dataset.test = "partial"; throw new Error("intentional-script-failure");');

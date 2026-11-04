@@ -1,6 +1,7 @@
 from pathlib import Path
 import json,os,subprocess,time
-from reference_paths import ROOT, CACHE, SHARED, GENERATOR, GADGET_LIBRARY
+from reference_paths import ROOT, CACHE, SHARED, GENERATOR, GADGET_LIBRARY, bundle_manifest
+manifest=bundle_manifest()
 from bridge import NodeBridge,ELECTRON
 run=Path(json.loads((CACHE/'active.json').read_text())['run']);b=None
 helper=GENERATOR
@@ -11,7 +12,7 @@ try:
  selected=[p for p in pages if p['url']=='https://www.douyin.com/jingxuan']
  assert len(selected)==1,selected
  target=selected[0];report['target']=target
- program=subprocess.check_output([str(helper),'apply',str(ROOT/'payload/manifest.json')],text=True)
+ program=subprocess.check_output([str(helper),'apply',str(manifest)],text=True)
  (run/'shared-apply.js').write_text(program)
  wrap=lambda js:'(()=>{const e='+ELECTRON+';const w=e.webContents.fromId('+str(target['id'])+');if(!w||w.isDestroyed()||w.getURL()!=='+json.dumps(target['url'])+')throw Error("Target changed");return w.executeJavaScript('+json.dumps(js)+');})()'
  result=b.evaluate(wrap(program));report['apply']=result

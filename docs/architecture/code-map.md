@@ -5,7 +5,7 @@
 | 能力 | 源码入口与职责 | 上下游边界 | 测试与专题 |
 | --- | --- | --- | --- |
 | 核心契约 | [core](../../crates/core/src/lib.rs)：BackendId/TargetRef/Capability/Error | 无执行域/JSON依赖；能力检查与错误语义 | 身份隔离测试；[架构](boundaries.md) |
-| Web载荷加载 | [bundle.rs](../../crates/web/src/bundle.rs)：版本、路径和资源限制 | 本地manifest → Bundle | 内联loader测试、[负例](../../tests/bundles/escape.json)；[使用](../dev.md) |
+| Web载荷加载 | [bundle.rs](../../crates/web/src/bundle.rs)：版本、路径和资源限制 | 本地manifest → Bundle | 内联loader测试、[临时夹具](../../tests/support/bundle.rs)；[使用](../dev.md) |
 | 程序生成 | [web](../../crates/web/src/lib.rs)：共享runtime嵌入、数据序列化 | Bundle → JS程序 | Electron端到端测试 |
 | 共享注入执行 | [runtime.js](../../web/runtime.js)：拥有节点、清理、重复/并发注入 | 单次注入及既有辅助行为；无平台判断或导航恢复 | [runtime.test.mjs](../../tests/runtime.test.mjs) |
 | CDP发现 | [discovery.rs](../../crates/cdp/src/discovery.rs)：本地HTTP发现 | CDP页面 → WebTarget | Electron发现实测 |
@@ -16,7 +16,7 @@
 | 原生域 | [target](../../crates/native/src/target.rs)、[memory](../../crates/native/src/memory.rs)：原生目标、地址、独立读写端口 | 无Web、无真实后端 | [受控缓冲区测试](../../crates/native/src/memory/tests.rs)、[契约](boundaries.md) |
 | 宿主规划 | [hosts/electron](../../crates/hosts/src/electron.rs)：Electron识别与只读规划 | 平台元数据 → LaunchPlan | recipe单测、Electron实测 |
 | CLI装配 | [main.rs](../../crates/cli/src/main.rs)、[args.rs](../../crates/cli/src/args.rs) | 参数 → 适配/载荷 → JSON | [smoke](../../scripts/electron-smoke.mjs) |
-| 示例载荷 | [manifest](../../examples/accent/manifest.json)、[behavior](../../examples/accent/behavior.js) | Web页面与清理回调 | 同上 |
+| 测试输入（非插件） | [临时夹具](../../tests/support/bundle.rs)、[Electron smoke](../../scripts/electron-smoke.mjs) | 仅在临时目录生成最小输入，结束后清理Rust夹具；不依赖插件库 | make check / make test-electron |
 | 工程入口 | [Makefile](../../Makefile)、[cargo.sh](../../scripts/cargo.sh)、[测试环境](../../scripts/test-env.mjs) | 外部缓存，不污染同步工作区 | make check；[开发](../dev.md) |
 | 软件参考源码（非产品模块） | [references](../../references/README.md)：apps按软件/路线归档，shared保留Electron/V8桥接及Web程序生成器 | 不加入根workspace；不参与默认构建/测试/发布；不复制Web runtime | make -C references check/stats；[抖音证据](../compatibility/douyin-gadget.md) |
 | 测试工具 | [setup-tests](../../scripts/setup-tests.mjs)、[锁文件](../../tests/package-lock.json)、[fixture](../../tests/electron/main.cjs) | 自有测试进程与profile | make test-electron；[验证](../validation.md) |

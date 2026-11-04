@@ -18,14 +18,14 @@ make run ARGS="--help"
 make run ARGS="targets --port 9222"
 ```
 
-`targets` 需要目标应用已开放 `127.0.0.1:9222` 的页面调试入口。确认输出中的页面身份后，把下面的 `TARGET_ID` 替换为对应 ID：
+插件统一位于[独立插件库](../../../JavaScript/code/web-ui-plugins/README.md)；本仓库不保存插件。将所选插件manifest的路径设为`BUNDLE_MANIFEST`，再运行下列命令。`targets` 需要目标应用已开放 `127.0.0.1:9222` 的页面调试入口。确认输出中的页面身份后，把下面的 `TARGET_ID` 替换为对应 ID：
 
 ```sh
-make run ARGS="apply --port 9222 --target TARGET_ID --bundle examples/accent/manifest.json"
+make run ARGS="apply --port 9222 --target TARGET_ID --bundle $BUNDLE_MANIFEST"
 make run ARGS="remove --port 9222 --target TARGET_ID --id injectra.accent"
 ```
 
-示例会添加右下角缩放按钮；再次 apply 替换同 ID 的已有内容；remove 删除拥有的节点并执行脚本登记的清理回调。CLI 成功输出 JSON，失败退出码为 1，参数错误为 2。
+插件效果由插件库中的实现决定；再次 apply 替换同 ID 的已有内容；remove 删除拥有的节点并执行脚本登记的清理回调。CLI 成功输出 JSON，失败退出码为 1，参数错误为 2。
 
 ## 验证与源码导航
 
@@ -48,4 +48,4 @@ make test-electron # 启动并退出独立 Electron fixture，验证真实注入
 
 载荷是受信任的本地代码，具有目标页面允许的权限，并非沙箱。当前不提供任意JS撤销或一键回滚；已有remove与清理回调保留为受管理内容的辅助接口。更新是先移除旧内容再应用新内容，失败不会自动恢复旧版本。超时/断线表示执行结果不确定，不自动重试。
 
-默认缓存根为 `${XDG_CACHE_HOME:-$HOME/.cache}/injectra`，可用 `INJECTRA_CACHE_DIR` 覆盖。构建、测试依赖、fixture profile/日志放仓库外；仓库只保存源码、锁文件和小样例。没有大型数据集、模型权重或远端部署。
+默认缓存根为 `${XDG_CACHE_HOME:-$HOME/.cache}/injectra`，可用 `INJECTRA_CACHE_DIR` 覆盖。构建、测试依赖、fixture profile/日志放仓库外；仓库只保存注入器源码、锁文件及最小测试数据，不保存可交付插件包。没有大型数据集、模型权重或远端部署。

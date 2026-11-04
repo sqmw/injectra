@@ -17,9 +17,14 @@ for name in ['shared/electron-v8/agent/bootstrap.js','shared/electron-v8/agent/v
     code=compiler.build(name,project_root=str(ROOT))
     (validation/(name.replace('/','-')+'.bundle.js')).write_text(code)
 helper=cache/'cargo-target/debug/injectra-reference-program'
-manifest=ROOT/'apps/douyin/gadget-v8/payload/manifest.json'
+# Generate minimal offline test input outside the repository; no shipped plugin.
+fixture=validation/'fixture-input';fixture.mkdir(exist_ok=True)
+manifest=fixture/'manifest.json'
+manifest.write_text(json.dumps({'version':1,'id':'injectra.reference.fixture','html':'content.html','js':'script.js'}))
+(fixture/'content.html').write_text('<section id="injectra-reference-proof"><button data-count="0">Fixture</button></section>')
+(fixture/'script.js').write_text('const p=context.root.querySelector("section");p.dataset.executed="1";const b=p.querySelector("button");b.onclick=()=>b.dataset.count="1";')
 apply=subprocess.check_output([str(helper),'apply',str(manifest)],text=True)
-remove=subprocess.check_output([str(helper),'remove','injectra.probe.douyin-gadget'],text=True)
+remove=subprocess.check_output([str(helper),'remove','injectra.reference.fixture'],text=True)
 programs=validation/'programs.json';programs.write_text(json.dumps({'apply':apply,'remove':remove}))
 subprocess.run(['node',str(ROOT/'scripts/payload-smoke.mjs'),str(programs)],check=True)
 print(f'Reference offline checks OK: {len(stats["files"])} source files, 3 compiled agents; no target application started')

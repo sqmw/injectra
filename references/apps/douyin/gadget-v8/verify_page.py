@@ -1,6 +1,7 @@
 from pathlib import Path
 import hashlib,json,os,secrets,subprocess,time
-from reference_paths import ROOT, CACHE, SHARED, GENERATOR, GADGET_LIBRARY
+from reference_paths import ROOT, CACHE, SHARED, GENERATOR, GADGET_LIBRARY, bundle_manifest
+manifest=bundle_manifest()
 from bridge import NodeBridge,PageBridge,ELECTRON
 run=Path(json.loads((CACHE/'active.json').read_text())['run']);target=json.loads((run/'selected-page.json').read_text())
 output=CACHE/('page-verification-'+str(time.time_ns()));output.mkdir()
@@ -39,7 +40,7 @@ try:
  time.sleep(.4)
  attempts=p.value('globalThis['+json.dumps(key)+']')
  check('no automatic replay',attempts==1,attempts)
- apply=subprocess.check_output([str(helper),'apply',str(ROOT/'payload/manifest.json')],text=True)
+ apply=subprocess.check_output([str(helper),'apply',str(manifest)],text=True)
  remove=subprocess.check_output([str(helper),'remove','injectra.probe.douyin-gadget'],text=True)
  (output/'shared-apply.js').write_text(apply)
  updated=p.evaluate(apply);count=p.value('document.querySelectorAll("#injectra-douyin-proof").length')

@@ -21,9 +21,12 @@
 
 Electron官方列出了[remote-debugging-port](https://www.electronjs.org/docs/latest/api/command-line-switches)；本适配仅使用[CDP Runtime协议](https://chromedevtools.github.io/devtools-protocol/)中的JS执行能力。调试入口提供页面控制能力，只为受信任的本地操作开放；客户端限制目标为127.0.0.1并不替目标应用证明其监听地址。
 
-## Bundle合同
+## 插件归属与Bundle合同
 
-[示例manifest](../examples/accent/manifest.json)包含`version:1`、唯一`id`和可选`css`/`html`/`js`相对文件名，至少一个非空。ID限1–80个ASCII字母、数字、点、下划线或连字符；未知字段、未知版本、绝对资源路径、解析后逃出manifest目录的路径/符号链接均拒绝。单文件上限1 MiB。
+所有实际插件和可复用载荷统一在[独立插件库](../../../../JavaScript/code/web-ui-plugins/README.md)，Injectra不维护主题/应用插件副本。通过`BUNDLE_MANIFEST`或CLI的`--bundle`显式传入所选文件；不把插件库路径写入构建依赖。核心测试只生成仓库外临时Bundle，不读取插件库。
+
+
+外部插件manifest包含`version:1`、唯一`id`和可选`css`/`html`/`js`相对文件名，至少一个非空。ID限1–80个ASCII字母、数字、点、下划线或连字符；未知字段、未知版本、绝对资源路径、解析后逃出manifest目录的路径/符号链接均拒绝。单文件上限1 MiB。
 
 JS文件作为async函数体执行，可使用`context.root`访问本bundle插入的HTML容器；没有HTML时root为null。可选的既有接口`context.onCleanup(callback)`由载荷作者登记清理，回调按逆序执行；需要使用时先登记，再执行对应副作用，不要求所有脚本可撤销。HTML中的script标签不作为脚本加载机制，行为代码放JS文件；HTML事件属性等仍属于受信任代码，不进行净化。
 

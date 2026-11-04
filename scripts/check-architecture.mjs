@@ -27,3 +27,22 @@ for (const [name, dependencies] of Object.entries(allowed)) {
   }
 }
 console.log(`Architecture OK: ${Object.keys(allowed).length} crate roles; core/native remain independent of Web and concrete backends.`);
+
+// Injector ownership boundary: no distributable plugin manifests in source trees.
+const { readdirSync, readFileSync, existsSync } = await import('node:fs');
+const { resolve } = await import('node:path');
+function checkNoPlugins(directory) {
+  if (!existsSync(directory)) return;
+  for (const entry of readdirSync(directory,{withFileTypes:true})) {
+    if (['node_modules','.git','target','dist'].includes(entry.name) || entry.isSymbolicLink()) continue;
+    const file=resolve(directory,entry.name);
+    if (entry.isDirectory()) checkNoPlugins(file);
+    else if (entry.name.endsWith('.json') && entry.name!=='package-lock.json') {
+      let value; try { value=JSON.parse(readFileSync(file,'utf8')); } catch { continue; }
+      assert.ok(!(value?.version===1 && typeof value.id==='string' && ['js','html','css'].some(k=>typeof value[k]==='string')),
+        `Plugin bundle belongs in the external plugin library: ${file}`);
+    }
+  }
+}
+for(const name of ['plugins','examples','crates','tests','web','references'])checkNoPlugins(resolve(root,name));
+console.log('Plugin ownership OK: no distributable plugin bundles in Injectra source trees.');
