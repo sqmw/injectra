@@ -1,0 +1,25 @@
+{
+  "repository": "Injectra--probe--douyin-gadget",
+  "commit": "622fe2e94e10164a083c36e34ff1ae3fdfedbc99",
+  "files": [
+    {
+      "source": "agent/v8.js",
+      "destination": "shared/electron-v8/agent/v8.js",
+      "source_sha256": "255955d443ffd95b30aef47f022862774b07190608a61debaf41c3fb87a4048e",
+      "changes": "byte-identical"
+    },
+    {
+      "source": "agent/bootstrap.js",
+      "destination": "shared/electron-v8/agent/bootstrap.js",
+      "source_sha256": "2459a94069dd84021b30ffec0401f8a8806525287a1878dd4d87a1e9283b9469",
+      "changes": "byte-identical"
+    },
+    {
+      "source": "bridge.py",
+      "destination": "shared/electron-v8/bridge.py",
+      "source_sha256": "b863698b995e18476d83e28a237eb87a19a22e5d6892049aff030c7d64864e85",
+      "changes": "agent path resolves relative to this shared module; original calling signature retained"
+    }
+  ],
+  "scope": "macOS arm64 Electron/V8 candidate; runtime verified only on recorded Douyin combination"
+}

@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "cases": [
+    "apps/douyin/gadget-v8/case.json",
+    "apps/figma/cdp/case.json",
+    "apps/youku/cdp/case.json",
+    "apps/workbuddy/cdp/case.json"
+  ],
+  "statistics": {
+    "unit": "physical source lines including comments and blank lines",
+    "excluded": [
+      "Markdown",
+      "JSON/TOML metadata",
+      "lock files",
+      "dependencies",
+      "binaries",
+      "runtime data"
+    ],
+    "shared_counting": "count each physical shared source file once; do not add it to per-app totals"
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "id": "workbuddy-cdp",
+  "application": "WorkBuddy",
+  "route": "CDP startup recipe",
+  "recorded_version": "5.9.3",
+  "historical_status": "historical-baseline-verified",
+  "archive_validation": "static/offline checks only; no applications relaunched",
+  "source_report": "docs/compatibility/macos-cdp-followup.md",
+  "source_commit": "60de21d9e372109042332d85ee28382969118853",
+  "source_groups": {
+    "application": [
+      "launch.example.sh"
+    ],
+    "validation": []
+  },
+  "shared_dependencies": [
+    "shared/cdp"
+  ],
+  "source_kind": "recipe-reconstructed-from-recorded-startup-conditions",
+  "historical_host": {
+    "os": "macOS",
+    "architecture": "arm64"
+  },
+  "target_architecture": "not inferred from host"
+}

@@ -4,6 +4,32 @@ main 分支为唯一权威来源；Parent 为当前 Codex 主窗口，single-wri
 
 ## 已关闭任务
 
+<a id="t-013"></a>
+### T-013 · 软件注入参考实现归档
+
+```tracking-task
+{
+  "id": "T-013",
+  "name": "软件注入参考实现归档",
+  "version": "v1",
+  "mode": "lightweight",
+  "status": "done",
+  "goal": "将已确认的软件接入参考源码和启动样例归档到主worktree，按软件导航并可靠统计，保持产品边界。",
+  "scope": "references中的抖音Gadget源码、共享桥接/生成器、Figma/优酷/WorkBuddy启动样例、独立依赖与离线检查及文档/来源/统计；不集成为产品后端、不启动或附加应用、不迁入运行数据。",
+  "acceptance": "四款软件入口、来源版本与验证边界可检索；共享代码只存/计一次；解除旧Probe运行依赖并保持唯一Web runtime；参考目录独立于产品workspace/默认代码检查；静态/离线载荷、产品回归、文档/任务及review通过后提交。",
+  "execution_ref": "archive/T-013.md#t-013",
+  "acceptance_evidence": [
+    "四款软件参考入口及来源/历史范围已归档；抖音共享agent/bridge和Web程序生成器单列，CDP案例只保存各自启动条件，不复制后端或Web runtime。",
+    "来源SHA核对、独立Rust生成器、Python/JS/Shell静态检查、3个agent离线编译、DOM载荷smoke通过；生成apply与历史实测产物逐字节一致。",
+    "主仓库make check通过：8 crate架构、格式/clippy、16 Rust和5 Web测试；参考目录不在产品workspace，未启动或附加任何目标应用。",
+    "分组统计每文件唯一归属，共享173/应用入口163/验证188/维护153行（本提交口径），原Probe历史保留；文档/任务检查、自审与独立main提交完成。"
+  ],
+  "unplanned_reason": "2026-11-04用户明确确认references参考归档方案，并要求合入主worktree后提交；不额外创建产品发布里程碑。"
+}
+```
+
+[参考入口](../references/README.md) · [执行与review](archive/T-013.md#t-013)
+
 <a id="t-012"></a>
 ### T-012 · 抖音非 CDP 阶段性成果归档
 

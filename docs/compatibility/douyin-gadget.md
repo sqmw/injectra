@@ -57,7 +57,9 @@ flowchart TD
 
 ## 代码、依赖与证据恢复
 
-源码留在独立仓库`Injectra--probe--douyin-gadget`，分支`codex/douyin-gadget-probe`，完整提交`622fe2e94e10164a083c36e34ff1ae3fdfedbc99`。源文件导航：
+2026-11-04经用户进一步确认，参考源码已归档到main的[软件参考目录](../../references/README.md)，当前入口为[抖音案例](../../references/apps/douyin/gadget-v8/README.md)及[共享Electron/V8桥接](../../references/shared/electron-v8/README.md)。仍未作为产品后端；采纳边界见[D-006](../DECISIONS.md#d-006)。
+
+历史源码仍保留于独立仓库`Injectra--probe--douyin-gadget`，分支`codex/douyin-gadget-probe`，完整提交`622fe2e94e10164a083c36e34ff1ae3fdfedbc99`。原提交内的源文件导航：
 
 | 相对探针根目录 | 职责 |
 | --- | --- |
@@ -66,7 +68,7 @@ flowchart TD
 | `apply_page.py`、`verify_page.py`、`capture_page.py` | 共享载荷、13项检查、自有面板截图 |
 | `docs/reproduce.md`、`Makefile` | 依赖、启动条件、复核和恢复入口 |
 
-克隆main不会自动取得该独立仓库；复现还需要此探针提交，以及相邻WK探针`db3a65e`的锁定环境/共享程序生成器。原探针在archive终态后保持不变，本次由main记录新的结论采纳事件，不改写其历史状态。正式Rust后端若后续落地，须在main按契约重新实现与验证，不整体搬入实验代码。
+现在克隆main即可取得参考源码；路径迁移版使用自己的锁定环境和[独立Web程序生成器](../../references/shared/web-program/README.md)，不再要求相邻旧探针作为运行依赖。此版本仅做迁移后的静态/离线检查，历史实机结果继续绑定原提交/run，不能冒充新实机复验。原独立仓库与archive终态不变；正式Rust后端若后续落地，仍须按契约重新实现与验证。
 
 Gadget来自官方17.25.2 release；压缩包SHA-256为`e364bc62c7628d6ad34d7ce04134702f2585875bce9d7abc1552bee21657b568`。这里只保存摘要，二进制、profile、token、原始日志及截图留在[缓存根](../dev.md)下的`probes/P-DY-GADGET-001/`：
 

@@ -1,0 +1,25 @@
+{
+  "id": "figma-cdp",
+  "application": "Figma",
+  "route": "CDP startup recipe",
+  "recorded_version": "126.5.6",
+  "historical_status": "historical-shell-verified",
+  "archive_validation": "static/offline checks only; no applications relaunched",
+  "source_report": "docs/compatibility/figma.md",
+  "source_commit": "0e32671dffeb1174bdf568d9b1c022b4ae071fe9",
+  "source_groups": {
+    "application": [
+      "launch.example.sh"
+    ],
+    "validation": []
+  },
+  "shared_dependencies": [
+    "shared/cdp"
+  ],
+  "source_kind": "recipe-reconstructed-from-recorded-startup-conditions",
+  "historical_host": {
+    "os": "macOS",
+    "architecture": "arm64"
+  },
+  "target_architecture": "not inferred from host"
+}

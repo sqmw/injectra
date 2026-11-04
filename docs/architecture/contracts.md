@@ -1,6 +1,6 @@
 # 执行域契约与扩展入口
 
-权威架构见[边界](boundaries.md)，取舍与术语映射见[D-004](../DECISIONS.md#d-004)。本页描述当前代码合同；原生只有契约，不宣称实际操作第三方进程。
+权威架构见[边界](boundaries.md)，取舍与术语映射见[D-004](../DECISIONS.md#d-004)。本页描述产品workspace的合同；native crate只有契约。[references](../../references/README.md)中的真实应用参考脚本不构成产品后端。
 
 ## 公共基础
 
@@ -33,7 +33,7 @@ Capability是执行域命名的操作标识，使用精确匹配，不提供隐�
 - MemoryError携带core Error、已确认transferred和读取失败时的read_data。Unknown的transferred只证明该部分已确认，不能用它推断其余字节没有变化。
 - 端口实现是受信任的适配代码；直接调用底层read/write不会经过用例校验。未来宿主权限和进程保护的核验仍属于真实后端，不由接口声明替代。
 
-只有`#[cfg(test)]`下的BufferSession使用本地Vec缓冲区。不存在真实进程访问、地址解引用、Frida依赖、unsafe或可对外返回模拟成功的CLI命令。原生脚本、模块加载及持续事件接口以后在native域扩展，不强制转换为页面JS或JSON。
+只有`#[cfg(test)]`下的BufferSession使用本地Vec缓冲区。当前native crate及默认CLI内不存在真实进程访问、地址解引用、Frida依赖、unsafe或可对外返回模拟成功的CLI命令。原生脚本、模块加载及持续事件接口以后在native域扩展，不强制转换为页面JS或JSON。
 
 ## 平台与宿主
 

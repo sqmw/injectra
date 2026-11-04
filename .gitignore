@@ -2,9 +2,10 @@
 .env
 .env.*
 !.env.example
-node_modules/
+node_modules
 target/
 dist/
 coverage/
 *.log
 code-base/
+__pycache__/

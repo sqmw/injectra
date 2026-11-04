@@ -1,0 +1,35 @@
+{
+  "id": "douyin-gadget-v8",
+  "application": "抖音",
+  "route": "Gadget -> V8/Node -> Electron page",
+  "recorded_version": "8.7.0",
+  "recorded_platform": "macOS arm64",
+  "historical_status": "historical-live-verified",
+  "archive_validation": "static/offline checks only; no applications relaunched",
+  "source_report": "docs/compatibility/douyin-gadget.md",
+  "source_commit": "622fe2e94e10164a083c36e34ff1ae3fdfedbc99",
+  "source_groups": {
+    "application": [
+      "launch.py",
+      "apply_page.py",
+      "reference_paths.py",
+      "Makefile"
+    ],
+    "validation": [
+      "node_probe.py",
+      "pages.py",
+      "capture_page.py",
+      "recover_bootstrap.py",
+      "verify_page.py",
+      "agent/cocoa.js",
+      "payload/behavior.js",
+      "payload/panel.html",
+      "payload/panel.css"
+    ]
+  },
+  "shared_dependencies": [
+    "shared/electron-v8",
+    "shared/web-program"
+  ],
+  "source_kind": "relocated-probe-source"
+}

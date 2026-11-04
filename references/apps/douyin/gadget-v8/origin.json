@@ -1,0 +1,92 @@
+{
+  "repository": "Injectra--probe--douyin-gadget",
+  "branch": "codex/douyin-gadget-probe",
+  "commit": "622fe2e94e10164a083c36e34ff1ae3fdfedbc99",
+  "files": [
+    {
+      "source": "launch.py",
+      "destination": "apps/douyin/gadget-v8/launch.py",
+      "source_sha256": "a1a5199ce9687d97652ee6ef2663b83a89ebd5cc221cfc88fddb9352460aa8c0",
+      "changes": "imports, shared agent paths, independent cache and generator paths only"
+    },
+    {
+      "source": "apply_page.py",
+      "destination": "apps/douyin/gadget-v8/apply_page.py",
+      "source_sha256": "95c0663583ae7fd5b34392d6daccc91454b50bfc3c05c150a3971da4ba8bcc6f",
+      "changes": "imports, shared agent paths, independent cache and generator paths only"
+    },
+    {
+      "source": "node_probe.py",
+      "destination": "apps/douyin/gadget-v8/node_probe.py",
+      "source_sha256": "752aa1d9c947d4310b0ae384acb88b9d5a2627179ba0c59f90491a1c0f2305c3",
+      "changes": "imports, shared agent paths, independent cache and generator paths only"
+    },
+    {
+      "source": "pages.py",
+      "destination": "apps/douyin/gadget-v8/pages.py",
+      "source_sha256": "659acdecfc7efd3d011f2e4f170411bbaf38ea4faab963057fa8921b9940bc50",
+      "changes": "imports, shared agent paths, independent cache and generator paths only"
+    },
+    {
+      "source": "capture_page.py",
+      "destination": "apps/douyin/gadget-v8/capture_page.py",
+      "source_sha256": "6b78119ed6b71fa40e9be327b87ec8f92d0a14face79a2fce00b07d1b6ee136e",
+      "changes": "imports, shared agent paths, independent cache and generator paths only"
+    },
+    {
+      "source": "recover_bootstrap.py",
+      "destination": "apps/douyin/gadget-v8/recover_bootstrap.py",
+      "source_sha256": "a8c15aaed356c9157a48c9e25cf1819bf23795785d8888175a211406b6e87a78",
+      "changes": "imports, shared agent paths, independent cache and generator paths only"
+    },
+    {
+      "source": "verify_page.py",
+      "destination": "apps/douyin/gadget-v8/verify_page.py",
+      "source_sha256": "f78fd5155c38726e0bd06f82f36d39cf832024fb669b9981ede8b489ad18f321",
+      "changes": "imports, shared agent paths, independent cache and generator paths only"
+    },
+    {
+      "source": "agent/cocoa.js",
+      "destination": "apps/douyin/gadget-v8/agent/cocoa.js",
+      "source_sha256": "a3dab5ed68cfc47ab4b800a13bcabd123a857e86aad3f33dfa8ee5f831f9cb52",
+      "changes": "byte-identical"
+    },
+    {
+      "source": "payload/behavior.js",
+      "destination": "apps/douyin/gadget-v8/payload/behavior.js",
+      "source_sha256": "d7e0d85bbb91cf8e00400ac8990591b17e5a5a4e8aa8adb8d6b29e7d178bced6",
+      "changes": "byte-identical"
+    },
+    {
+      "source": "payload/manifest.json",
+      "destination": "apps/douyin/gadget-v8/payload/manifest.json",
+      "source_sha256": "fffb631f0a5fab26007ac29b2142b34c6105314012ce6dc527d28cf73b1b4edf",
+      "changes": "byte-identical"
+    },
+    {
+      "source": "payload/panel.css",
+      "destination": "apps/douyin/gadget-v8/payload/panel.css",
+      "source_sha256": "51f17808766f06270d9f1076bb143e65e3b64ea7793710d4b26dbeb4f99faeea",
+      "changes": "byte-identical"
+    },
+    {
+      "source": "payload/panel.html",
+      "destination": "apps/douyin/gadget-v8/payload/panel.html",
+      "source_sha256": "0bc0ac8f15c005dc089dafdd0cd55a272951ac433f69e9bf841a9ed4c0f68148",
+      "changes": "byte-identical"
+    }
+  ],
+  "migration": "No live retest of relocated scripts. Historical evidence remains bound to original commit/run.",
+  "helper_origin": {
+    "repository": "Injectra--probe--native-web-bridge",
+    "commit": "db3a65e3ae975a6d639c9ccc27d1a60a50bb5f34"
+  },
+  "new_archive_support": [
+    "reference_paths.py",
+    "Makefile"
+  ],
+  "migration_notes": [
+    "Verifier source hashes now locate shared bridge/agent paths; verification revision marks reference archive.",
+    "No old Probe runtime directory or sibling repository is required by executable reference paths."
+  ]
+}
