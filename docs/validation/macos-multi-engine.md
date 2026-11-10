@@ -13,6 +13,8 @@
 | 真实Tauri/WKWebView | Codex Switcher0.2.11；t017/webkit-real-contract.log和webkit-real-result.json | 用户明确批准的空HOME/CODEX_HOME；主页面及托盘隔离；未执行账号切换 |
 | 会话失败合同 | 6项Python测试及Rust错误映射测试 | 文件权限/符号链接、进程世代、端点、SDK截止、Unknown不重放 |
 
+最终源码eb42869通过18项Rust、5项Web、6项Python测试；最后一轮代表run为electron-1DwXMi、gadget-electron-_k0wlaet、webkit-vyzxd327、cef-vugdzba_、nwjs-0gj69od7，真实抖音final-douyin.log通过。迁出源码目录且使用全新helper缓存的Gadget发现检查也通过。
+
 最终检查摘要保存于外部缓存t017/final-checks.json；原始stdout、失败run和profile继续在仓库外保存。临时测试仅创建自己的DOM，程序触发自有按钮事件；没有声称新增真实鼠标或截图验收。
 
 ## 自审及处理

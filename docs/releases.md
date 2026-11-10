@@ -3,7 +3,7 @@
 ## T-017 · macOS多引擎开发交付（未发布）
 
 - 当前窗口工作分支交付，尚未合入main或推送；既有MVP tag不移动。CLI包版本暂沿用0.1.0，新增能力以本分支提交及--help为准，不把旧tag当作新后端版本。
-- 1c02dca建立基线，6c1655b交付Electron Gadget，5f2d013补CEF/NW.js合同；WebKit及最终收口对应本节所在提交链。
+- 1c02dca建立基线，6c1655b交付Electron Gadget，5f2d013补CEF/NW.js合同；eb42869交付WKWebView；最终关闭记录为本节所在提交。
 - 默认CDP保持兼容，新增electron-gadget/webkit显式后端；可选依赖安装和使用见[Frida说明](frida-backends.md)、[WebKit说明](webkit-backend.md)。
 - 验收与限制见[Mac交付](macos-delivery.md)和[当前矩阵](compatibility/current-matrix.md)；未创建安装包或GitHub Release。源码回退按独立提交处理，不自动撤销页面副作用或删除运行证据。
 

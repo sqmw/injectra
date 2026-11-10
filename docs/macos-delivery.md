@@ -1,6 +1,6 @@
 # macOS多引擎交付
 
-所属[T-017](TODO.md#t-017)；[执行证据](STEPS.md#t-017)。当前仅macOS arm64，主页面，不外推Intel/Windows/Gecko。
+所属[T-017](TODO.md#t-017)；[执行证据](STEPS.md#t-017)。本分支T-017已验收关闭；当前仅macOS arm64，主页面，不外推Intel/Windows/Gecko。
 
 ## 已批准实现边界
 
@@ -20,3 +20,5 @@
 ## 操作边界
 
 不自动重启用户应用，不修改安装包、重签名或调整系统保护。Clash Verge仅先做只读可行性检查；改变其运行状态须讨论。独立测试宿主由测试创建和退出。不能以fixture通过替代真实应用验收。
+
+最终源码eb42869：18项Rust、5项Web、6项Python测试与全部代表路线通过；[集中验收与自审](validation/macos-multi-engine.md)。成果仅在本窗口工作分支，未合入main或推送。

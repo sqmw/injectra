@@ -2,7 +2,7 @@
 
 本工作树持有T-017的权威状态；T-001至T-016继承自62c1676，仅作只读历史快照。保留完整定义与验收；默认从[任务索引](tasks.md)进入，按Task ID定向读取，不整读历史。
 
-## 当前任务
+## 本工作树已关闭任务
 
 <a id="t-017"></a>
 ### T-017 · macOS 多引擎接入与正式工具整合
@@ -13,18 +13,23 @@
   "name": "macOS 多引擎接入与正式工具整合",
   "version": "v1",
   "mode": "staged",
-  "status": "in_progress",
+  "status": "done",
   "goal": "在macOS arm64统一交付Chromium/CDP、Electron Gadget与WebKit主页面注入，按引擎/宿主/路线分别验收。",
   "scope": "保留现有核心契约与共享runtime；新增并列后端、共享Frida桥接、CLI选择、锁定可选环境、CEF/NW.js/WKWebView验证；不推进Windows/Gecko/iframe/自动重注入，不改第三方安装包/系统保护，不自动重启用户应用。",
   "acceptance": "既有CDP回归通过；Gadget正式CLI在独立Electron及抖音真实页面通过；CEF/NW.js独立宿主通过；WebKit独立宿主与至少一个真实应用通过；结果/异常/Unknown/资源生命周期明确；文档、review和可恢复提交完成。",
-  "execution_ref": "STEPS.md#t-017",
-  "acceptance_evidence": [],
+  "execution_ref": "archive/T-017.md#t-017",
+  "acceptance_evidence": [
+    "正式CLI默认CDP兼容，新增Electron Gadget/WKWebView并列后端；core/Web契约与唯一runtime保持。",
+    "macOS arm64：抖音8.7.0、独立Electron36、CEF156/NW.js0.119.2、独立双WKWebView及用户批准的真实Codex Switcher0.2.11通过对应合同/CLI检查；原CDP Electron45回归通过。",
+    "最终18 Rust/5 Web/6 Python测试、原生清理/控制端退出、可移出源码运行、文档/任务检查与自审通过；实现eb42869及前置提交可恢复，运行证据仓库外保存。",
+    "已按授权退出本次真实测试新实例，未导入原账号或执行账号切换；Gadget ABI/加载条件、未验证平台及极端阻塞边界如实记录；未合入main/推送，不声称所有Mac软件可注入。"
+  ],
   "priority": "P1",
   "unplanned_reason": "2026-11-10用户确认Mac优先、Chromium+WebKit、正式工具交付、并列后端扩展、仅主页面、复用Python/Frida，并明确Implement the plan。"
 }
 ```
 
-[恢复上下文](agent-context/tasks/T-017.md) · [实施与验收](macos-delivery.md) · [执行](STEPS.md#t-017)
+[关闭上下文](archive/T-017-context.md) · [实施与验收](macos-delivery.md) · [执行](archive/T-017.md#t-017)
 
 ## 已关闭任务
 
