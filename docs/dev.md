@@ -23,7 +23,7 @@ Electron官方列出了[remote-debugging-port](https://www.electronjs.org/docs/l
 
 ## 插件归属与Bundle合同
 
-所有实际插件和可复用载荷统一在[独立插件库](../../../../JavaScript/code/web-ui-plugins/README.md)，Injectra不维护主题/应用插件副本。通过`BUNDLE_MANIFEST`或CLI的`--bundle`显式传入所选文件；不把插件库路径写入构建依赖。核心测试只生成仓库外临时Bundle，不读取插件库。
+所有实际插件和可复用载荷统一在独立插件库（独立 web-ui-plugins 仓库内 README.md），Injectra不维护主题/应用插件副本。通过`BUNDLE_MANIFEST`或CLI的`--bundle`显式传入所选文件；不把插件库路径写入构建依赖。核心测试只生成仓库外临时Bundle，不读取插件库。
 
 
 外部插件manifest包含`version:1`、唯一`id`和可选`css`/`html`/`js`相对文件名，至少一个非空。ID限1–80个ASCII字母、数字、点、下划线或连字符；未知字段、未知版本、绝对资源路径、解析后逃出manifest目录的路径/符号链接均拒绝。单文件上限1 MiB。

@@ -4,7 +4,7 @@
 
 ## 当前归属
 
-全部已识别的活跃Injectra插件与可复用Bundle集中在独立web-ui-plugins库，权威目录见[catalog](../../../../../JavaScript/code/web-ui-plugins/catalog.json)。原有豆包快捷主题、抖音图片主题保留，新增迁入论文阅读、通用缩放、抖音验证面板、Cursor居中面板、WorkBuddy居中面板，共7项。
+全部已识别的活跃Injectra插件与可复用Bundle集中在独立web-ui-plugins库，权威目录见catalog（独立 web-ui-plugins 仓库内 catalog.json）。原有豆包快捷主题、抖音图片主题保留，新增迁入论文阅读、通用缩放、抖音验证面板、Cursor居中面板、WorkBuddy居中面板，共7项。
 
 Injectra不再保存examples/accent或参考案例payload；注入runtime、CDP/V8桥接和验证工具仍属于注入器。Rust、Electron及离线参考检查只生成临时测试输入，不依赖插件库，不对外提供测试插件命令。架构检查拒绝源码树中的可交付Bundle JSON。
 
@@ -12,7 +12,7 @@ Injectra不再保存examples/accent或参考案例payload；注入runtime、CDP/
 
 - 独立doubao-paper-focus项目完整迁入插件库，原目录删除；原HEAD为20e6fe0，完整Git元数据保存在仓库外插件缓存的migrations/20261105-NpxIsQ/doubao-paper-focus.git，保留所有引用/对象。
 - 原examples/accent和references内抖音payload各4文件迁入相应插件bundle目录；Cursor/WorkBuddy原缓存bundle分别4/3文件迁入后删除旧bundle目录。
-- 共53文件先复制逐项SHA核对，再删除旧位置；[迁入收据](../../../../../JavaScript/code/web-ui-plugins/docs/migrations/20261105-inventory.json)为来源与原文件hash的唯一清单。论文src与tests、四组静态Bundle共29文件在构建后再次比对一致；构建环境/导航整合修改另由提交记录。
+- 共53文件先复制逐项SHA核对，再删除旧位置；迁入收据（独立 web-ui-plugins 仓库内 docs/migrations/20261105-inventory.json）为来源与原文件hash的唯一清单。论文src与tests、四组静态Bundle共29文件在构建后再次比对一致；构建环境/导航整合修改另由提交记录。
 - 插件库交付提交为67908ba；本库源文件删除、测试解耦与边界由本文件所在提交保存。需要恢复旧项目时使用原Git备份，或从插件库提交取得文件；不要恢复长期双份活跃源码。
 - 既有profile、账号、日志和历史run结果未删除，历史生成的验证夹具不作为活跃插件源码；没有重启或重新注入用户应用。原始origin.json仅承担迁移前来源证据，当前case.json与统计不再把插件计入接入源码。
 

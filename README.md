@@ -18,7 +18,7 @@ make run ARGS="--help"
 make run ARGS="targets --port 9222"
 ```
 
-插件统一位于[独立插件库](../../../JavaScript/code/web-ui-plugins/README.md)；本仓库不保存插件。将所选插件manifest的路径设为`BUNDLE_MANIFEST`，再运行下列命令。`targets` 需要目标应用已开放 `127.0.0.1:9222` 的页面调试入口。确认输出中的页面身份后，把下面的 `TARGET_ID` 替换为对应 ID：
+插件统一位于独立插件库（独立 web-ui-plugins 仓库内 README.md）；本仓库不保存插件。将所选插件manifest的路径设为`BUNDLE_MANIFEST`，再运行下列命令。`targets` 需要目标应用已开放 `127.0.0.1:9222` 的页面调试入口。确认输出中的页面身份后，把下面的 `TARGET_ID` 替换为对应 ID：
 
 ```sh
 make run ARGS="apply --port 9222 --target TARGET_ID --bundle $BUNDLE_MANIFEST"

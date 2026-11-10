@@ -1,6 +1,30 @@
 # 任务入口
 
-本文件为main唯一权威Task状态簿，保留完整定义与验收；默认从[任务索引](tasks.md)进入，按Task ID定向读取，不整读历史。
+本工作树持有T-017的权威状态；T-001至T-016继承自62c1676，仅作只读历史快照。保留完整定义与验收；默认从[任务索引](tasks.md)进入，按Task ID定向读取，不整读历史。
+
+## 当前任务
+
+<a id="t-017"></a>
+### T-017 · macOS 多引擎接入与正式工具整合
+
+```tracking-task
+{
+  "id": "T-017",
+  "name": "macOS 多引擎接入与正式工具整合",
+  "version": "v1",
+  "mode": "staged",
+  "status": "in_progress",
+  "goal": "在macOS arm64统一交付Chromium/CDP、Electron Gadget与WebKit主页面注入，按引擎/宿主/路线分别验收。",
+  "scope": "保留现有核心契约与共享runtime；新增并列后端、共享Frida桥接、CLI选择、锁定可选环境、CEF/NW.js/WKWebView验证；不推进Windows/Gecko/iframe/自动重注入，不改第三方安装包/系统保护，不自动重启用户应用。",
+  "acceptance": "既有CDP回归通过；Gadget正式CLI在独立Electron及抖音真实页面通过；CEF/NW.js独立宿主通过；WebKit独立宿主与至少一个真实应用通过；结果/异常/Unknown/资源生命周期明确；文档、review和可恢复提交完成。",
+  "execution_ref": "STEPS.md#t-017",
+  "acceptance_evidence": [],
+  "priority": "P1",
+  "unplanned_reason": "2026-11-10用户确认Mac优先、Chromium+WebKit、正式工具交付、并列后端扩展、仅主页面、复用Python/Frida，并明确Implement the plan。"
+}
+```
+
+[恢复上下文](agent-context/tasks/T-017.md) · [实施与验收](macos-delivery.md) · [执行](STEPS.md#t-017)
 
 ## 已关闭任务
 
