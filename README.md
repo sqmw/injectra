@@ -46,7 +46,7 @@ make test-electron # 启动并退出独立 Electron fixture，验证真实注入
 
 ## 当前限制
 
-页面操作仅连接显式回环端口或身份核对的会话，使用精确页面ID；apply/remove不自动启动或结束应用，不改应用包。Gadget受控启动是单独的显式命令。页面刷新或窗口重建后需由使用者重新选择目标并 apply；自动重注入、跨窗口恢复及应用控件适配不属当前交付。当前WebKit已在独立WKWebView和真实Tauri应用验证；尚无Windows/Linux/Intel Mac兼容性证明。
+页面操作仅连接显式回环端口或身份核对的会话，使用精确页面ID；apply/remove不自动启动或结束应用，不改应用包。Gadget受控启动是单独的显式命令。页面刷新或窗口重建后需由使用者重新选择目标并 apply；自动重注入、跨窗口恢复及应用控件适配不属当前交付。当前WebKit已在独立WKWebView和真实Tauri应用验证；macOS硬件范围仅Apple Silicon，Intel Mac不在支持或验证计划内；Windows/Linux尚无兼容性证明，详见[范围](docs/requirements.md)。
 
 载荷是受信任的本地代码，具有目标页面允许的权限，并非沙箱。当前不提供任意JS撤销或一键回滚；已有remove与清理回调保留为受管理内容的辅助接口。更新是先移除旧内容再应用新内容，失败不会自动恢复旧版本。超时/断线表示执行结果不确定，不自动重试。
 

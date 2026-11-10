@@ -4,6 +4,29 @@
 
 ## 最近完成的验证
 
+<a id="t-031"></a>
+### T-031 · macOS 应用未验清单与硬件范围确认
+
+```tracking-task
+{
+  "id": "T-031",
+  "name": "macOS 应用未验清单与硬件范围确认",
+  "version": "v1",
+  "mode": "lightweight",
+  "status": "done",
+  "goal": "从原应用列表提取未完成验证的真实应用，并记录用户排除Intel Mac的硬件范围。",
+  "scope": "只读核对兼容性表及后续WebKit记录，更新macOS硬件范围与任务/决策；不启动或重试应用，不改变保留的抖音窗口。",
+  "acceptance": "14款未进入完整注入验证、2款尝试未取得页面、部分/版本未复验分别列明；后续Easydict单列；Intel硬件从后续范围移除，历史证据不改。",
+  "execution_ref": "archive/T-031.md#t-031",
+  "acceptance_evidence": [
+    "按兼容性表状态列提取14款未验证；微信开发者工具和CocosCreator为尝试未取得页面，Figma部分通过、豆包2.34.6仅入口；后来Easydict接入未完成单列。D-011与README/需求/矩阵记录Apple Silicon硬件范围，Intel不继续列作缺口；无代码或应用操作。"
+  ],
+  "unplanned_reason": "用户要求回到先前macOS应用列表查看未验证项，并明确不考虑Intel芯片。"
+}
+```
+
+[清单核对与范围记录](archive/T-031.md#t-031) · [D-011](DECISIONS.md#d-011)
+
 <a id="t-030"></a>
 ### T-030 · 注入适配复用边界与插件化阈值确认
 

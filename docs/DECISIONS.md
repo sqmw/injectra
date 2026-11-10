@@ -264,3 +264,31 @@ D-006参考归档边界补充：接入、桥接与验证工具可以保留，可
 ```
 
 [计数、现状与验收](architecture/boundaries.md) · [用户边界](requirements.md)。此决策补充未来扩展约束，不覆盖既有试验或静态装配历史；变更阈值或插件化验收需另行记录用户决策。
+
+<a id="d-011"></a>
+## D-011 · macOS仅考虑Apple Silicon硬件
+
+```tracking-decision
+{
+  "id": "D-011",
+  "date": "2026-11-11",
+  "status": "accepted",
+  "conclusion": "macOS硬件支持及后续验证范围仅Apple Silicon，排除Intel Mac；历史未验证Intel记录保留，不继续作为待补项。硬件范围不自动扩张或变更Rosetta/x86_64目标支持声明。",
+  "trigger": "用户明确mac不考虑Intel芯片，要求回到先前真实应用列表查看未验证项。",
+  "context": "T-031@v1；基线35eb610；当前实机证据来自arm64主机。",
+  "affects": [
+    "macOS硬件支持范围",
+    "后续验证清单",
+    "README与需求入口"
+  ],
+  "alternatives": [
+    "继续列Intel硬件为验证缺口：与用户范围决定冲突",
+    "改写历史未验证证据或删除架构代码：非本轮要求",
+    "将Intel硬件与Apple Silicon上的x86_64进程混为一谈：混淆设备与目标架构"
+  ],
+  "commit": "本条所在提交",
+  "supersedes": []
+}
+```
+
+[范围](requirements.md) · [原应用清单](compatibility/current-matrix.md)；本次仅确定硬件范围，未修改构建目标或真实后端实现。

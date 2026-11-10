@@ -18,6 +18,8 @@
 
 runtime / pre-runtime描述注入时机；CDP、Hook等描述接入机制。当前保留CDP，T-017新增Gadget接入并推进WebKit；统一验证接入、正确页面注入及失败判定，不扩张管理功能。
 
+macOS硬件范围：2026-11-11用户明确仅考虑Apple Silicon，Intel Mac不纳入后续支持或验证计划，见[D-011](DECISIONS.md#d-011)。历史“Intel未验证”保留为当时的证据边界，不继续列作待补项。硬件范围不等于目标进程架构：本次不据此扩张或变更Rosetta/x86_64目标的既有支持声明。
+
 ## 插件存放边界
 
 2026-11-05用户明确要求插件统一由独立web-ui-plugins库持有；Injectra不得保存任何实际插件、示例插件或可交付Bundle。已迁移原examples/accent及参考实现中的受控面板；注入runtime、协议/原生桥接仍属于注入器，验证仅生成临时测试输入。插件目录通过用户显式提供的manifest引用，不进入核心构建依赖。迁移证据见[T-016](TODO.md#t-016)。
