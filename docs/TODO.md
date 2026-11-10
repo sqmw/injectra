@@ -1,8 +1,8 @@
 # 任务入口
 
-本工作树持有T-017的权威状态；T-001至T-016继承自62c1676，仅作只读历史快照。保留完整定义与验收；默认从[任务索引](tasks.md)进入，按Task ID定向读取，不整读历史。
+本文件为main的权威任务状态簿。T-017保留独立工作树交付时的历史结论，后续主分支集成状态以T-018为准。保留完整定义与验收；默认从[任务索引](tasks.md)进入，按Task ID定向读取，不整读历史。
 
-## 当前集成任务
+## 最近完成的集成
 
 <a id="t-018"></a>
 ### T-018 · macOS 多引擎成果合入 main
@@ -13,34 +13,23 @@
   "name": "macOS 多引擎成果合入 main",
   "version": "v1",
   "mode": "lightweight",
-  "status": "in_progress",
+  "status": "done",
   "goal": "将T-017已验证成果快进合入本地main，同步当前交付状态并核验主分支。",
   "scope": "仅本地Git集成、当前状态文档及集成回归；不推送，不批量改写历史，不重新操作用户真实应用，不改变架构和功能。",
   "acceptance": "main包含c2f090f及其全部功能提交；make check/test-frida通过；当前说明不再误称未合入；新提交具有来源trailer；main和本窗口工作树干净。",
-  "execution_ref": "TODO.md#t-018",
-  "acceptance_evidence": [],
+  "execution_ref": "archive/T-018.md#t-018",
+  "acceptance_evidence": [
+    "本地main快进接收c2f090f及完整实现链，无冲突、无覆盖；功能源码与eb42869一致。",
+    "main上的make check/test-frida通过（18 Rust、5 Web、6 Python），文档/任务校验通过；当前交付状态已同步。",
+    "所有本次新建提交均含Commit-Origin: chinami-mac-work并核验；main及本窗口分支收口至同一提交，未推送。"
+  ],
   "unplanned_reason": "用户明确要求合入main；T-017原交付不包含主分支集成。"
 }
 ```
 
-```tracking-execution
-{
-  "id": "T-018/E-001",
-  "name": "快进集成与主分支验收",
-  "task_id": "T-018",
-  "task_version": "v1",
-  "status": "running",
-  "authorization": "用户明确要求“合入到main”；仅本地集成，不推送。",
-  "scope": "仅本地Git集成、当前状态文档及集成回归；不推送，不批量改写历史，不重新操作用户真实应用，不改变架构和功能。",
-  "steps": [],
-  "evidence": [
-    "main当前为62c1676且工作区干净；源分支c2f090f干净，main为其祖先，可快进。"
-  ],
-  "stop_reason": ""
-}
-```
 
-本窗口/root为唯一Parent，single-writer。集成前记录在本工作分支；main接收后移交main，由Parent更新唯一当前状态。输入为c2f090f，主树基线62c1676；不覆盖主树未提交内容。
+
+本窗口/root为唯一Parent，single-writer；main已快进接收2bc763d（包含c2f090f及全部功能提交），当前权威写入位置为main。本窗口分支跟随接收结果，作为main的已采用快照。原主树基线62c1676，无未提交内容被覆盖。 [执行与核验](archive/T-018.md#t-018)。
 
 ## 本工作树已关闭任务
 

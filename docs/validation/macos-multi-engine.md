@@ -1,6 +1,6 @@
 # T-017 macOS多引擎验收与审阅
 
-[任务](../TODO.md#t-017) · [当前矩阵](../compatibility/current-matrix.md) · [交付映射](../releases.md)。所有本轮结果对应当前窗口Mac工作树，基线62c1676；不代表main已集成，不改写历史MVP/Probe结果。
+[任务](../TODO.md#t-017) · [当前矩阵](../compatibility/current-matrix.md) · [交付映射](../releases.md)。本轮实现与实测来自基线62c1676的独立Mac工作树；本地main已通过[T-018](../TODO.md#t-018)接收，不改写历史MVP/Probe结果。
 
 ## 验收对象
 
