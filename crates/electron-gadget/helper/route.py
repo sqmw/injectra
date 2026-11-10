@@ -3,6 +3,7 @@ import hashlib
 import json
 import secrets
 import time
+from pathlib import Path
 from connection import BridgeError
 
 ELECTRON = """(()=>{const key=Symbol.for('injectra.electron.v1');if(!globalThis[key]){
@@ -18,6 +19,17 @@ process:w.mainFrame.processId}))"""
 
 class Route:
     name = "electron-gadget"
+    @staticmethod
+    def validate_binding(state):
+        binding = state.route("electron-gadget")
+        if (binding.profile != "macos-electron-v8" or state.device.platform != "macos"
+                or state.device.provider != "macos-local"):
+            raise BridgeError("unsupported", "Electron host profile is not implemented for this target")
+        ack = binding.options.get("acknowledgements", {})
+        if (not isinstance(ack, dict) or ack.get("kind") != "controller-file"
+                or not isinstance(ack.get("path"), str) or not Path(ack["path"]).is_absolute()):
+            raise BridgeError("invalid_input", "This host profile requires an explicit controller-file acknowledgement source")
+
     def __init__(self, connection, state, root):
         self.connection, self.state, self.root = connection, state, root
         self.script = None
@@ -44,7 +56,7 @@ class Route:
 
     def node(self, expression, timeout=5):
         request = secrets.token_hex(16)
-        log = self.state["ack_log"]
+        log = self.state.route(self.name).options["acknowledgements"]["path"]
         with open(log, "rb") as stream:
             stream.seek(0, 2)
             offset = stream.tell()
@@ -66,7 +78,7 @@ class Route:
                         reply = json.loads(line.split(b"INJECTRA_REPLY:", 1)[1])
                     except (ValueError, UnicodeDecodeError):
                         continue
-                    if reply.get("request") != request or reply.get("pid") != self.state["pid"]:
+                    if reply.get("request") != request or reply.get("pid") != self.state.process.pid:
                         continue
                     if not reply.get("ok"):
                         raise BridgeError("execution", reply.get("message", "Node exception"), "Executed")
@@ -82,7 +94,7 @@ class Route:
         result = self.node(PAGES)
         for page in result:
             fingerprint = json.dumps([page["url"], page["routing"], page["process"]])
-            page["id"] = str(page["native_id"]) + ":" + hashlib.sha256(fingerprint.encode()).hexdigest()[:20]
+            page["id"] = self.state.page_id(self.name, str(page["native_id"]) + ":" + hashlib.sha256(fingerprint.encode()).hexdigest()[:20])
         return result
 
     def request(self, request):

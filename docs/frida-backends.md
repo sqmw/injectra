@@ -21,7 +21,7 @@ CLI使用：
 
 当前实测覆盖抖音8.7.0的Electron36.4.0-rs及独立Electron36.4.0。Electron45.2.1缺少HandleScope导出，明确Unsupported/NotExecuted，不宣称全Electron支持。
 
-每次核对进程PID、启动时间、可执行文件及架构；页面ID包含webContents身份、URL及主frame路由/进程指纹。执行前再次核对。只覆盖主页面，不承诺同URL同frame内的文档世代锁定或导航期间执行原子性。
+T-019将控制端与目标分开：会话v2分别保存device/process/connection/routes，新注册输出v2，旧v1按历史Mac本机会话只读兼容，不写回原文件。每次由Mac目标provider核对设备boot实例、进程世代、路径与架构，并用目标agent回执交叉确认。页面ID绑定设备/进程/路由作用域，再包含webContents身份、URL及主frame指纹。升级后旧未限定页面ID需重新运行targets，不提供不安全回退。执行前再次核对。只覆盖主页面，不承诺同URL同frame内的文档世代锁定或导航期间执行原子性。
 
 返回值等待Promise并转JSON；脚本异常为Executed，超时/断线为Unknown且不重放，缺目标/ABI不支持为NotExecuted。消息按随机请求ID关联，读取Node日志只从本请求起点开始。
 
@@ -42,3 +42,5 @@ SDK操作15秒/清理5秒可取消截止，25秒助手截止后CLI报告Unknown�
 - 显式真实页面测试：设置INJECTRA_TEST_SESSION和INJECTRA_TEST_TARGET后运行cargo test -p injectra-electron-gadget --test live -- --ignored。会短暂添加并移除测试自身DOM，不点击应用业务控件。
 
 当前结果及阶段退出条件见[Mac交付](macos-delivery.md)、[执行证据](STEPS.md#t-017)。
+
+内部扩展接口与当前支持范围见[控制端/设备边界](architecture/device-boundaries.md)：目前只注册Mac本机target provider及认证回环Gadget TCP connector，其他设备与连接器明确Unsupported。Rust平台检查仅表示本地Python控制端当前认证的平台，不代表手机端实现。

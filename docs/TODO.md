@@ -1,6 +1,30 @@
 # 任务入口
 
-本文件为main的权威任务状态簿。T-017保留独立工作树交付时的历史结论，后续主分支集成状态以T-018为准。保留完整定义与验收；默认从[任务索引](tasks.md)进入，按Task ID定向读取，不整读历史。
+本工作树持有T-019当前权威记录，T-018及以前为74844e7的只读历史快照。T-017保留独立工作树交付时的历史结论，后续主分支集成状态以T-018为准。保留完整定义与验收；默认从[任务索引](tasks.md)进入，按Task ID定向读取，不整读历史。
+
+## 当前任务
+
+<a id="t-019"></a>
+### T-019 · 控制端与目标设备边界解耦
+
+```tracking-task
+{
+  "id": "T-019",
+  "name": "控制端与目标设备边界解耦",
+  "version": "v1",
+  "mode": "staged",
+  "status": "in_progress",
+  "goal": "消除控制端本机与目标设备混用，建立设备扩展接口，保持现有Mac行为。",
+  "scope": "Frida内部控制端/会话/目标provider/连接器分离；v2会话并兼容v1；页面ID加入设备进程作用域；Mac宿主发现与WK执行分离；测试和文档。不新增crate、不改core/Web公开契约、CLI命令，不实现手机/USB/ADB或自动恢复。",
+  "acceptance": "未知设备在本机核验/连接前拒绝；不同设备/进程的相同局部ID不互认；旧会话无损读取；Mac目标身份核验及既有独立宿主回归通过；文档、自审及带来源标记提交完成。",
+  "execution_ref": "STEPS.md#t-019",
+  "acceptance_evidence": [],
+  "priority": "P1",
+  "unplanned_reason": "用户明确要求review并解决控制端/目标设备及扩展入口问题，同时不实现手机端。"
+}
+```
+
+[审查与设计](architecture/device-boundaries.md) · [恢复](agent-context/tasks/T-019.md) · [执行](STEPS.md#t-019)
 
 ## 最近完成的集成
 

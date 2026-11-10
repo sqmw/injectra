@@ -117,3 +117,5 @@ CLI命令、manifest v1、targets的id/title/url、apply/remove返回字段、la
 T-017在现有WebBackend/WebSession契约下新增Frida通信及Electron Gadget适配；core/native/application职责不变。Frida通信只依赖core，不依赖Web或应用名；Electron Gadget依赖web/core/frida。详细边界见[Frida后端](../frida-backends.md)。
 
 WKWebView适配器仅依赖core/web/frida，与Electron Gadget并列；不将Objective-C/Node假设加入通用core或native契约。[范围与证据](../webkit-backend.md)。
+
+T-019在frida内部区分控制端运行环境、目标device/process身份与连接器；页面ID携带设备/进程作用域，目标路径与进程世代由provider解释。当前只实现Mac本机provider；未知或手机设备不回退本机核验。core/Web公开契约不变，见[控制端/设备边界](device-boundaries.md)。

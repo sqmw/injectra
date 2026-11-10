@@ -23,6 +23,9 @@ try:
     if records:pid=records[0].get("launcher_pid")
     if launch.returncode:raise RuntimeError("Launch failed; see "+str(run))
     session=records[-1]["session"];pid=records[-1]["pid"]
+    descriptor=json.loads(Path(session).read_text())
+    assert descriptor["schema"]==2 and descriptor["process"]["pid"]==pid
+    assert descriptor["device"]["provider"]=="macos-local"
     binary=Path(os.environ.get("CARGO_TARGET_DIR",cache/"cargo-target"))/"debug/injectra"
     for _ in range(20):
         p=subprocess.run([str(binary),"targets","--backend","webkit","--session",session],capture_output=True,text=True,timeout=30)

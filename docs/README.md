@@ -25,3 +25,5 @@
 宿主验证：[CEF/NW.js](host-validation.md)。
 
 WebKit：[WKWebView正式后端与验收边界](webkit-backend.md)。
+
+设备扩展边界：[控制端与目标设备](architecture/device-boundaries.md)。

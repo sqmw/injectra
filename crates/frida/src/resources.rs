@@ -3,6 +3,24 @@ use std::{fs, path::PathBuf};
 const COMMON: &[(&str, &str)] = &[
     ("main.py", include_str!("../helper/main.py")),
     ("connection.py", include_str!("../helper/connection.py")),
+    ("errors.py", include_str!("../helper/errors.py")),
+    (
+        "session_model.py",
+        include_str!("../helper/session_model.py"),
+    ),
+    (
+        "session_store.py",
+        include_str!("../helper/session_store.py"),
+    ),
+    ("contracts.py", include_str!("../helper/contracts.py")),
+    ("transport.py", include_str!("../helper/transport.py")),
+    ("targets.py", include_str!("../helper/targets.py")),
+    ("target_macos.py", include_str!("../helper/target_macos.py")),
+    (
+        "target_macos_identity.js",
+        include_str!("../helper/target_macos_identity.js"),
+    ),
+    ("deadline.py", include_str!("../helper/deadline.py")),
 ];
 pub(crate) fn cache() -> Result<PathBuf> {
     if let Some(value) = std::env::var_os("INJECTRA_CACHE_DIR") {

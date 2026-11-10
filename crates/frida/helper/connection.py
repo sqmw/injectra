@@ -1,75 +1,42 @@
-"""Authenticated process connection; does not spawn, resume or stop target processes."""
-import json
-import threading
-from contextlib import contextmanager
-import os
-import stat
-import subprocess
-from pathlib import Path
-import frida
-
-class BridgeError(Exception):
-    def __init__(self, kind, message, certainty="NotExecuted"):
-        super().__init__(message)
-        self.kind, self.certainty = kind, certainty
-
-def process_start(pid):
-    value = subprocess.check_output(["/bin/ps", "-p", str(pid), "-o", "lstart="], text=True).strip()
-    if not value:
-        raise BridgeError("target_not_found", "Target process no longer exists")
-    return value
-
-def read_session(path):
-    path = Path(path)
-    info = path.lstat()
-    if not stat.S_ISREG(info.st_mode) or info.st_uid != os.getuid() or info.st_mode & 0o077:
-        raise BridgeError("invalid_input", "Session must be a private, user-owned regular file (0600)")
-    data = json.loads(path.read_text())
-    if data.get("schema") != 1 or not isinstance(data.get("pid"), int) or data["pid"] <= 0:
-        raise BridgeError("invalid_input", "Invalid session descriptor")
-    if process_start(data["pid"]) != data.get("process_start"):
-        raise BridgeError("target_not_found", "Target process identity changed; register a new session")
-    if data.get("transport") != "gadget":
-        raise BridgeError("unsupported", "This route requires an authenticated Gadget session")
-    if not isinstance(data.get("port"), int) or not 0 < data["port"] < 65536 or not data.get("token"):
-        raise BridgeError("invalid_input", "Invalid Gadget endpoint")
-    return data
+"""Coordinate target verification and channel lifetime; no local OS process assumptions."""
+from dataclasses import replace
+from errors import BridgeError
+from session_store import read_session
+from deadline import deadline
+from targets import resolve_target
+from transport import resolve_transport
+from contracts import TargetProvider, TransportConnector
 
 class Connection:
-    def __init__(self, state):
-        self.state = state
-        self.device = frida.get_device_manager().add_remote_device(
-            "127.0.0.1:" + str(state["port"]), token=state["token"])
-        self.session = self.device.attach(state["pid"], persist_timeout=30)
+    def __init__(self, state, *, target_provider: TargetProvider | None = None,
+                 connector: TransportConnector | None = None):
+        # Resolve all declared capabilities before inspecting a process or opening a channel.
+        self.target_provider = target_provider if target_provider is not None else resolve_target(state.device)
+        transport = connector if connector is not None else resolve_transport(state.connection)
+        self.state = replace(state, target=self.target_provider.bind(state.target))
+        self.lease = transport.attach(self.state.target)
+        self.session = self.lease.session
         self.script = None
+        try:
+            self.target_provider.verify_attached(self.session, self.state.target)
+        except Exception:
+            self.lease.close()
+            raise
 
     def load(self, source):
         self.script = self.session.create_script(source, runtime="qjs")
         self.script.load()
         receipt = self.script.exports_sync.identity()
-        if (receipt["pid"] != self.state["pid"] or
-                receipt["executable"] != self.state["executable"] or
-                receipt["arch"] != self.state["arch"] or
-                process_start(self.state["pid"]) != self.state["process_start"]):
+        try:
+            self.target_provider.verify_agent(self.state.target, receipt)
+        except Exception:
             self.script.unload()
             self.script = None
-            raise BridgeError("target_not_found", "Authenticated agent identity does not match the session")
+            raise
         return self.script
 
     def detach(self):
         if self.script is not None:
             self.script.unload()
             self.script = None
-        self.session.detach()
-
-@contextmanager
-def deadline(seconds):
-    cancellation=frida.Cancellable()
-    timer=threading.Timer(seconds,cancellation.cancel)
-    timer.daemon=True
-    timer.start()
-    try:
-        with cancellation:
-            yield cancellation
-    finally:
-        timer.cancel()
+        self.lease.close()

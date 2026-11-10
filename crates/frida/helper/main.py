@@ -15,10 +15,9 @@ def run(request):
             raise BridgeError("invalid_input", "Invalid bridge request")
         with deadline(15):
             state = read_session(request["session"])
-            if Route.name not in state.get("routes", []):
-                raise BridgeError("unsupported", "Session is not registered for the selected backend")
+            Route.validate_binding(state)
             connection = Connection(state)
-            route = Route(connection, state, Path(__file__).parent)
+            route = Route(connection, connection.state, Path(__file__).parent)
             route.open()
             response = {"schema": 1, "ok": True, "value": route.request(request)}
     except frida.OperationCancelledError:

@@ -47,7 +47,7 @@ impl WebBackend for ElectronGadgetBackend {
         if !self.targets()?.iter().any(|page| &page.reference == target) {
             return Err(Error::prepare(
                 ErrorKind::TargetNotFound,
-                "target must match exactly one current Gadget page",
+                "target must match exactly one current Gadget page; run targets again",
             ));
         }
         Ok(Box::new(PageSession {

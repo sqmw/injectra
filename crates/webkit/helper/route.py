@@ -6,6 +6,10 @@ from connection import BridgeError
 
 class Route:
     name="webkit"
+    @staticmethod
+    def validate_binding(state):
+        if state.route("webkit").profile != "macos-appkit" or state.device.platform != "macos":
+            raise BridgeError("unsupported","WKWebView host profile is not implemented for this target")
     def __init__(self,connection,state,root):
         self.connection,self.state,self.root=connection,state,root
         self.script=None;self.submitted=False
@@ -35,7 +39,7 @@ class Route:
     def pages(self):
         pages=self.unwrap(self.script.exports_sync.targets())
         for page in pages:
-            page["id"]=page["native_id"]+":"+hashlib.sha256(page["url"].encode()).hexdigest()[:20]
+            page["id"]=self.state.page_id(self.name,page["native_id"]+":"+hashlib.sha256(page["url"].encode()).hexdigest()[:20])
         return pages
     def request(self,request):
         pages=self.pages()
