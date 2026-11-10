@@ -1,0 +1,7 @@
+{
+  "name": "injectra-gadget-fixture-tools",
+  "private": true,
+  "dependencies": {
+    "electron": "36.4.0"
+  }
+}

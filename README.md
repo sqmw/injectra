@@ -6,6 +6,8 @@
 
 首个核心版本为 **Rust CLI + macOS Electron/CDP**：连接已运行且显式开放本地调试端口的目标，选定单个页面并执行注入，报告结果、失败或结果未知。Injectra负责接入与注入能力；使用者负责脚本内容、选择器、组件适配及渲染覆盖问题。管理平台和Agent属于后续演进方向，见[产品边界](docs/requirements.md)。
 
+当前Mac扩展已在本工作树实现[可选Gadget后端](docs/frida-backends.md)，抖音真实页面及独立Electron36通过；CEF/NW.js/WebKit进展见[Mac交付](docs/macos-delivery.md)。
+
 **MVP 已于 2026-10-31 经用户亲自验证通过**，交付版本为 `v0.1.0-mvp`。版本范围与证据见[交付记录](docs/releases.md)。项目采用 [Apache-2.0 许可证](LICENSE)。
 
 ## 快速入口

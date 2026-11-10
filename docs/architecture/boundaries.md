@@ -28,7 +28,7 @@ flowchart TD
 | core | BackendId、TargetRef、Capability、错误类别/阶段/执行确定性；无项目crate依赖、无serde_json，无页面/进程操作方法 |
 | web | WebTarget、PageContext、WebBackend/WebSession；manifest v1加载与共享程序生成；JSON返回值只属于Web域 |
 | application | targets/apply/remove/execute库用例；后端参数注入，连接前检查实例身份，执行前核对会话目标与页面能力 |
-| cdp | 唯一真实Web后端；回环端口、精确页面、CDP响应/异常映射；不包含应用名称、载荷加载或原生方法 |
+| cdp | 既有CDP Web后端；回环端口、精确页面、CDP响应/异常映射；不包含应用名称、载荷加载或原生方法 |
 | native | NativeTarget、目标架构/地址、NativeSession及独立MemoryRead/MemoryWrite；受控测试与生产契约分开，无真实后端或Web依赖 |
 | platform-macos | inspect_app：.app可执行路径、Framework目录元数据；不识别Electron或生成调试参数 |
 | hosts | Electron识别及macOS只读启动规划；依赖平台元数据，不管理用户进程 |
@@ -60,7 +60,7 @@ CDP发送或等待响应后失联、超时或无法解析响应保守记为Unkno
 - WebBackend提供id/targets/connect；connect只能接受其本实例TargetRef，并返回绑定该目标的WebSession。
 - WebSession提供target/capabilities/evaluate_page；页面求值等待Promise、以JSON值返回，脚本异常必须保留。某个JS引擎可执行脚本并不足以声明`web.page.evaluate`。
 - application公开targets/apply/remove/execute；后端由调用者注入，不导入具体适配。apply保持manifest v1的目录/大小校验和原有共享程序生成；execute核对后端身份、会话目标与页面能力。
-- CLI在单次命令边界将显式端口和原target ID转换为内部TargetRef；输出投影回原id/title/url，不暴露实例ID。默认命令仍只装配CDP。
+- CLI在单次命令边界将显式端口和原target ID转换为内部TargetRef；输出投影回原id/title/url，不暴露实例ID。默认命令仍装配CDP，显式electron-gadget选择新增并列后端。
 
 当前CDP仅发现page目标并使用主页面默认上下文；不声明frame/isolated-world兼容性。`js.evaluate`等通用脚本能力不能替代页面能力。
 
@@ -104,3 +104,5 @@ CLI命令、manifest v1、targets的id/title/url、apply/remove返回字段、la
 - 测试替身只证明契约；真实支持范围以[验证记录](../validation.md)及[豆包历史证据](../compatibility/doubao.md)为准。
 
 [代码地图](code-map.md)提供模块与测试导航。
+
+T-017在现有WebBackend/WebSession契约下新增Frida通信及Electron Gadget适配；core/native/application职责不变。Frida通信只依赖core，不依赖Web或应用名；Electron Gadget依赖web/core/frida。详细边界见[Frida后端](../frida-backends.md)。

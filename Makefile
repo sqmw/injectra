@@ -40,3 +40,21 @@ doc-check:
 
 architecture-check:
 	node scripts/check-architecture.mjs
+
+.PHONY: setup-frida
+setup-frida:
+	sh scripts/setup-frida.sh
+
+.PHONY: test-gadget setup-gadget-tests
+setup-gadget-tests:
+	node scripts/setup-gadget-tests.mjs
+
+test-gadget: build
+	"$${INJECTRA_FRIDA_PYTHON:-$${INJECTRA_CACHE_DIR:-$${XDG_CACHE_HOME:-$$HOME/.cache}/injectra}/frida/venv/bin/python3}" -B scripts/gadget-smoke.py
+
+.PHONY: setup-gadget test-frida
+setup-gadget:
+	python3 scripts/get-gadget.py
+
+test-frida:
+	"$${INJECTRA_FRIDA_PYTHON:-$${INJECTRA_CACHE_DIR:-$${XDG_CACHE_HOME:-$$HOME/.cache}/injectra}/frida/venv/bin/python3}" -B -m unittest discover -s tests/frida

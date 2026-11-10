@@ -1,0 +1,15 @@
+[package]
+name = "injectra-electron-gadget"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+[dependencies]
+injectra-core.workspace = true
+injectra-web.workspace = true
+injectra-frida.workspace = true
+serde_json.workspace = true
+
+[dev-dependencies]
+injectra-application.workspace = true
+tempfile = "3"

@@ -37,8 +37,12 @@ CLI+独立Electron+抖音真实页面验收，资源/错误合同齐全。
   "task_id": "T-017",
   "task_version": "v1",
   "number": 2,
-  "status": "进行中",
-  "evidence": []
+  "status": "已完成",
+  "evidence": [
+    "正式Gadget后端真实抖音8.7.0全组通过；独立Electron36.4.0全组通过，run gadget-electron-us6ccbwv；Electron45缺HandleScope符号在执行前拒绝。",
+    "make check、4项Python会话校验及CDP Electron10项回归通过；自审发现并修正CLI缺省参数约束和结果读取失败确定性。",
+    "CLI抖音apply/update/remove通过；独立fixture控制端退出后助手仍完成并关闭回调，run gadget-electron-c5qkiq_k。正式会话拒绝符号链接；自审与定向回归通过。"
+  ]
 }
 ```
 
@@ -53,7 +57,7 @@ CEF和NW.js独立宿主完整CDP验收。
   "task_id": "T-017",
   "task_version": "v1",
   "number": 3,
-  "status": "未开始",
+  "status": "进行中",
   "evidence": []
 }
 ```
@@ -107,7 +111,8 @@ CEF和NW.js独立宿主完整CDP验收。
     "T-017/S-005"
   ],
   "evidence": [
-    "基线make check与Electron10项通过；日志位于外部缓存t017/baseline.log和electron-baseline.log。"
+    "基线make check与Electron10项通过；日志位于外部缓存t017/baseline.log和electron-baseline.log。",
+    "Gadget正式CLI、真实抖音/独立Electron36、控制端退出清理、默认CDP回归与4项会话单测通过。"
   ],
   "stop_reason": ""
 }

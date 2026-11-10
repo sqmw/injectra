@@ -179,3 +179,29 @@ D-006参考归档边界补充：接入、桥接与验证工具可以保留，可
 ```
 
 接口与限制见[架构](architecture/boundaries.md)。成本：Rust工具链与测试用Node并存；当前仅一个运行时实现，不承诺零成本新增引擎。恢复：停止CLI不撤销已注入页面内容，使用remove执行受管理清理；源码按独立提交回退，保留历史测试证据。
+
+<a id="d-008"></a>
+## D-008 · macOS多引擎正式接入
+
+```tracking-decision
+{
+  "id": "D-008",
+  "date": "2026-11-10",
+  "status": "accepted",
+  "conclusion": "Mac优先，Chromium+WebKit、主页面；在现有分层新增并列后端和共享Frida通信，CLI统一入口，Python/Frida作为锁定可选依赖。公共契约或职责变更另行与用户讨论。",
+  "trigger": "用户纠正按软件数衡量进展，确认Mac先完成、结构变化须讨论，并逐项批准计划后要求实施。",
+  "context": "T-017@v1，基线62c1676；既有MVP和探针历史证据保留，不改写D-005/D-006当时的交付范围。",
+  "affects": [
+    "macOS后端交付",
+    "CLI显式后端选择",
+    "可选依赖与统一验收"
+  ],
+  "alternatives": [
+    "先推进Windows/Gecko：不在本阶段",
+    "仅验证探针：用户要求统一正式工具",
+    "立即纯Rust绑定：用户选择复用Python/Frida"
+  ],
+  "commit": "本条所在提交",
+  "supersedes": []
+}
+```

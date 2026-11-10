@@ -10,8 +10,8 @@
 
 | 引擎/宿主 | 路线 | 本轮状态 |
 |---|---|---|
-| Chromium浏览器/Electron/定制宿主 | CDP | 待基线回归；历史通过见兼容性总表 |
-| Electron/抖音 | Gadget→原Node→页面 | 历史探针成功；正式后端待实现 |
+| Chromium浏览器/Electron/定制宿主 | CDP | 基线Rust/Web与Electron45的10项通过；历史应用见兼容性总表 |
+| Electron/抖音 | Gadget→原Node→页面 | 正式后端及抖音/独立Electron36实测通过；45缺符号拒绝，详见Frida后端 |
 | CEF/NW.js | CDP | 独立宿主待验证 |
 | WKWebView | Frida→主线程原生页面API | 待实现与真实应用验收 |
 

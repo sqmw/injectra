@@ -19,3 +19,5 @@
 `make doc-check`检查本地链接、显式锚点和文档可达性；任务结构通过全局project-tracking-check单独校验。历史从任务关闭索引进入，不默认加载。
 
 当前Mac实施：[macOS多引擎交付](macos-delivery.md)。
+
+可选正式接入：[Frida后端](frida-backends.md)。

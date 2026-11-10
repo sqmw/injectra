@@ -1,5 +1,5 @@
 [workspace]
-members = ["crates/core", "crates/web", "crates/application", "crates/native", "crates/hosts", "crates/cdp", "crates/platform-macos", "crates/cli"]
+members = ["crates/core", "crates/web", "crates/application", "crates/native", "crates/hosts", "crates/cdp", "crates/platform-macos", "crates/cli", "crates/frida", "crates/electron-gadget"]
 resolver = "3"
 
 [workspace.package]
@@ -18,3 +18,6 @@ injectra-cdp = { path = "crates/cdp" }
 injectra-platform-macos = { path = "crates/platform-macos" }
 injectra-native = { path = "crates/native" }
 injectra-hosts = { path = "crates/hosts" }
+
+injectra-frida = { path = "crates/frida" }
+injectra-electron-gadget = { path = "crates/electron-gadget" }

@@ -1,15 +1,15 @@
 mod args;
+mod backend;
 use args::{Args, Command};
 use clap::Parser;
 use injectra_core::{Result, TargetRef};
-use injectra_web::WebBackend;
 use serde_json::{Value, json};
 
 fn run(args: Args) -> Result<Value> {
     match args.command {
-        Command::Targets { port } => {
-            let backend = injectra_cdp::CdpBackend::new(port)?;
-            let targets = injectra_application::targets(&backend)?;
+        Command::Targets { endpoint } => {
+            let backend = backend::create(endpoint)?;
+            let targets = injectra_application::targets(backend.as_ref())?;
             // Preserve the v0.1 CLI wire format, without serializing internal identity.
             Ok(Value::Array(
                 targets
@@ -19,16 +19,28 @@ fn run(args: Args) -> Result<Value> {
             ))
         }
         Command::Apply {
-            port,
+            endpoint,
             target,
             bundle,
         } => {
-            let backend = injectra_cdp::CdpBackend::new(port)?;
-            injectra_application::apply(&backend, &TargetRef::new(backend.id(), target), &bundle)
+            let backend = backend::create(endpoint)?;
+            injectra_application::apply(
+                backend.as_ref(),
+                &TargetRef::new(backend.id(), target),
+                &bundle,
+            )
         }
-        Command::Remove { port, target, id } => {
-            let backend = injectra_cdp::CdpBackend::new(port)?;
-            injectra_application::remove(&backend, &TargetRef::new(backend.id(), target), &id)
+        Command::Remove {
+            endpoint,
+            target,
+            id,
+        } => {
+            let backend = backend::create(endpoint)?;
+            injectra_application::remove(
+                backend.as_ref(),
+                &TargetRef::new(backend.id(), target),
+                &id,
+            )
         }
         Command::LaunchPlan { app, port } => Ok(serde_json::to_value(
             injectra_hosts::electron::macos_launch_plan(&app, port)?,

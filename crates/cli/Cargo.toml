@@ -18,3 +18,5 @@ injectra-hosts.workspace = true
 serde.workspace = true
 serde_json.workspace = true
 clap = { version = "4.6", features = ["derive"] }
+
+injectra-electron-gadget.workspace = true
