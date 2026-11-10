@@ -2,6 +2,46 @@
 
 本工作树持有T-017的权威状态；T-001至T-016继承自62c1676，仅作只读历史快照。保留完整定义与验收；默认从[任务索引](tasks.md)进入，按Task ID定向读取，不整读历史。
 
+## 当前集成任务
+
+<a id="t-018"></a>
+### T-018 · macOS 多引擎成果合入 main
+
+```tracking-task
+{
+  "id": "T-018",
+  "name": "macOS 多引擎成果合入 main",
+  "version": "v1",
+  "mode": "lightweight",
+  "status": "in_progress",
+  "goal": "将T-017已验证成果快进合入本地main，同步当前交付状态并核验主分支。",
+  "scope": "仅本地Git集成、当前状态文档及集成回归；不推送，不批量改写历史，不重新操作用户真实应用，不改变架构和功能。",
+  "acceptance": "main包含c2f090f及其全部功能提交；make check/test-frida通过；当前说明不再误称未合入；新提交具有来源trailer；main和本窗口工作树干净。",
+  "execution_ref": "TODO.md#t-018",
+  "acceptance_evidence": [],
+  "unplanned_reason": "用户明确要求合入main；T-017原交付不包含主分支集成。"
+}
+```
+
+```tracking-execution
+{
+  "id": "T-018/E-001",
+  "name": "快进集成与主分支验收",
+  "task_id": "T-018",
+  "task_version": "v1",
+  "status": "running",
+  "authorization": "用户明确要求“合入到main”；仅本地集成，不推送。",
+  "scope": "仅本地Git集成、当前状态文档及集成回归；不推送，不批量改写历史，不重新操作用户真实应用，不改变架构和功能。",
+  "steps": [],
+  "evidence": [
+    "main当前为62c1676且工作区干净；源分支c2f090f干净，main为其祖先，可快进。"
+  ],
+  "stop_reason": ""
+}
+```
+
+本窗口/root为唯一Parent，single-writer。集成前记录在本工作分支；main接收后移交main，由Parent更新唯一当前状态。输入为c2f090f，主树基线62c1676；不覆盖主树未提交内容。
+
 ## 本工作树已关闭任务
 
 <a id="t-017"></a>
