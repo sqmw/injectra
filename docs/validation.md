@@ -23,3 +23,5 @@ T-021：[Firefox/Gecko实机验证](gecko-validation.md)，独立测试路线与
 T-022：[Thunderbird安装与验收](thunderbird-validation.md)，主界面DOM路线和内容页通过，HTML字符串限制与整组partial如实保留。
 
 T-024：[Thunderbird主界面HTML装配路线](validation/thunderbird-html.md)，新路线通过，原innerHTML合同仍partial；正式CLI另行推进。
+
+T-025：[抖音原生Interceptor新路线验证](compatibility/douyin-native-hook.md)，原包前置接入受限；自有进程Hook成功不外推为抖音支持。

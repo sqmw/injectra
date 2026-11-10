@@ -4,7 +4,7 @@
 
 ## 当前任务
 
-无。T-024测试用HTML装配路线已验证收口；默认innerHTML合同仍partial，正式Gecko/Thunderbird CLI后端按用户选择另行推进。
+无。T-025新原生Hook验证得到受限结论：抖音原包外部attach被拒绝，Gadget optional被代码签名保护终止；未交付抖音Interceptor能力。既有页面后端支持不受此结果覆盖。
 
 ## 已关闭任务索引
 
@@ -12,6 +12,7 @@
 
 | 任务 | 标准名称 | 定义版本 |
 | --- | --- | --- |
+| <a id="t-025"></a>[T-025](TODO.md#t-025) | 抖音 Frida 原生函数 Hook 可行性验证 | v1 |
 | <a id="t-024"></a>[T-024](TODO.md#t-024) | Thunderbird HTML 注入实机验证收口 | v1 |
 | <a id="t-023"></a>[T-023](TODO.md#t-023) | Gecko 验证成果合入 main | v1 |
 | <a id="t-022"></a>[T-022](TODO.md#t-022) | macOS Thunderbird 安装与实机验证 | v1 |

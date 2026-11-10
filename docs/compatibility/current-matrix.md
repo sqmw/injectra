@@ -44,6 +44,12 @@
 |---|---|---|
 | macOS arm64 / Thunderbird159.0 | 测试用DOMParser→importNode装配主界面HTML；37项实机检查通过（最终run thunderbird-gecko-DxFYST）；[验收](../validation/thunderbird-html.md) | 原runtime.html仍partial（默认合同复测fjBUxN），BiDi仍不枚举标签页；不是正式CLI能力，也不代表任意HTML/插件兼容 |
 
+## T-025 抖音原生Interceptor验证（2026-11-11）
+
+| 平台/版本 | 新路线 | 结果 |
+|---|---|---|
+| macOS / 抖音8.7.0原包 / Frida17.25.2 | 外部attach→Interceptor；Gadget optional→Interceptor | 未通过：前者PermissionDenied；后者在监听建立前被CODESIGNING/Invalid Page终止。Hook未进入；自有调试进程对照通过不计作抖音支持。[证据](douyin-native-hook.md) |
+
 ## 历史应用矩阵
 
 | 应用 | 平台 | 应用版本 | 宿主／运行时 | 内核／协议实测值 | 接入路线与条件 | 当前验证状态与范围 | 证据／代码入口 |

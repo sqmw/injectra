@@ -4,6 +4,29 @@
 
 ## 最近完成的验证
 
+<a id="t-025"></a>
+### T-025 · 抖音 Frida 原生函数 Hook 可行性验证
+
+```tracking-task
+{
+  "id": "T-025",
+  "name": "抖音 Frida 原生函数 Hook 可行性验证",
+  "version": "v1",
+  "mode": "lightweight",
+  "status": "done",
+  "goal": "验证抖音8.7.0原包的外部Frida attach及Interceptor函数Hook前提、回调和卸载，区别于已验证的Gadget页面桥接。",
+  "scope": "签名/进程/可选Frida环境核对，独立home/profile受控实例的无返回值改写Hook测试，证据/文档；不重签名、改系统保护或用户实例，不访问账号和业务数据。",
+  "acceptance": "取得真实函数Hook回调和卸载证据，或明确记录阻止进入Hook的实际阶段与错误；身份/签名/自有进程退出确认，不将旧页面注入成功或配置检查当新Hook成功。",
+  "execution_ref": "archive/T-025.md#t-025",
+  "acceptance_evidence": [
+    "新原生Hook可行性验证已执行并得到受限结论：抖音8.7外部attach PermissionDenied；Gadget optional在listener前被CODESIGNING/Invalid Page终止，均未进入Interceptor。自有空进程同agent真实Hook/卸载通过；本轮不交付抖音Hook能力。哈希/签名、退出、证据与回归已核验。"
+  ],
+  "unplanned_reason": "用户要求抖音测试Frida Hook，并纠正不重复已有方案，要验证新方案。"
+}
+```
+
+[新方案实测](compatibility/douyin-native-hook.md) · [执行与review](archive/T-025.md#t-025)
+
 <a id="t-024"></a>
 ### T-024 · Thunderbird HTML 注入实机验证收口
 
