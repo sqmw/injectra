@@ -41,3 +41,5 @@ Thunderbird宿主差异：[tabmail目标发现/世代核验](../../tests/gecko/t
 Thunderbird HTML补充验证：[测试用装配器](../../tests/gecko/parsed-html.mjs)、[装配与套件隔离单测](../../tests/gecko/parsed-html.test.mjs)；[V2路线验收与原合同边界](../validation/thunderbird-html.md)。不注册正式CLI、不修改共享runtime。
 
 原生函数Hook可行性验证：[可选受控启动/attach测试](../../scripts/frida-hook-smoke.py)、[纯函数Interceptor测试agent](../../tests/frida/native-hook.js)；[抖音失败与控制正例边界](../compatibility/douyin-native-hook.md)，不属于已交付页面后端或插件。
+
+Objective-C分派Hook专项：[受控启动测试](../../scripts/objc-hook-smoke.py)、[自有对象IMP替换agent](../../tests/frida/objc-dispatch-hook.js)、[判定/所有权测试](../../tests/frida/test_objc_hook.py)；[抖音实机证据与限制](../compatibility/douyin-objc-hook.md)。不注册正式后端，不修改Web runtime。

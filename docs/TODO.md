@@ -4,6 +4,29 @@
 
 ## 最近完成的验证
 
+<a id="t-026"></a>
+### T-026 · 抖音 Frida Objective-C 分派 Hook 验证
+
+```tracking-task
+{
+  "id": "T-026",
+  "name": "抖音 Frida Objective-C 分派 Hook 验证",
+  "version": "v1",
+  "mode": "lightweight",
+  "status": "done",
+  "goal": "验证抖音原包在Gadget required模式下能否对专用Objective-C对象实施方法分派Hook，并保持原结果及恢复方法。",
+  "scope": "独立home/profile、自有测试对象与实例；复用Gadget接入，新增方法指针Hook；不改应用包、签名、系统保护或业务对象，不重跑旧页面套件。",
+  "acceptance": "记录真实进程身份、原方法/Hook调用/恢复证据或明确阻塞阶段；核验主文件哈希、签名与自有进程退出。不得外推为Interceptor、任意业务方法或正式CLI支持。",
+  "execution_ref": "archive/T-026.md#t-026",
+  "acceptance_evidence": [
+    "抖音8.7.0原包内自有NSObject子类hash的IMP Hook实测通过：两次回调，原结果一致，恢复后计数不再增长，agent成功卸载；运行r2hmbl3w和补强清理判定后的eo1jroii保留。主程序哈希/签名通过，自有进程退出；不外推业务方法或Interceptor。make check及26项Frida测试通过。"
+  ],
+  "unplanned_reason": "用户要求继续推进抖音新Frida Hook方案，前序Interceptor路线受限，测试同保护边界内的方法分派路线。"
+}
+```
+
+[实机机制验证](compatibility/douyin-objc-hook.md) · [执行与review](archive/T-026.md#t-026)
+
 <a id="t-025"></a>
 ### T-025 · 抖音 Frida 原生函数 Hook 可行性验证
 
