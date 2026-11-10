@@ -40,9 +40,9 @@ class ObjcHookVerdict(unittest.TestCase):
             executable = (app / "Contents/MacOS/fixture").resolve()
             with (patch.object(probe.sys, "platform", "darwin"),
                   patch.object(probe.sys, "argv", ["probe", "--app", str(app), "--gadget", "unused"]),
-                  patch.object(probe.subprocess, "check_output", return_value=str(executable)+"\n"),
-                  patch.object(probe.subprocess, "Popen") as launch,
-                  patch.object(probe.subprocess, "run") as command):
+                  patch.object(probe.gadget_probe.subprocess, "check_output", return_value=str(executable)+"\n"),
+                  patch.object(probe.gadget_probe.subprocess, "Popen") as launch,
+                  patch.object(probe.gadget_probe.subprocess, "run") as command):
                 with self.assertRaisesRegex(RuntimeError, "already running"):
                     probe.main()
                 launch.assert_not_called()

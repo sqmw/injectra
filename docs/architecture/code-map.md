@@ -43,3 +43,5 @@ Thunderbird HTML补充验证：[测试用装配器](../../tests/gecko/parsed-htm
 原生函数Hook可行性验证：[可选受控启动/attach测试](../../scripts/frida-hook-smoke.py)、[纯函数Interceptor测试agent](../../tests/frida/native-hook.js)；[抖音失败与控制正例边界](../compatibility/douyin-native-hook.md)，不属于已交付页面后端或插件。
 
 Objective-C分派Hook专项：[受控启动测试](../../scripts/objc-hook-smoke.py)、[自有对象IMP替换agent](../../tests/frida/objc-dispatch-hook.js)、[判定/所有权测试](../../tests/frida/test_objc_hook.py)；[抖音实机证据与限制](../compatibility/douyin-objc-hook.md)。不注册正式后端，不修改Web runtime。
+
+真实宿主Hook：[受控入口](../../scripts/host-hook-smoke.py)、[宿主事件agent](../../tests/frida/host-dispatch-hook.js)、[判定测试](../../tests/frida/test_host_hook.py)；与自有对象实验共享[启动/身份/释放夹具](../../tests/frida/gadget_probe.py)，[抖音实测](../compatibility/douyin-host-hook.md)，仅测试、不注册产品后端。

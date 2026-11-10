@@ -4,6 +4,29 @@
 
 ## 最近完成的验证
 
+<a id="t-028"></a>
+### T-028 · 抖音实际宿主方法 Hook 验证
+
+```tracking-task
+{
+  "id": "T-028",
+  "name": "抖音实际宿主方法 Hook 验证",
+  "version": "v1",
+  "mode": "lightweight",
+  "status": "done",
+  "goal": "验证在抖音原包受控实例内，对真实宿主的Objective-C方法实施保持原行为的分派Hook，并取得应用自然调用及恢复证据。",
+  "scope": "Gadget required接入，真实宿主方法的文档化分派API；独立HOME/profile和自有进程，不改原包/系统保护，不读账号或业务载荷；并行只读分析旧optional崩溃，不重跑已知失败。",
+  "acceptance": "核对实际接收对象、方法定义类、原IMP所属映像；捕获非探针主动调用的宿主调用，确认原方法继续执行及恢复/卸载；或保存明确新阻塞。禁止把测试对象/主动调用计作自然业务调用，禁止外推Interceptor支持。",
+  "execution_ref": "archive/T-028.md#t-028",
+  "acceptance_evidence": [
+    "抖音8.7原包真实NSApp的AtomApplication.sendEvent:方法分派Hook通过：两次无窗口操作30秒复测为360/360和最终默认命令147/147原调用完成，实际类/原实现Electron Framework/主线程核验一致；恢复、卸载及4个自有进程退出确认，主文件哈希/签名通过。保留初次8秒0调用失败；不外推业务逻辑或Interceptor。make check、31项Frida测试和review通过。"
+  ],
+  "unplanned_reason": "用户明确要求继续尝试抖音Hook；在原包和系统保护不变的边界内，把已通过的自有对象方法分派验证推进到真实宿主。"
+}
+```
+
+[真实宿主Hook实测](compatibility/douyin-host-hook.md) · [执行与review](archive/T-028.md#t-028)
+
 <a id="t-027"></a>
 ### T-027 · 抖音 Frida Interceptor 授权重试
 

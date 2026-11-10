@@ -4,7 +4,7 @@
 
 ## 当前任务
 
-无。T-027重试后，抖音原包外部attach与Gadget optional仍受限；自有可调试进程外部attach/Interceptor已通过。T-026仅证明自有对象的Objective-C分派Hook，均未交付抖音Interceptor产品支持。
+无。T-028已验证抖音真实AtomApplication.sendEvent:方法分派Hook（无窗口操作复测360/360、最终147/147），未交付Interceptor、业务逻辑或正式原生CLI支持；旧受限结果保留。
 
 ## 已关闭任务索引
 
@@ -12,6 +12,7 @@
 
 | 任务 | 标准名称 | 定义版本 |
 | --- | --- | --- |
+| <a id="t-028"></a>[T-028](TODO.md#t-028) | 抖音实际宿主方法 Hook 验证 | v1 |
 | <a id="t-027"></a>[T-027](TODO.md#t-027) | 抖音 Frida Interceptor 授权重试 | v1 |
 | <a id="t-026"></a>[T-026](TODO.md#t-026) | 抖音 Frida Objective-C 分派 Hook 验证 | v1 |
 | <a id="t-025"></a>[T-025](TODO.md#t-025) | 抖音 Frida 原生函数 Hook 可行性验证 | v1 |

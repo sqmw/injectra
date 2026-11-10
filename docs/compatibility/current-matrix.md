@@ -62,6 +62,12 @@
 |---|---|---|
 | macOS / 抖音8.7.0原包 / Frida17.25.2 | 外部attach两次仍PermissionDenied，首次用户确认无授权窗口；Gadget optional再次CODESIGNING/Invalid Page | 新的自有可调试进程外部attach→Interceptor通过，补齐旧对照缺口；不证明抖音原包支持，未改系统保护或应用签名。[复测](douyin-hook-auth-retry.md) |
 
+## T-028 抖音真实宿主方法Hook（2026-11-11）
+
+| 平台/版本 | 路线与实测 | 边界 |
+|---|---|---|
+| macOS arm64 / 抖音8.7.0原包 / Frida17.25.2 | Gadget required → AtomApplication.sendEvent:方法分派Hook；30秒无窗口操作复测360/360、最终默认命令147/147原调用完成，恢复/卸载通过 | 真实Electron宿主方法，未创建测试对象；不证明业务逻辑、任意原生函数或Interceptor支持。[证据](douyin-host-hook.md) |
+
 ## 历史应用矩阵
 
 | 应用 | 平台 | 应用版本 | 宿主／运行时 | 内核／协议实测值 | 接入路线与条件 | 当前验证状态与范围 | 证据／代码入口 |
