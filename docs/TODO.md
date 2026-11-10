@@ -2,7 +2,7 @@
 
 本工作树持有T-019当前权威记录，T-018及以前为74844e7的只读历史快照。T-017保留独立工作树交付时的历史结论，后续主分支集成状态以T-018为准。保留完整定义与验收；默认从[任务索引](tasks.md)进入，按Task ID定向读取，不整读历史。
 
-## 当前任务
+## 本工作树最近完成
 
 <a id="t-019"></a>
 ### T-019 · 控制端与目标设备边界解耦
@@ -13,18 +13,22 @@
   "name": "控制端与目标设备边界解耦",
   "version": "v1",
   "mode": "staged",
-  "status": "in_progress",
+  "status": "done",
   "goal": "消除控制端本机与目标设备混用，建立设备扩展接口，保持现有Mac行为。",
   "scope": "Frida内部控制端/会话/目标provider/连接器分离；v2会话并兼容v1；页面ID加入设备进程作用域；Mac宿主发现与WK执行分离；测试和文档。不新增crate、不改core/Web公开契约、CLI命令，不实现手机/USB/ADB或自动恢复。",
   "acceptance": "未知设备在本机核验/连接前拒绝；不同设备/进程的相同局部ID不互认；旧会话无损读取；Mac目标身份核验及既有独立宿主回归通过；文档、自审及带来源标记提交完成。",
-  "execution_ref": "STEPS.md#t-019",
-  "acceptance_evidence": [],
+  "execution_ref": "archive/T-019.md#t-019",
+  "acceptance_evidence": [
+    "24ca687分离控制端执行、目标身份provider、连接器及v2会话；01cbf7f分离WK宿主并完成回调、输入与诊断补强。core/Web及CDP源码、crate依赖和CLI命令保持。",
+    "18 Rust、5 Web、8 WK host、23 Python及独立CDP/Gadget/WK宿主验证通过；旧v1抖音会话发现7页且源SHA未变。原targets超时与后续通过分别保留，见validation/device-boundaries.md。",
+    "自审、文档/任务检查和来源标记核验完成；当前只有Mac实现，手机入口是可替换接口而非兼容声明；旧页面ID需重新发现。本工作分支交付，未合入main或推送。"
+  ],
   "priority": "P1",
   "unplanned_reason": "用户明确要求review并解决控制端/目标设备及扩展入口问题，同时不实现手机端。"
 }
 ```
 
-[审查与设计](architecture/device-boundaries.md) · [恢复](agent-context/tasks/T-019.md) · [执行](STEPS.md#t-019)
+[审查与设计](architecture/device-boundaries.md) · [关闭上下文](archive/T-019-context.md) · [执行](archive/T-019.md#t-019)
 
 ## 最近完成的集成
 
