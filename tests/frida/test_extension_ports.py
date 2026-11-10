@@ -3,7 +3,7 @@ import unittest
 from dataclasses import replace
 from types import SimpleNamespace
 from unittest.mock import patch
-from support import current
+from support import current, ROOT
 from session_model import parse_descriptor, DeviceIdentity
 from connection import Connection
 from errors import BridgeError
@@ -46,4 +46,13 @@ class ExtensionPorts(unittest.TestCase):
         with self.assertRaises(BridgeError):
             Connection(parse_descriptor(current()),target_provider=Target(),connector=Transport())
         self.assertEqual(events,["detach"])
+class ConcreteLauncherBoundary(unittest.TestCase):
+    def test_mac_launcher_rejects_another_controller_before_process_or_file_operations(self):
+        import importlib.util
+        spec=importlib.util.spec_from_file_location("launcher_boundary_test",ROOT/"scripts/frida-launch.py")
+        module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
+        with patch.object(module.sys,"platform","linux"),patch("pathlib.Path.read_bytes") as read,patch.object(module.subprocess,"Popen") as spawn:
+            with self.assertRaises(RuntimeError):module.launch(ROOT/"unused.app",ROOT/"unused.dylib",[],"webkit")
+            read.assert_not_called();spawn.assert_not_called()
+
 if __name__=="__main__":unittest.main()

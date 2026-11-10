@@ -43,6 +43,18 @@ class SessionContract(unittest.TestCase):
         self.assertEqual(path.stat().st_mode & 0o777,0o600)
         self.assertEqual(read_session(path).page_id("webkit","view"),session.page_id("webkit","view"))
         with self.assertRaises(FileExistsError):write_session(path,session)
+    def test_malformed_private_json_is_an_input_failure_before_target_work(self):
+        self.path.write_text("{not-json")
+        with patch("subprocess.run") as run,self.assertRaises(BridgeError) as error:
+            read_session(self.path)
+        self.assertEqual(error.exception.kind,"invalid_input")
+        run.assert_not_called()
+    def test_duplicate_fields_cannot_override_declared_device_identity(self):
+        self.path.write_text('{"schema":2,"device":{"platform":"android"},"device":{"platform":"macos"}}')
+        with patch("subprocess.run") as run,self.assertRaises(BridgeError) as error:
+            read_session(self.path)
+        self.assertEqual(error.exception.kind,"invalid_input")
+        run.assert_not_called()
     def test_mixed_versions_cannot_hide_a_device_override(self):
         data=legacy();data["device"]={"provider":"mobile","platform":"android"}
         with patch("subprocess.run") as run,self.assertRaises(BridgeError):parse_descriptor(data)

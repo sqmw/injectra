@@ -205,3 +205,33 @@ D-006参考归档边界补充：接入、桥接与验证工具可以保留，可
   "supersedes": []
 }
 ```
+
+<a id="d-009"></a>
+## D-009 · 控制端与目标设备边界解耦
+
+```tracking-decision
+{
+  "id": "D-009",
+  "date": "2026-11-10",
+  "status": "accepted",
+  "conclusion": "保留现有crate及core/Web公开契约，在Frida内部区分控制端执行、目标身份provider与传输connector；会话v2分域，v1只读兼容；Frida页面ID绑定设备/进程/路由；WK执行使用独立宿主发现/调度接口。当前不实现手机端。",
+  "trigger": "用户要求review并解决控制端与目标设备未充分分开的问题，为不同于桌面的手机实现保留入口。",
+  "context": "T-019@v1；输入74844e7；用户要求保持当前结构，内部解耦沿用既有边界，不增加公开分层或移动端功能。",
+  "affects": [
+    "Frida内部接口与会话描述",
+    "目标身份和页面作用域",
+    "WK宿主适配",
+    "扩展验收边界"
+  ],
+  "alternatives": [
+    "把控制端OS/PID检查复用为任意目标检查：无法区分远端设备",
+    "现在实现手机或USB/ADB：超出当前授权",
+    "把设备管理写入core/Web或新增crate：当前内部接口足够，无需改变公开结构",
+    "接受旧未限定页面ID：有跨会话误选风险"
+  ],
+  "commit": "本条所在提交；会话/目标分离前置24ca687",
+  "supersedes": []
+}
+```
+
+[接口与支持范围](architecture/device-boundaries.md) · [验证与恢复](validation/device-boundaries.md)。设备/provider、连接器及宿主profile分别注册；未知实现明确Unsupported，禁止回退本机。旧页面ID重新发现；测试接口不作手机支持声明。

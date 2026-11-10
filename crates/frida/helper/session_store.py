@@ -6,6 +6,14 @@ from pathlib import Path
 from errors import BridgeError
 from session_model import parse_descriptor
 
+def unique_fields(pairs):
+    result={}
+    for key,value in pairs:
+        if key in result:
+            raise BridgeError("invalid_input", "Duplicate field in session descriptor")
+        result[key]=value
+    return result
+
 def private_json(path):
     path = Path(path)
     info = path.lstat()
@@ -13,7 +21,10 @@ def private_json(path):
         raise BridgeError("invalid_input", "Session must be a private, user-owned regular file (0600)")
     if info.st_size > 1024 * 1024:
         raise BridgeError("invalid_input", "Session descriptor exceeds size limit")
-    return json.loads(path.read_text(encoding="utf-8"))
+    try:
+        return json.loads(path.read_text(encoding="utf-8"),object_pairs_hook=unique_fields)
+    except (json.JSONDecodeError, UnicodeError) as error:
+        raise BridgeError("invalid_input", "Session descriptor is not valid UTF-8 JSON") from error
 
 def read_session(path):
     return parse_descriptor(private_json(path))

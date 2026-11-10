@@ -15,3 +15,5 @@
 T-017新增Mac后端与宿主验收见[Mac交付](macos-delivery.md)、[Frida](frida-backends.md)、[CEF/NW.js](host-validation.md)、[WebKit](webkit-backend.md)；不覆盖原MVP与探针历史证据。
 
 本轮集中[验收与自审](validation/macos-multi-engine.md)。
+
+T-019控制端/设备解耦的[验收与自审](validation/device-boundaries.md)，包括保留的失败和后续验证。

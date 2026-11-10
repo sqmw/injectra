@@ -13,7 +13,7 @@ check: doc-check architecture-check
 build:
 	sh scripts/cargo.sh build --workspace --locked
 
-test:
+test: test-webkit-host
 	sh scripts/cargo.sh test --workspace --locked
 	$(MAKE) test-web
 
@@ -69,3 +69,7 @@ test-hosts: build
 .PHONY: test-webkit
 test-webkit: build
 	"$${INJECTRA_FRIDA_PYTHON:-$${INJECTRA_CACHE_DIR:-$${XDG_CACHE_HOME:-$$HOME/.cache}/injectra}/frida/venv/bin/python3}" -B scripts/webkit-smoke.py
+
+.PHONY: test-webkit-host
+test-webkit-host:
+	node --test tests/webkit/host-contract.test.mjs

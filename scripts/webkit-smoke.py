@@ -15,9 +15,10 @@ modules=cache/"webkit-test-tools/swift-modules";modules.mkdir(parents=True,exist
 subprocess.run(["/usr/bin/xcrun","swiftc",str(ROOT/"tests/webkit/main.swift"),
     "-o",str(macos/"fixture"),"-module-cache-path",str(modules),"-framework","AppKit","-framework","WebKit"],check=True)
 pid=None
+fixture_env={**os.environ,"INJECTRA_WK_FIXTURE_READY":str(run/"ready")}
 try:
     launch=subprocess.run([str(python),"-B",str(ROOT/"scripts/frida-launch.py"),
-        "--app",str(app),"--gadget",str(gadget),"--route","webkit"],capture_output=True,text=True,timeout=35)
+        "--app",str(app),"--gadget",str(gadget),"--route","webkit"],env=fixture_env,capture_output=True,text=True,timeout=35)
     (run/"launch.log").write_text(launch.stdout+launch.stderr)
     records=[json.loads(l) for l in launch.stdout.splitlines() if l.startswith("{")]
     if records:pid=records[0].get("launcher_pid")
@@ -26,6 +27,10 @@ try:
     descriptor=json.loads(Path(session).read_text())
     assert descriptor["schema"]==2 and descriptor["process"]["pid"]==pid
     assert descriptor["device"]["provider"]=="macos-local"
+    ready_deadline=time.monotonic()+25
+    while not (run/"ready").exists():
+        if time.monotonic()>=ready_deadline:raise RuntimeError("Owned WKWebView pages did not finish navigation")
+        time.sleep(.05)
     binary=Path(os.environ.get("CARGO_TARGET_DIR",cache/"cargo-target"))/"debug/injectra"
     for _ in range(20):
         p=subprocess.run([str(binary),"targets","--backend","webkit","--session",session],capture_output=True,text=True,timeout=30)

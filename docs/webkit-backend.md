@@ -1,6 +1,6 @@
 # macOS WKWebView 后端
 
-属于[T-017](TODO.md#t-017)，复用WebBackend/WebSession与唯一Web runtime；[源入口](../crates/webkit/src/lib.rs)、[原生agent](../crates/webkit/helper/agent.js)、[桥接](../crates/webkit/helper/route.py)。
+属于[T-017](TODO.md#t-017)，复用WebBackend/WebSession与唯一Web runtime；[源入口](../crates/webkit/src/lib.rs)、[装配入口](../crates/webkit/helper/agent.js)、[WK执行](../crates/webkit/helper/webkit_agent.js)、[Mac宿主](../crates/webkit/helper/macos_appkit.js)、[桥接](../crates/webkit/helper/route.py)。
 
 ## 调用与条件
 
@@ -16,7 +16,7 @@ make setup-frida准备锁定Python3.13/Frida17.25.2及frida-objc-bridge8.0.6源�
 
 ## 页面执行与资源
 
-在原生主线程遍历NSApplication窗口的视图树，仅选择WKWebView；页面ID绑定视图指针和URL，每次执行重新查找当前视图并核对URL。只执行主frame的page content world，不承诺未挂入窗口树的WebView、iframe或同URL文档世代锁定。
+在原生主线程遍历NSApplication窗口的视图树，仅选择WKWebView；页面ID先绑定设备/进程/route-profile作用域，再绑定视图指针和URL，每次执行重新查找当前视图并核对URL。只执行主frame的page content world，不承诺未挂入窗口树的WebView、iframe或同URL文档世代锁定。
 
 使用WKWebView的callAsyncJavaScript，等待Promise，页面内封装JSON结果及原异常；原生API错误保守Unknown。异步等待使用4.5秒页面计时返回Unknown，不重放；原表达式可能稍后继续，计时返回不等于撤销。
 
@@ -37,3 +37,9 @@ Easydict尝试未完成受控接入，保留launch-1794287157890869000并退出�
 make test-webkit编译自有Swift宿主到外部缓存，创建独立HOME和非持久WebKit数据存储，验证两个页面，最后只退出自己的进程。Swift模块缓存、Gadget、日志和profile均在仓库外。make check默认不启动或接入真实应用。
 
 首次下载官方Gadget约25MB压缩包；ObjC依赖版本和完整性见crates/frida/helper/package-lock.json；恢复依赖使用make setup-frida/setup-gadget，不恢复旧token或猜测旧PID。
+
+T-019将Mac AppKit窗口发现/主线程调度与WK执行分开；只有macos-appkit profile已注册。宿主schedule同步抛出必须表示未入队；已入队回调必须保留资源直至回执。排队期间超过截止的回调只做排空，不再启动迟到载荷；已经开始的原生操作仍保持Unknown/回调清理语义。该接口通过测试替身和Mac真实宿主验证，不代表UIKit/iOS实现。
+
+回调分配及清理调度失败也纳入宿主合同：没有提交载荷的分配失败为NotExecuted；仍持有原生资源时shutdown不得报告closed。
+
+T-019最终回归与一次未定位到具体SDK调用的targets超时见[验收记录](validation/device-boundaries.md)。自有测试宿主在双页导航完成后发出ready，测试工具据此再开始发现；该等待只属于测试准备，不改变正式操作截止。

@@ -35,7 +35,7 @@ SDK操作15秒/清理5秒可取消截止，25秒助手截止后CLI报告Unknown�
 
 ## 检查
 
-- make check：默认Rust/Web回归，不接入用户应用。
+- make check：默认Rust/Web及WK宿主合同回归，不接入用户应用。
 - make test-frida：可选Python会话校验测试，不接入应用。
 - make setup-gadget-tests：独立Electron36.4.0测试依赖，锁文件在tests/gadget。
 - make test-gadget：创建和退出自己的Electron实例，INJECTRA_TEST_GADGET指定已校验库文件。
@@ -44,3 +44,5 @@ SDK操作15秒/清理5秒可取消截止，25秒助手截止后CLI报告Unknown�
 当前结果及阶段退出条件见[Mac交付](macos-delivery.md)、[执行证据](STEPS.md#t-017)。
 
 内部扩展接口与当前支持范围见[控制端/设备边界](architecture/device-boundaries.md)：目前只注册Mac本机target provider及认证回环Gadget TCP connector，其他设备与连接器明确Unsupported。Rust平台检查仅表示本地Python控制端当前认证的平台，不代表手机端实现。
+
+每次helper将阶段名和相对耗时写入外部诊断stderr，不含会话token；截止错误带当前阶段，保持15秒操作/5秒清理/25秒助手边界及无自动重放语义。

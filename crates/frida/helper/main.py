@@ -2,6 +2,7 @@
 import json
 import frida
 import sys
+import time
 from pathlib import Path
 from connection import BridgeError, Connection, read_session, deadline
 from route import Route
@@ -10,20 +11,28 @@ def run(request):
     connection = None
     route = None
     response = None
+    stage = "controller-input"
+    started = time.monotonic()
+    def report_stage(value):
+        nonlocal stage
+        stage = value
+        print(json.dumps({"stage":value,"elapsed":round(time.monotonic()-started,3)}),file=sys.stderr,flush=True)
     try:
         if request.get("schema") != 1 or request.get("operation") not in ("targets", "evaluate"):
             raise BridgeError("invalid_input", "Invalid bridge request")
         with deadline(15):
             state = read_session(request["session"])
             Route.validate_binding(state)
-            connection = Connection(state)
+            connection = Connection(state, report_stage=report_stage)
             route = Route(connection, connection.state, Path(__file__).parent)
+            report_stage("host-preparation")
             route.open()
+            report_stage("operation-"+request["operation"])
             response = {"schema": 1, "ok": True, "value": route.request(request)}
     except frida.OperationCancelledError:
         response = {"schema":1,"ok":False,"error":{"kind":"timeout",
             "certainty":"Unknown" if route and route.submitted else "NotExecuted",
-            "message":"Frida operation deadline; no automatic replay"}}
+            "message":"Frida operation deadline during "+stage+"; no automatic replay"}}
     except BridgeError as error:
         response = {"schema":1,"ok":False,"error":{
             "kind":error.kind,"certainty":error.certainty,"message":str(error)}}

@@ -29,3 +29,5 @@
 [WKWebView后端](../../crates/webkit/src/lib.rs)复用Frida通信；原生主线程API、异步completion与范围见[WebKit说明](../webkit-backend.md)。
 
 Frida内部边界：[控制端执行](../../crates/frida/src/controller.rs)、[会话模型](../../crates/frida/helper/session_model.py)、[目标接口](../../crates/frida/helper/contracts.py)、[Mac本机核验](../../crates/frida/helper/target_macos.py)、[连接器](../../crates/frida/helper/transport.py)；详见[设备边界](device-boundaries.md)。
+
+WK宿主边界：[Mac AppKit发现/调度](../../crates/webkit/helper/macos_appkit.js)与[WK执行/回调](../../crates/webkit/helper/webkit_agent.js)由[入口](../../crates/webkit/helper/agent.js)装配；[宿主合同](../../tests/webkit/host-contract.test.mjs)不代表手机实现。

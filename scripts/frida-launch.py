@@ -1,4 +1,4 @@
-"""Explicitly start a new isolated app with Gadget. Never closes an existing app."""
+"""Explicit macOS-local Gadget launcher; never restarts an existing app or launches a mobile target."""
 import argparse
 import importlib.util
 import json
@@ -20,6 +20,8 @@ BOOTSTRAP = """const env=n=>{const p=new NativeFunction(Module.getGlobalExportBy
 rpc.exports={bootstrap(){const home=env('HOME');let foundationHome=null;const homeFn=Module.findGlobalExportByName('NSHomeDirectory');if(homeFn!==null){const object=new NativeFunction(homeFn,'pointer',[])();const selector=new NativeFunction(Module.getGlobalExportByName('sel_registerName'),'pointer',['pointer'])(Memory.allocUtf8String('UTF8String'));const chars=new NativeFunction(Module.getGlobalExportByName('objc_msgSend'),'pointer',['pointer','pointer'])(object,selector);foundationHome=chars.isNull()?null:chars.readUtf8String();}const unset=new NativeFunction(Module.getGlobalExportByName('unsetenv'),'int',['pointer']);unset(Memory.allocUtf8String('DYLD_INSERT_LIBRARIES'));return {pid:Process.id,executable:Process.mainModule.path,home,foundationHome,dyld:env('DYLD_INSERT_LIBRARIES')};}};"""
 
 def launch(app, gadget, arguments, route, launcher="direct"):
+    if sys.platform != "darwin":
+        raise RuntimeError("This launcher only supports macOS-local .app targets")
     info=plistlib.loads((app/"Contents/Info.plist").read_bytes())
     executable=(app/"Contents/MacOS"/info["CFBundleExecutable"]).resolve()
     processes=subprocess.check_output(["/bin/ps","-axo","comm="],text=True).splitlines()

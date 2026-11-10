@@ -57,8 +57,12 @@
   "task_id": "T-019",
   "task_version": "v1",
   "number": 3,
-  "status": "进行中",
-  "evidence": []
+  "status": "已完成",
+  "evidence": [
+    "WK入口只装配引擎和Mac宿主；macos_appkit提供available/schedule/views，webkit_agent不依赖NSApplication。",
+    "6项宿主合同测试通过，覆盖非桌面测试宿主、主线程/page world、错误目标、调度拒绝、超时持有原生回调及迟到排队工作不启动载荷。",
+    "真实独立双WKWebView v2会话、完整页面合同、CLI及控制端退出清理通过，run webkit-djwsgq6k；无手机profile注册。"
+  ]
 }
 ```
 
@@ -71,8 +75,11 @@
   "task_id": "T-019",
   "task_version": "v1",
   "number": 4,
-  "status": "未开始",
-  "evidence": []
+  "status": "进行中",
+  "evidence": [
+    "最终18 Rust/5 Web/8 WK host/23 Python测试通过；CDP Electron45、Gadget Electron36和双WKWebView独立宿主通过，详见validation/device-boundaries.md。",
+    "保留webkit-2fclaktz的targets超时；新增阶段诊断和fixture ready，webkit-5jucn2z7通过，未加长截止或放宽身份。"
+  ]
 }
 ```
 
@@ -93,7 +100,9 @@
   ],
   "evidence": [
     "确认本机ps/目标混用、扁平会话、页面ID跨会话歧义与WK/AppKit耦合。",
-    "会话/目标分离完成并通过旧v1及新v2独立Electron验证，正在分离WK宿主发现。"
+    "会话/目标分离完成并通过旧v1及新v2独立Electron验证，正在分离WK宿主发现。",
+    "WK执行与Mac宿主发现分离；6项宿主合同和真实双WKWebView回归通过。",
+    "最终回归通过；输入重复字段/格式失败、启动器Mac限定及WK回调失败防御完成，正在提交与关闭。"
   ],
   "stop_reason": ""
 }

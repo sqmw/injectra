@@ -26,6 +26,7 @@ class Route:
         else:link.symlink_to(modules,target_is_directory=True)
         bundle=self.root/"webkit-agent.bundle.js"
         if not bundle.exists():
+            self.connection.report_stage("controller-agent-compile")
             code=frida.Compiler().build("agent.js",project_root=str(self.root))
             temporary=self.root/("bundle-"+str(os.getpid())+".tmp")
             temporary.write_text(code);temporary.replace(bundle)

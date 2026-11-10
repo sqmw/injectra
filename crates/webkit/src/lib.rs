@@ -17,6 +17,8 @@ impl WebkitBackend {
                 vec![
                     ("route.py", include_str!("../helper/route.py")),
                     ("agent.js", include_str!("../helper/agent.js")),
+                    ("webkit_agent.js", include_str!("../helper/webkit_agent.js")),
+                    ("macos_appkit.js", include_str!("../helper/macos_appkit.js")),
                 ],
             )?,
         })
