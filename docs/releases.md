@@ -1,5 +1,11 @@
 # 版本与交付映射
 
+## T-019 · 控制端与目标设备边界解耦（未发布）
+
+- 已通过[T-020](TODO.md#t-020)快进合入本地main，尚未推送；未移动旧tag或创建发布。
+- 24ca687分离控制端、目标身份与传输，01cbf7f分离WK宿主并补强回调及诊断，c6d0cf3关闭验收。
+- v2会话与v1只读兼容；旧Frida页面ID需重新发现。手机实现未加入；[接口与支持范围](architecture/device-boundaries.md)、[验证与限制](validation/device-boundaries.md)。
+
 ## T-017 · macOS多引擎开发交付（未发布）
 
 - 已通过T-018快进合入本地main，尚未推送；既有MVP tag不移动。CLI包版本暂沿用0.1.0，新增能力以本分支提交及--help为准，不把旧tag当作新后端版本。
