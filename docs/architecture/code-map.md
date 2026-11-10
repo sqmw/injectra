@@ -37,3 +37,5 @@ Gecko专项验证：[官方下载校验](../../scripts/setup-gecko-tests.py)、[
 Thunderbird验证：[宿主与内容页测试](../../scripts/thunderbird-smoke.mjs)、[Marionette测试连接](../../tests/gecko/marionette-client.mjs)、[共用runtime断言](../../tests/gecko/runtime-checks.mjs)；[说明](../thunderbird-validation.md)，不作为公开产品后端。
 
 Thunderbird宿主差异：[tabmail目标发现/世代核验](../../tests/gecko/thunderbird-host.mjs)、[原Window调试执行](../../tests/gecko/page-world.mjs)；仅测试用，标准BiDi发现限制及特权HTML过滤见上述验收。
+
+Thunderbird HTML补充验证：[测试用装配器](../../tests/gecko/parsed-html.mjs)、[装配与套件隔离单测](../../tests/gecko/parsed-html.test.mjs)；[V2路线验收与原合同边界](../validation/thunderbird-html.md)。不注册正式CLI、不修改共享runtime。

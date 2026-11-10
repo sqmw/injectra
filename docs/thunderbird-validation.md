@@ -1,5 +1,7 @@
 # macOS Thunderbird 安装与验证
 
+2026-11-11后续：[T-024主界面HTML装配路线](validation/thunderbird-html.md)已实测通过；原innerHTML严格合同仍partial，标准BiDi发现和正式CLI支持边界未改变。下文保留T-022历史结果。
+
 [T-022](TODO.md#t-022)，输入2c0117c。官方Thunderbird159.0，独立空HOME/profile，不登录邮箱、导入账号或发送邮件，不改默认客户端。验证实际宿主窗口和自有内容页；正式CLI支持单独计。
 
 成立标准：真实实例、明确目标、逐项执行与效果/清理回读；只有端口或会话成功不算页面通过。失败/未测如实保留，不放宽系统保护。安装前确认用户无既有Thunderbird，计划保留于用户Applications；运行数据在仓库外。

@@ -2,6 +2,31 @@
 
 当前权威来源为本地main。T-021/T-022原交付记录保留当时口径，后续接收状态以T-023为准；更早任务亦保留原验收事实。保留完整定义与证据，默认从[任务索引](tasks.md)按Task ID定向读取。
 
+## 最近完成的验证
+
+<a id="t-024"></a>
+### T-024 · Thunderbird HTML 注入实机验证收口
+
+```tracking-task
+{
+  "id": "T-024",
+  "name": "Thunderbird HTML 注入实机验证收口",
+  "version": "v1",
+  "mode": "lightweight",
+  "status": "done",
+  "goal": "继续验证Thunderbird159.0主界面HTML注入缺口，以真实页面效果与清理回读闭合可行路线或明确不可行边界。",
+  "scope": "独立空配置实例、HTML构造路径诊断与测试适配、原合同回归及证据文档；不新增正式CLI后端、不改安装包/安全设置、不接入邮箱账号。",
+  "acceptance": "主界面HTML字符串载荷路线有真实效果与更新/清理证据，或保留无法支持的具体阻塞；旧innerHTML失败与BiDi限制独立保留，不改历史run/冒充全协议支持；自有进程退出，回归/review完成。",
+  "execution_ref": "archive/T-024.md#t-024",
+  "acceptance_evidence": [
+    "测试用DOMParser→importNode装配路线在Thunderbird159.0主界面通过37项检查，gHjeHb及最终DxFYST两次成功；默认合同fjBUxN仍27项成功/原HTML失败/partial。原失败、BiDi限制和正式CLI未适配均保留；5次自有实例已退出，截图已核对；make check和review通过。仅验证阶段收口。"
+  ],
+  "unplanned_reason": "用户指出截图中的Thunderbird验证未收口，选择先补齐实机验证、正式CLI另行推进。"
+}
+```
+
+[验收报告](validation/thunderbird-html.md) · [执行与review证据](archive/T-024.md#t-024)
+
 ## 最近完成的集成
 
 <a id="t-023"></a>

@@ -38,6 +38,12 @@
 |---|---|---|---|
 | Gecko / Thunderbird | macOS26.5.1、arm64主机 / 159.0 | Marionette + Thunderbird宿主枚举 + Gecko调试执行接口 | 已安装；内容页JS/CSS/HTML通过；主界面JS/CSS及DOM控件通过；主界面HTML按钮字符串未通过，整组partial；BiDi会话可建但不枚举其标签页。正式CLI尚未适配。[实测](../thunderbird-validation.md) |
 
+## T-024 Thunderbird HTML补充验证（2026-11-11）
+
+| 平台/版本 | 新路线与结果 | 仍保留的限制 |
+|---|---|---|
+| macOS arm64 / Thunderbird159.0 | 测试用DOMParser→importNode装配主界面HTML；37项实机检查通过（最终run thunderbird-gecko-DxFYST）；[验收](../validation/thunderbird-html.md) | 原runtime.html仍partial（默认合同复测fjBUxN），BiDi仍不枚举标签页；不是正式CLI能力，也不代表任意HTML/插件兼容 |
+
 ## 历史应用矩阵
 
 | 应用 | 平台 | 应用版本 | 宿主／运行时 | 内核／协议实测值 | 接入路线与条件 | 当前验证状态与范围 | 证据／代码入口 |

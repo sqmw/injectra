@@ -13,7 +13,7 @@ check: doc-check architecture-check
 build:
 	sh scripts/cargo.sh build --workspace --locked
 
-test: test-webkit-host
+test: test-webkit-host test-gecko-html-unit
 	sh scripts/cargo.sh test --workspace --locked
 	$(MAKE) test-web
 
@@ -87,3 +87,10 @@ setup-thunderbird-tests:
 
 test-thunderbird:
 	node scripts/thunderbird-smoke.mjs
+
+.PHONY: test-thunderbird-html test-gecko-html-unit
+test-thunderbird-html:
+	node scripts/thunderbird-smoke.mjs --parsed-html
+
+test-gecko-html-unit:
+	node --test tests/gecko/parsed-html.test.mjs

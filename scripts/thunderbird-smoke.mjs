@@ -14,6 +14,8 @@ import { ThunderbirdContentHost } from "../tests/gecko/thunderbird-host.mjs";
 
 assert.equal(process.platform, "darwin");
 const inspectOnly = process.argv.includes("--inspect");
+const parsedHtml = process.argv.includes("--parsed-html");
+assert(!(inspectOnly && parsedHtml), "Use --inspect or --parsed-html, not both");
 const pinned = JSON.parse(await readFile(join(root, "tests/gecko/thunderbird.json"), "utf8"));
 const receipt = JSON.parse(await readFile(join(cache, "gecko-tests/thunderbird", pinned.version, "verified.json"), "utf8"));
 assert.equal(receipt.sha512, pinned.sha512);
@@ -48,7 +50,8 @@ const env = { ...process.env, HOME: home, CFFIXED_USER_HOME: home, MOZ_NO_REMOTE
   MOZ_CRASHREPORTER_DISABLE: "1", MOZ_REMOTE_ALLOW_SYSTEM_ACCESS: "1" };
 delete env.MOZ_HEADLESS;
 const transcript = [];
-const result = { passed: false, mode: inspectOnly ? "inspection" : "contract",
+const result = { passed: false, mode: inspectOnly ? "inspection" : parsedHtml ? "parsed-html-contract-v2" : "contract",
+  htmlRoute: parsedHtml ? "test-only DOMParser + importNode preparation" : "shared runtime innerHTML",
   host: "Thunderbird", version: pinned.version, run, checks: [], productBackend: false };
 let child, exited = false, spawnError, marionette, bidi;
 const check = async (name, action) => {
@@ -138,7 +141,7 @@ if (!inspectOnly) {
     const suite = async (name, action) => {
       try { await action(); result.suites[name] = { passed: true }; }
       catch (error) {
-        result.suites[name] = { passed: false, message: error.message, response: error.response };
+        result.suites[name] = { passed: false, message: error.message, response: error.response, cleanupFailure: error.cleanupFailure };
         console.log("FAIL " + name + ": " + error.message);
       }
     };
@@ -148,6 +151,15 @@ if (!inspectOnly) {
       screenshot: async () => {
         const image = await marionette.command("WebDriver:TakeScreenshot", { full: false });
         await savePng("application-ui.png", image.value);
+      },
+    }));
+    if (parsedHtml) await suite("applicationUIParsedHtml", () => verifyRuntime({
+      evaluate: expression => marionette.evaluatePage(expression), other: otherEvaluate, runtime,
+      id: "injectra.thunderbird.parsed-html", mountMode: "parsed-html",
+      check: (name, action) => check("application UI parsed HTML: " + name, action),
+      screenshot: async () => {
+        const image = await marionette.command("WebDriver:TakeScreenshot", { full: false });
+        await savePng("application-ui-parsed-html.png", image.value);
       },
     }));
     await suite("applicationUIDom", () => verifyRuntime({
@@ -196,8 +208,17 @@ if (!inspectOnly) {
     });
   }
   await check("session deletion", () => marionette.command("WebDriver:DeleteSession", {}));
-  result.passed = Object.values(result.suites).every(suite => suite.passed);
-  result.outcome = result.passed ? "passed" : "partial";
+  result.baselinePassed = Object.entries(result.suites).filter(([name]) => name !== "applicationUIParsedHtml").every(([, suite]) => suite.passed);
+  result.baselineOutcome = result.baselinePassed ? "passed" : "partial";
+  if (parsedHtml) {
+    // V2 certifies the alternate fixture preparation route. V1 is still measured above.
+    result.requiredSuites = ["applicationUIParsedHtml", "applicationUIDom", "contentPage"];
+    result.passed = result.requiredSuites.every(name => result.suites[name]?.passed === true);
+    result.outcome = result.passed ? "parsed-html-route-passed" : "partial";
+  } else {
+    result.passed = result.baselinePassed;
+    result.outcome = result.passed ? "passed" : "partial";
+  }
 } catch (error) {
   result.failure = { message: error.message, stack: error.stack, response: error.response };
 } finally {

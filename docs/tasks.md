@@ -4,7 +4,7 @@
 
 ## 当前任务
 
-无。T-021/T-022已通过[T-023](TODO.md#t-023)合入本地main；Thunderbird部分支持及正式Gecko后端未实现的边界保持。
+无。T-024测试用HTML装配路线已验证收口；默认innerHTML合同仍partial，正式Gecko/Thunderbird CLI后端按用户选择另行推进。
 
 ## 已关闭任务索引
 
@@ -12,6 +12,7 @@
 
 | 任务 | 标准名称 | 定义版本 |
 | --- | --- | --- |
+| <a id="t-024"></a>[T-024](TODO.md#t-024) | Thunderbird HTML 注入实机验证收口 | v1 |
 | <a id="t-023"></a>[T-023](TODO.md#t-023) | Gecko 验证成果合入 main | v1 |
 | <a id="t-022"></a>[T-022](TODO.md#t-022) | macOS Thunderbird 安装与实机验证 | v1 |
 | <a id="t-021"></a>[T-021](TODO.md#t-021) | macOS Gecko 实机接入验证 | v1 |
