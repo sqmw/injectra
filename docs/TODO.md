@@ -2,6 +2,32 @@
 
 当前权威来源为本地main。T-021/T-022原交付记录保留当时口径，后续接收状态以T-023为准；更早任务亦保留原验收事实。保留完整定义与证据，默认从[任务索引](tasks.md)按Task ID定向读取。
 
+## 当前执行
+
+<a id="t-032"></a>
+### T-032 · macOS 十款应用顺序注入验证
+
+```tracking-task
+{
+  "id": "T-032",
+  "name": "macOS 十款应用顺序注入验证",
+  "version": "v1",
+  "mode": "staged",
+  "status": "blocked",
+  "goal": "按用户指定顺序对10款macOS应用逐一尝试接入与实际runtime注入，获得可复现成功证据或准确的实测阻塞及下一条件。",
+  "scope": "当前Apple Silicon本机应用；依次尝试CDP/已有原生页面后端，检查独立目录与已有实例；只用自有临时UI载荷验证并清理，保留账号/同步任务/文档；不改签名/系统保护或未授权结束已有进程。",
+  "acceptance": "10款均有当前版本/路径/运行条件及明确尝试结果；取得页面时验证JS/CSS/HTML或如实记录HTML限制、交互、更新与清理；失败保留阶段与证据，不以肯定可行为结论，不以仅识别宿主作为注入成功。",
+  "execution_ref": "STEPS.md#t-032",
+  "acceptance_evidence": [
+    "10款已按顺序实际尝试；五款页面合同通过，另五款接入未完成，逐项证据见验证报告。",
+    "剩余补查：阿里Node路线需正常退出新普通实例，等待用户授权；未关闭整体任务。"
+  ],
+  "unplanned_reason": "用户明确要求对旧列表中的10款应用依次实际尝试。"
+}
+```
+
+上下文r14：Parent/main，single-writer，基线8c041ce。首轮10项及有依据的补查已记录；[本轮报告](validation/macos-ten-apps.md)。当前唯一待用户条件：阿里普通实例PID69081的正常退出授权；收到后重新核对PID/路径/启动世代，继续缓存runs/mac-ten-apps-fzwjzf8z/node-attempt.py的阿里试验。原QQ已获准退出测试并重新正常打开；原Xmind/Claude保留。不得重放Unknown、不得把只读识别当注入成功。
+
 ## 最近完成的验证
 
 <a id="t-031"></a>
@@ -573,7 +599,9 @@
   "scope": "新增兼容性报告与脱敏尝试清单，更新文档导航、验证入口和任务记录；不改源码、不重跑应用、不提交原始运行数据。",
   "acceptance": "222个应用包、40个候选、26个尝试应用和31次尝试口径一致；首次与最终结果分开；失败和未测边界明确；review、文档及任务检查通过，形成独立本地提交。",
   "execution_ref": "archive/T-009.md#t-009",
-  "acceptance_evidence": ["兼容性报告覆盖40个候选及方法边界；31条脱敏尝试与原始结果逐条核对，首次16个、最终20个完整通过的口径保留；自审、make doc-check、任务结构检查及git diff --check通过。仅文档与证据摘要变更，本条所在提交为独立本地归档提交。"],
+  "acceptance_evidence": [
+    "兼容性报告覆盖40个候选及方法边界；31条脱敏尝试与原始结果逐条核对，首次16个、最终20个完整通过的口径保留；自审、make doc-check、任务结构检查及git diff --check通过。仅文档与证据摘要变更，本条所在提交为独立本地归档提交。"
+  ],
   "unplanned_reason": "用户要求将已完成的本机应用CDP注入普查结果整理并提交。"
 }
 ```
@@ -664,7 +692,9 @@
   "scope": "项目定位、需求、架构职责、使用与验收说明、导航及决策记录；不修改源码、命令行为或历史验收证据。",
   "acceptance": "当前注入合同、使用者责任、后续候选方向明确且跨文档一致；已有清理接口仅记为实现事实；review、文档与任务结构检查通过。",
   "execution_ref": "archive/T-005.md#t-005",
-  "acceptance_evidence": ["定位、责任及当前验收已统一，D-003记录用户纠正；review、make doc-check、任务结构检查与git diff --check通过；仅Markdown变更。"],
+  "acceptance_evidence": [
+    "定位、责任及当前验收已统一，D-003记录用户纠正；review、make doc-check、任务结构检查与git diff --check通过；仅Markdown变更。"
+  ],
   "unplanned_reason": "用户纠正产品范围并明确要求同步文档与当前产品边界。"
 }
 ```
