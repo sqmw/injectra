@@ -1,6 +1,35 @@
 # 任务入口
 
-当前权威来源为本地main；T-019交付历史保留，后续主分支集成状态以T-020为准。T-018及以前保留原验收口径。T-017保留独立工作树交付时的历史结论，后续主分支集成状态以T-018为准。保留完整定义与验收；默认从[任务索引](tasks.md)进入，按Task ID定向读取，不整读历史。
+T-021当前权威记录在本工作分支；T-020及以前是885b8b5的只读历史快照。此前权威来源为本地main；T-019交付历史保留，后续主分支集成状态以T-020为准。T-018及以前保留原验收口径。T-017保留独立工作树交付时的历史结论，后续主分支集成状态以T-018为准。保留完整定义与验收；默认从[任务索引](tasks.md)进入，按Task ID定向读取，不整读历史。
+
+## 本工作树最新完成
+
+<a id="t-021"></a>
+### T-021 · macOS Gecko 实机接入验证
+
+```tracking-task
+{
+  "id": "T-021",
+  "name": "macOS Gecko 实机接入验证",
+  "version": "v1",
+  "mode": "lightweight",
+  "status": "done",
+  "goal": "下载官方Firefox，在Mac独立配置实例上验证Gecko页面接入与共享Web runtime执行，明确正式产品适配缺口。",
+  "scope": "官方macOS Firefox下载、校验及仓库外保存；新增可复用验证脚本；独立配置/本地测试页上的BiDi发现、JS/CSS/HTML、Promise/异常、更新清理及目标隔离测试；文档和提交。不新增公开后端/crate，不改已有架构，不操作原账号和默认浏览器设置。",
+  "acceptance": "记录精确版本/来源/hash和Mac架构；实际页面验证有逐项结果，失败与未测如实保留；只退出本次实例；说明能否复用共享runtime及正式CLI是否支持；文档、review和检查通过。",
+  "execution_ref": "archive/T-021.md#t-021",
+  "acceptance_evidence": [
+    "官方Firefox160.0已下载到Mac仓库外缓存，SHA512、Mozilla签名及spctl验签通过；实际会话PID/profile与自有启动实例一致。",
+    "firefox-bidi-Js5cnC的15项真实页面检查通过，包括共享runtime的JS/CSS/HTML、交互/Promise/异常、更新清理、页面隔离与失效目标拒绝；截图已查看，测试进程退出并复查无残留。",
+    "初次初始化超时和旧realm错误码断言失误的run均保留；当前CDP CLI接入该Firefox为404，正式BiDi后端尚未实现，不外推Thunderbird。",
+    "make check及脚本语法通过；文档/任务检查、自审和带来源标记提交完成。本工作分支保存验证脚本和记录，未合入main/推送。"
+  ],
+  "unplanned_reason": "用户明确要求下载Mac上的Gecko桌面软件并实际测试。"
+}
+```
+
+本窗口/root、single-writer；基线885b8b5，交付记录在本工作分支。下载副本和运行证据保留在Mac外部缓存，正式后端未变。[验证说明](gecko-validation.md) · [执行与关闭上下文](archive/T-021.md#t-021)。
+
 
 ## 最近完成的集成
 

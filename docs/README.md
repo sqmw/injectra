@@ -27,3 +27,5 @@
 WebKit：[WKWebView正式后端与验收边界](webkit-backend.md)。
 
 设备扩展边界：[控制端与目标设备](architecture/device-boundaries.md)。
+
+Gecko：[macOS Firefox实机接入验证](gecko-validation.md)。

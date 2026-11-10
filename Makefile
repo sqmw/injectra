@@ -73,3 +73,10 @@ test-webkit: build
 .PHONY: test-webkit-host
 test-webkit-host:
 	node --test tests/webkit/host-contract.test.mjs
+
+.PHONY: setup-gecko-tests test-gecko
+setup-gecko-tests:
+	/usr/bin/python3 -B scripts/setup-gecko-tests.py
+
+test-gecko: build
+	node scripts/gecko-smoke.mjs

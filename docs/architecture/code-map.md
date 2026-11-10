@@ -31,3 +31,5 @@
 Frida内部边界：[控制端执行](../../crates/frida/src/controller.rs)、[会话模型](../../crates/frida/helper/session_model.py)、[目标接口](../../crates/frida/helper/contracts.py)、[Mac本机核验](../../crates/frida/helper/target_macos.py)、[连接器](../../crates/frida/helper/transport.py)；详见[设备边界](device-boundaries.md)。
 
 WK宿主边界：[Mac AppKit发现/调度](../../crates/webkit/helper/macos_appkit.js)与[WK执行/回调](../../crates/webkit/helper/webkit_agent.js)由[入口](../../crates/webkit/helper/agent.js)装配；[宿主合同](../../tests/webkit/host-contract.test.mjs)不代表手机实现。
+
+Gecko专项验证：[官方下载校验](../../scripts/setup-gecko-tests.py)、[Firefox实机测试](../../scripts/gecko-smoke.mjs)、[测试用BiDi连接](../../tests/gecko/bidi-client.mjs)；见[验证边界](../gecko-validation.md)，不属于正式CLI后端。

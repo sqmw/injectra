@@ -1,0 +1,9 @@
+{
+  "version": "160.0",
+  "platform": "mac-universal",
+  "language": "en-US",
+  "url": "https://archive.mozilla.org/pub/firefox/releases/160.0/mac/en-US/Firefox%20160.0.dmg",
+  "checksums_url": "https://archive.mozilla.org/pub/firefox/releases/160.0/SHA512SUMS",
+  "sha512": "d760a14787964825a427f400eedd4c16f17359f4e903096cc4862d04bd28ff3cc5a614d606c2c7a4fec1cbab78b74873b2e1e1032e41d203da1da684dceb0fad",
+  "license_url": "https://www.mozilla.org/MPL/2.0/"
+}
