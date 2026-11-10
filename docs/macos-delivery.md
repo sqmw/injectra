@@ -13,7 +13,7 @@
 | Chromium浏览器/Electron/定制宿主 | CDP | 基线Rust/Web与Electron45的10项通过；历史应用见兼容性总表 |
 | Electron/抖音 | Gadget→原Node→页面 | 正式后端及抖音/独立Electron36实测通过；45缺符号拒绝，详见Frida后端 |
 | CEF/NW.js | CDP | CEF156.0.26与NW.js0.119.2独立宿主通过，原第三方应用记录不回填 |
-| WKWebView | Frida→主线程原生页面API | 待实现与真实应用验收 |
+| WKWebView | Frida→主线程原生页面API | 独立双WKWebView及真实Codex Switcher0.2.11、CLI检查通过 |
 
 各后端统一验证目标隔离、JS/CSS/HTML、点击读回、Promise/异常、更新/清理、断线/超时Unknown不重放和资源释放。测试宿主、真实应用与历史run分别记证据。
 

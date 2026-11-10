@@ -25,3 +25,5 @@
 | 文档检查 | [check-docs](../../scripts/check-docs.mjs) | 相对链接/显式锚点/可达性 | make doc-check，不证明业务正确性 |
 
 新增并列后端：共享[Frida通信](../../crates/frida/src/lib.rs)、[Electron Gadget](../../crates/electron-gadget/src/lib.rs)、[CLI装配](../../crates/cli/src/backend.rs)；[使用/边界](../frida-backends.md)。
+
+[WKWebView后端](../../crates/webkit/src/lib.rs)复用Frida通信；原生主线程API、异步completion与范围见[WebKit说明](../webkit-backend.md)。

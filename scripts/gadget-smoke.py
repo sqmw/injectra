@@ -1,5 +1,6 @@
 """Owned Electron Gadget smoke; never attaches to or exits a user's app."""
 import json
+import sys
 import os
 import subprocess
 import tempfile
@@ -8,7 +9,7 @@ from pathlib import Path
 
 ROOT=Path(__file__).resolve().parents[1]
 cache=Path(os.environ.get("INJECTRA_CACHE_DIR",Path(os.environ.get("XDG_CACHE_HOME",Path.home()/".cache"))/"injectra"))
-python=cache/"frida/venv/bin/python3"
+python=Path(os.environ.get("INJECTRA_FRIDA_PYTHON",sys.executable))
 gadget=Path(os.environ["INJECTRA_TEST_GADGET"]).resolve()
 electron=cache/"gadget-test-tools/node_modules/electron/dist/Electron.app/Contents/MacOS/Electron"
 app=electron.parents[2]

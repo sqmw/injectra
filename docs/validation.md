@@ -11,3 +11,7 @@
 | 参考源码的检查边界和分组统计 | [参考实现](../references/README.md) |
 
 当前检查入口与使用方法见[开发说明](dev.md)。实测只覆盖记录中的版本、页面及载荷；契约替身、代码统计和文档校验不等于真实兼容性证明。
+
+T-017新增Mac后端与宿主验收见[Mac交付](macos-delivery.md)、[Frida](frida-backends.md)、[CEF/NW.js](host-validation.md)、[WebKit](webkit-backend.md)；不覆盖原MVP与探针历史证据。
+
+本轮集中[验收与自审](validation/macos-multi-engine.md)。

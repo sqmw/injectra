@@ -17,7 +17,8 @@ const allowed = {
   "injectra-hosts": ["injectra-core", "injectra-platform-macos"],
   "injectra-frida": ["injectra-core"],
   "injectra-electron-gadget": ["injectra-core", "injectra-web", "injectra-frida"],
-  "injectra-cli": ["injectra-electron-gadget", "injectra-core", "injectra-web", "injectra-application", "injectra-cdp", "injectra-hosts"],
+  "injectra-webkit": ["injectra-core", "injectra-web", "injectra-frida"],
+  "injectra-cli": ["injectra-webkit", "injectra-electron-gadget", "injectra-core", "injectra-web", "injectra-application", "injectra-cdp", "injectra-hosts"],
 };
 for (const [name, dependencies] of Object.entries(allowed)) {
   const pkg = packages.get(name);

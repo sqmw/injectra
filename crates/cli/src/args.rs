@@ -13,6 +13,7 @@ pub struct Args {
 pub enum Backend {
     Cdp,
     ElectronGadget,
+    Webkit,
 }
 #[derive(ClapArgs)]
 pub struct Endpoint {
@@ -28,7 +29,7 @@ pub struct Endpoint {
     pub port: Option<u16>,
     #[arg(
         long,
-        required_if_eq("backend", "electron-gadget"),
+        required_if_eq_any([("backend", "electron-gadget"),("backend", "webkit")]),
         requires = "backend",
         conflicts_with = "port"
     )]
@@ -74,6 +75,28 @@ mod tests {
     fn backend_arguments_are_explicit_and_legacy_port_still_works() {
         assert!(Args::try_parse_from(["injectra", "targets", "--port", "9222"]).is_ok());
         assert!(Args::try_parse_from(["injectra", "targets"]).is_err());
+        assert!(
+            Args::try_parse_from([
+                "injectra",
+                "targets",
+                "--backend",
+                "webkit",
+                "--session",
+                "s.json"
+            ])
+            .is_ok()
+        );
+        assert!(
+            Args::try_parse_from([
+                "injectra",
+                "targets",
+                "--backend",
+                "webkit",
+                "--port",
+                "9222"
+            ])
+            .is_err()
+        );
         assert!(
             Args::try_parse_from([
                 "injectra",

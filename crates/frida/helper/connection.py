@@ -1,5 +1,7 @@
 """Authenticated process connection; does not spawn, resume or stop target processes."""
 import json
+import threading
+from contextlib import contextmanager
 import os
 import stat
 import subprocess
@@ -59,3 +61,15 @@ class Connection:
             self.script.unload()
             self.script = None
         self.session.detach()
+
+@contextmanager
+def deadline(seconds):
+    cancellation=frida.Cancellable()
+    timer=threading.Timer(seconds,cancellation.cancel)
+    timer.daemon=True
+    timer.start()
+    try:
+        with cancellation:
+            yield cancellation
+    finally:
+        timer.cancel()

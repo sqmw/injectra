@@ -65,3 +65,7 @@ setup-host-tests:
 
 test-hosts: build
 	python3 -B scripts/host-smoke.py
+
+.PHONY: test-webkit
+test-webkit: build
+	"$${INJECTRA_FRIDA_PYTHON:-$${INJECTRA_CACHE_DIR:-$${XDG_CACHE_HOME:-$$HOME/.cache}/injectra}/frida/venv/bin/python3}" -B scripts/webkit-smoke.py

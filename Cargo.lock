@@ -401,6 +401,7 @@ dependencies = [
  "injectra-electron-gadget",
  "injectra-hosts",
  "injectra-web",
+ "injectra-webkit",
  "serde",
  "serde_json",
 ]
@@ -459,6 +460,18 @@ dependencies = [
  "injectra-core",
  "serde",
  "serde_json",
+]
+
+[[package]]
+name = "injectra-webkit"
+version = "0.1.0"
+dependencies = [
+ "injectra-application",
+ "injectra-core",
+ "injectra-frida",
+ "injectra-web",
+ "serde_json",
+ "tempfile",
 ]
 
 [[package]]

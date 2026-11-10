@@ -1,0 +1,7 @@
+{
+  "name": "injectra-native-agent-dependencies",
+  "private": true,
+  "dependencies": {
+    "frida-objc-bridge": "8.0.6"
+  }
+}

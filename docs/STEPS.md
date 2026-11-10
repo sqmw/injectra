@@ -76,8 +76,12 @@ CEF和NW.js独立宿主完整CDP验收。
   "task_id": "T-017",
   "task_version": "v1",
   "number": 4,
-  "status": "进行中",
-  "evidence": []
+  "status": "已完成",
+  "evidence": [
+    "独立双WKWebView合同通过，run webkit-i07adzl2；CLI与控制端退出后助手清理通过，run webkit-lg0f0zoc。",
+    "用户明确批准的空HOME/CODEX_HOME Codex Switcher0.2.11真实主页面合同、托盘隔离和CLI通过，t017/webkit-real-contract.log；未导入账号或切换，测试新实例按身份退出。",
+    "Easydict接入尝试失败保留，未修改签名/系统保护/Clash运行；新增SDK可取消截止与6项会话单测通过，真实WebKit通过包含该截止实现。"
+  ]
 }
 ```
 
@@ -92,7 +96,7 @@ CEF和NW.js独立宿主完整CDP验收。
   "task_id": "T-017",
   "task_version": "v1",
   "number": 5,
-  "status": "未开始",
+  "status": "进行中",
   "evidence": []
 }
 ```
@@ -104,7 +108,7 @@ CEF和NW.js独立宿主完整CDP验收。
   "task_id": "T-017",
   "task_version": "v1",
   "status": "running",
-  "authorization": "2026-11-10用户Implement the plan；已确认并列后端、Python/Frida可选依赖、Mac主页面、Chromium+WebKit。",
+  "authorization": "2026-11-10用户Implement the plan；已确认并列后端、Python/Frida可选依赖、Mac主页面、Chromium+WebKit。；用户另明确批准Codex Switcher独立空目录真实验收，不导入账号或切换。",
   "scope": "保留现有核心契约与共享runtime；新增并列后端、共享Frida桥接、CLI选择、锁定可选环境、CEF/NW.js/WKWebView验证；不推进Windows/Gecko/iframe/自动重注入，不改第三方安装包/系统保护，不自动重启用户应用。",
   "steps": [
     "T-017/S-001",
@@ -116,7 +120,8 @@ CEF和NW.js独立宿主完整CDP验收。
   "evidence": [
     "基线make check与Electron10项通过；日志位于外部缓存t017/baseline.log和electron-baseline.log。",
     "Gadget正式CLI、真实抖音/独立Electron36、控制端退出清理、默认CDP回归与4项会话单测通过。",
-    "CEF/NW.js官方独立宿主已通过；开始WebKit并列后端。"
+    "CEF/NW.js官方独立宿主已通过；开始WebKit并列后端。",
+    "WebKit并列后端、独立双页与真实Tauri应用合同/CLI通过；进入Mac最终回归。"
   ],
   "stop_reason": ""
 }

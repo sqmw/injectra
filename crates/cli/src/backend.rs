@@ -6,6 +6,9 @@ pub(crate) fn create(endpoint: Endpoint) -> Result<Box<dyn WebBackend>> {
         Backend::Cdp => Ok(Box::new(injectra_cdp::CdpBackend::new(
             endpoint.port.ok_or("--port is required for CDP")?,
         )?)),
+        Backend::Webkit => Ok(Box::new(injectra_webkit::WebkitBackend::new(
+            &endpoint.session.ok_or("--session is required for WebKit")?,
+        )?)),
         Backend::ElectronGadget => Ok(Box::new(
             injectra_electron_gadget::ElectronGadgetBackend::new(
                 &endpoint.session.ok_or("--session is required for Gadget")?,

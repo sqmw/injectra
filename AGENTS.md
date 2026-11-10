@@ -14,7 +14,7 @@
 - MVP 首个支持组合是 macOS + Electron 宿主；不据此推定 Injectra 自身使用 Electron 构建。
 - 所有实际插件、示例插件及可复用插件Bundle归独立web-ui-plugins库；本仓库不得存放插件或其副本。仅保留注入runtime、接入实现和最小测试夹具，测试不得依赖插件库，详见[产品边界](docs/requirements.md)。
 - 共享 Web 注入代码保留单一来源；平台、宿主体系、目标应用差异分别隔离，禁止复制成各平台版本。
-- 当前采用Rust CLI + CDP；需求和边界见docs/requirements.md。不得把接口设计或测试替身当成真实应用兼容性证明。
+- 当前采用Rust CLI，默认CDP，并提供可选Electron Gadget/WKWebView页面后端；需求和边界见docs/requirements.md。不得把接口设计或测试替身当成真实应用兼容性证明。
 - 长期扩展边界现在建立：通用core不包含页面、JS、JSON或原生操作假设；Web/native分域，平台与宿主规则隔离，详见[执行域契约](docs/architecture/boundaries.md)。原生测试替身不能作为真实后端支持。
 - 入口只负责装配；核心流程依赖契约，具体适配实现不得反向进入核心。
 - 新适配必须说明支持能力、限制、失败行为与验证范围；不以空实现伪装跨平台支持。

@@ -35,10 +35,10 @@ runtime / pre-runtime描述注入时机；CDP、Hook等描述接入机制。当�
 
 ## 当前交付与已有实现
 
-- Rust CLI + macOS Electron/CDP；发现指定本地调试端口的页面，以精确ID选择单个目标。
+- Rust CLI在macOS提供默认CDP及可选Electron Gadget/WKWebView页面后端；通过显式端口或会话，以精确ID选择主页面。
 - 从本地版本化manifest加载CSS/HTML/JS，经单一共享Web runtime执行；平台与宿主接入分别隔离。
 - 不可连接、不支持、找不到目标、脚本异常均明确报告；超时或断线保留结果未知语义，不伪报成功或自动重放。
-- 标准macOS Electron .app提供只读启动参数规划，由使用者自行启动目标；不修改应用源码或安装包，不自动管理用户进程。
+- 标准macOS Electron .app保留只读启动参数规划；Gadget另有显式受控新实例启动脚本，拒绝已有同路径实例，不修改应用包或自动重启用户进程。
 - 既有同ID更新、remove、context.onCleanup保留并如实记录；它们是已实现的受管理内容辅助行为，不等于任意JS撤销，也不构成新增回滚系统的要求。本次文档校准不删除代码或改写历史验收。
 
 Rust用于无Node运行时的单可执行文件交付，并为后续原生接入留出实现空间；Node/Electron仅供开发验证。实际命令与辅助接口见[开发说明](dev.md)。

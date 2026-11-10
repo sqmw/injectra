@@ -8,7 +8,7 @@
 - 现有本机记录均为macOS，主机为arm64；未逐应用推断目标进程架构。Windows、Linux及其他平台没有实测，本表不编造其版本、内核或支持状态；取得证据后按同列新增行，不套用macOS结果。
 - “通过”只覆盖该行版本/页面/受控载荷；“部分通过”不等于完整基线；“仅入口”不等于执行通过；“未验证/未取得页面”不等于不支持。
 - Chromium内核列沿用协议报告或明确运行时读回；未连接的应用只列已识别引擎族，不从宿主版本推算内核版本。
-- 产品CLI当前只装配CDP。抖音非CDP成功属于已确认的独立探针/参考实现，不冒充已交付的Rust Frida后端。
+- 本工作树的T-017已将Electron Gadget与WKWebView接入正式CLI；旧探针/参考实现证据仍单独保留，新增产品证据见下表。main是否包含本次成果以实际Git集成为准。
 
 
 ## T-017工作树新增宿主证据（2026-11-10）
@@ -21,6 +21,8 @@
 | NW.js官方SDK宿主 | macOS arm64 / 0.119.2 | CDP | 主页面共享合同通过，run nwjs-ypuq07xm |
 | Electron独立fixture | macOS arm64 / 36.4.0 | Gadget | 正式CLI及控制端退出清理通过，run gadget-electron-c5qkiq_k |
 | 抖音现有隔离实例 | macOS arm64 / 8.7.0 | Gadget | 正式后端及CLI通过；不改写旧探针run |
+| WKWebView独立Swift宿主 | macOS arm64 / 系统WebKit | Gadget→原生页面API | 双页合同、CLI和控制端退出清理通过，run webkit-lg0f0zoc |
+| Codex Switcher真实Tauri应用 | macOS arm64 / 0.2.11 | Gadget→WKWebView | 明确授权的空目录实例主页面合同与CLI通过，托盘未污染；测试实例已退出 |
 
 ## 历史应用矩阵
 

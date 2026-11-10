@@ -9,12 +9,15 @@ import shutil
 import socket
 import subprocess
 import time
+import sys
 from pathlib import Path
 import frida
 
 ROOT=Path(__file__).resolve().parents[1]
+sys.path.insert(0,str(ROOT/"crates/frida/helper"))
+from connection import deadline
 BOOTSTRAP = """const env=n=>{const p=new NativeFunction(Module.getGlobalExportByName('getenv'),'pointer',['pointer'])(Memory.allocUtf8String(n));return p.isNull()?null:p.readUtf8String();};
-rpc.exports={bootstrap(){const home=env('HOME');const unset=new NativeFunction(Module.getGlobalExportByName('unsetenv'),'int',['pointer']);unset(Memory.allocUtf8String('DYLD_INSERT_LIBRARIES'));return {pid:Process.id,executable:Process.mainModule.path,home,dyld:env('DYLD_INSERT_LIBRARIES')};}};"""
+rpc.exports={bootstrap(){const home=env('HOME');let foundationHome=null;const homeFn=Module.findGlobalExportByName('NSHomeDirectory');if(homeFn!==null){const object=new NativeFunction(homeFn,'pointer',[])();const selector=new NativeFunction(Module.getGlobalExportByName('sel_registerName'),'pointer',['pointer'])(Memory.allocUtf8String('UTF8String'));const chars=new NativeFunction(Module.getGlobalExportByName('objc_msgSend'),'pointer',['pointer','pointer'])(object,selector);foundationHome=chars.isNull()?null:chars.readUtf8String();}const unset=new NativeFunction(Module.getGlobalExportByName('unsetenv'),'int',['pointer']);unset(Memory.allocUtf8String('DYLD_INSERT_LIBRARIES'));return {pid:Process.id,executable:Process.mainModule.path,home,foundationHome,dyld:env('DYLD_INSERT_LIBRARIES')};}};"""
 
 def launch(app, gadget, arguments, route, launcher="direct"):
     info=plistlib.loads((app/"Contents/Info.plist").read_bytes())
@@ -35,6 +38,8 @@ def launch(app, gadget, arguments, route, launcher="direct"):
     log=run/"startup.log"
     env={**os.environ,"HOME":str(home),"CFFIXED_USER_HOME":str(home),"DYLD_INSERT_LIBRARIES":str(library)}
     env.pop("ELECTRON_RUN_AS_NODE",None)
+    for key,relative in (("XDG_CONFIG_HOME",".config"),("XDG_CACHE_HOME",".cache"),("XDG_DATA_HOME",".local/share")):
+        env[key]=str(home/relative)
     args=list(arguments)
     if route=="electron-gadget":
         args=["--user-data-dir="+str(home/"profile"),"--no-first-run",*args]
@@ -56,20 +61,30 @@ def launch(app, gadget, arguments, route, launcher="direct"):
             with socket.create_connection(("127.0.0.1",port),timeout=.1):break
         except OSError:time.sleep(.1)
     else:raise TimeoutError("Gadget listener unavailable; inspect "+str(log))
-    device=frida.get_device_manager().add_remote_device("127.0.0.1:"+str(port),token=state["token"])
-    pid=device.spawn(["re.frida.Gadget"])
-    session=device.attach(pid)
-    script=session.create_script(BOOTSTRAP)
+    session=None;script=None
     try:
-        script.load();receipt=script.exports_sync.bootstrap()
-        if receipt!={"pid":pid,"executable":str(executable),"home":str(home),"dyld":None}:
-            raise RuntimeError("Bootstrap identity or inheritance check failed")
-        if launcher=="direct" and pid!=child.pid:raise RuntimeError("Unexpected process identity")
-        state.update(pid=pid,phase="running")
+        with deadline(10):
+            device=frida.get_device_manager().add_remote_device("127.0.0.1:"+str(port),token=state["token"])
+            pid=device.spawn(["re.frida.Gadget"])
+            state.update(pid=pid,phase="verifying")
+            statefile.write_text(json.dumps(state))
+            session=device.attach(pid)
+            script=session.create_script(BOOTSTRAP)
+            script.load();receipt=script.exports_sync.bootstrap()
+            if receipt!={"pid":pid,"executable":str(executable),"home":str(home),"foundationHome":str(home),"dyld":None}:
+                raise RuntimeError("Bootstrap identity or inheritance check failed")
+            if launcher=="direct" and pid!=child.pid:raise RuntimeError("Unexpected process identity")
+            device.resume(pid)
+            state.update(phase="running")
+            statefile.write_text(json.dumps(state))
+    except Exception:
+        state["phase"]="failed"
         statefile.write_text(json.dumps(state))
-        device.resume(pid)
+        raise
     finally:
-        script.unload();session.detach()
+        with deadline(3):
+            if script is not None:script.unload()
+            if session is not None:session.detach()
     spec=importlib.util.spec_from_file_location("register",ROOT/"scripts/frida-session.py")
     module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
     descriptor=run/"session.json"

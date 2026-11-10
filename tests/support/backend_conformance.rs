@@ -85,7 +85,7 @@ pub fn verify(backend: &dyn WebBackend, selected: &str) {
             .targets()
             .unwrap()
             .into_iter()
-            .filter(|p| p.reference != reference && p.url.starts_with("http"))
+            .filter(|p| p.reference != reference && !p.url.is_empty() && p.url != "about:blank")
         {
             assert_eq!(
                 injectra_application::execute(backend, &other.reference, &count).unwrap(),

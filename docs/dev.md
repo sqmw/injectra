@@ -47,3 +47,7 @@ CSS/HTML以JSON数据嵌入共享程序，任意引号不应改变生成程序�
 默认缓存根`${XDG_CACHE_HOME:-$HOME/.cache}/injectra`：`cargo-target/`构建产物，`test-tools/`锁定测试依赖，`runs/electron-*/`每次验证的profile、electron.log和result.json。`INJECTRA_CACHE_DIR`可整体覆盖；`CARGO_TARGET_DIR`可单独覆盖构建位置。覆盖路径仍应选仓库及同步目录之外。
 
 这些数据不是源码真相；恢复时使用Cargo/npm锁文件重建，历史测试证据保留在原run，项目[验证摘要](validation.md)记录相对run身份。不要把cache、profile、日志和调试输出提交Git。没有正式发布或远端服务。
+
+## 可选Mac后端
+
+默认CDP命令保持兼容。新增后端、会话准备和锁定依赖见[Frida](frida-backends.md)；WKWebView执行与边界见[WebKit](webkit-backend.md)。构建产物可以离开源目录，第一方helper已嵌入Rust可执行文件；外部可选依赖与缓存仍须准备。开发工作树可通过CARGO_TARGET_DIR选择独立编译缓存，避免不同窗口覆盖同一个开发可执行文件。

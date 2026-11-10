@@ -2,8 +2,8 @@
 import argparse,json,os,subprocess,tempfile,time
 from pathlib import Path
 
-def verify(binary,session,target,crash=False):
-    flags=["--backend","electron-gadget","--session",str(session),"--target",target]
+def verify(binary,session,target,crash=False,backend="electron-gadget"):
+    flags=["--backend",backend,"--session",str(session),"--target",target]
     def cli(op,*args):
         p=subprocess.run([str(binary),op,*flags,*args],capture_output=True,text=True,timeout=30)
         if p.returncode:raise RuntimeError(p.stderr)
@@ -52,6 +52,6 @@ def verify(binary,session,target,crash=False):
 if __name__=="__main__":
     p=argparse.ArgumentParser()
     p.add_argument("--binary",type=Path,required=True);p.add_argument("--session",type=Path,required=True)
-    p.add_argument("--target",required=True);p.add_argument("--crash",action="store_true")
+    p.add_argument("--backend",choices=["electron-gadget","webkit"],default="electron-gadget");p.add_argument("--target",required=True);p.add_argument("--crash",action="store_true")
     a=p.parse_args()
-    print(json.dumps(verify(a.binary,a.session,a.target,a.crash)))
+    print(json.dumps(verify(a.binary,a.session,a.target,a.crash,a.backend)))

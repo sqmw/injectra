@@ -2,11 +2,11 @@
 
 面向桌面 Web UI 的**代码注入工具／核心**：在不修改目标应用源码的情况下，向其 Web 运行环境注入用户提供的 JS、HTML、CSS。长期考虑 runtime / pre-runtime 两类注入时机，**当前仅实现 runtime 注入**。
 
-长期架构已建立执行域隔离：通用核心、Web／原生契约、可复用应用用例及平台／宿主职责分离。原生仅有契约测试，真实原生后端尚未实现，见[架构](docs/architecture/boundaries.md)。
+长期架构已建立执行域隔离：通用核心、Web／原生契约、可复用应用用例及平台／宿主职责分离。原生内存读写执行域仍仅有契约测试；已实现的Frida桥接用于Web页面执行，不等同于交付通用进程内存接口，见[架构](docs/architecture/boundaries.md)。
 
 首个核心版本为 **Rust CLI + macOS Electron/CDP**：连接已运行且显式开放本地调试端口的目标，选定单个页面并执行注入，报告结果、失败或结果未知。Injectra负责接入与注入能力；使用者负责脚本内容、选择器、组件适配及渲染覆盖问题。管理平台和Agent属于后续演进方向，见[产品边界](docs/requirements.md)。
 
-当前Mac扩展已在本工作树实现[可选Gadget后端](docs/frida-backends.md)，抖音真实页面及独立Electron36通过；CEF/NW.js/WebKit进展见[Mac交付](docs/macos-delivery.md)。
+当前Mac扩展已在本工作树实现[可选Gadget后端](docs/frida-backends.md)，抖音真实页面及独立Electron36通过；CEF/NW.js独立宿主也已通过；WebKit后端、独立宿主与真实Tauri应用已通过。详细进展见[Mac交付](docs/macos-delivery.md)。
 
 **MVP 已于 2026-10-31 经用户亲自验证通过**，交付版本为 `v0.1.0-mvp`。版本范围与证据见[交付记录](docs/releases.md)。项目采用 [Apache-2.0 许可证](LICENSE)。
 
@@ -46,7 +46,7 @@ make test-electron # 启动并退出独立 Electron fixture，验证真实注入
 
 ## 当前限制
 
-仅连接指定的回环端口与精确页面 ID；不扫描进程、不自动启动/结束用户应用、不改应用包。页面刷新或窗口重建后需由使用者重新选择目标并 apply；自动重注入、跨窗口恢复及应用控件适配不属当前交付。当前没有WebKit接入或跨平台兼容性证明。
+页面操作仅连接显式回环端口或身份核对的会话，使用精确页面ID；apply/remove不自动启动或结束应用，不改应用包。Gadget受控启动是单独的显式命令。页面刷新或窗口重建后需由使用者重新选择目标并 apply；自动重注入、跨窗口恢复及应用控件适配不属当前交付。当前WebKit已在独立WKWebView和真实Tauri应用验证；尚无Windows/Linux/Intel Mac兼容性证明。
 
 载荷是受信任的本地代码，具有目标页面允许的权限，并非沙箱。当前不提供任意JS撤销或一键回滚；已有remove与清理回调保留为受管理内容的辅助接口。更新是先移除旧内容再应用新内容，失败不会自动恢复旧版本。超时/断线表示执行结果不确定，不自动重试。
 
