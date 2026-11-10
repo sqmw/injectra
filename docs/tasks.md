@@ -4,7 +4,7 @@
 
 ## 当前任务
 
-无。T-021/T-022验证成果保存在本工作分支；Thunderbird为部分支持，具体限制见[T-022](TODO.md#t-022)。正式main接收状态以T-020为准。
+无。T-021/T-022已通过[T-023](TODO.md#t-023)合入本地main；Thunderbird部分支持及正式Gecko后端未实现的边界保持。
 
 ## 已关闭任务索引
 
@@ -12,6 +12,7 @@
 
 | 任务 | 标准名称 | 定义版本 |
 | --- | --- | --- |
+| <a id="t-023"></a>[T-023](TODO.md#t-023) | Gecko 验证成果合入 main | v1 |
 | <a id="t-022"></a>[T-022](TODO.md#t-022) | macOS Thunderbird 安装与实机验证 | v1 |
 | <a id="t-021"></a>[T-021](TODO.md#t-021) | macOS Gecko 实机接入验证 | v1 |
 | <a id="t-020"></a>[T-020](TODO.md#t-020) | 设备边界解耦成果合入 main | v1 |

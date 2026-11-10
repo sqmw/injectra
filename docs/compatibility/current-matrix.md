@@ -24,15 +24,15 @@
 | WKWebView独立Swift宿主 | macOS arm64 / 系统WebKit | Gadget→原生页面API | 双页合同、CLI和控制端退出清理通过，run webkit-lg0f0zoc |
 | Codex Switcher真实Tauri应用 | macOS arm64 / 0.2.11 | Gadget→WKWebView | 明确授权的空目录实例主页面合同与CLI通过，托盘未污染；测试实例已退出 |
 
-## T-021 Gecko专项证据（工作分支，2026-11-10）
+## T-021 Gecko专项证据（已合入本地main，验收于2026-11-10）
 
 | 引擎/宿主 | 平台/版本 | 路线 | 结果与范围 |
 |---|---|---|---|
 | Gecko / 官方Firefox | macOS26.5.1、arm64主机 / Firefox160.0 | WebDriver BiDi测试客户端 + 唯一Web runtime | 15项真实页面检查通过，run firefox-bidi-Js5cnC；正式CLI尚无BiDi后端，CDP发现返回404；[详情与失败记录](../gecko-validation.md) |
 
-这条证据按引擎/路线新增，不回填原普查计数，也不外推Thunderbird或其他平台；是否已集成源码以[T-021](../TODO.md#t-021)为准。
+这条证据按引擎/路线新增，不回填原普查计数，也不外推Thunderbird或其他平台；当前集成状态以[T-023](../TODO.md#t-023)为准。
 
-## T-022 Thunderbird专项证据（工作分支，2026-11-10）
+## T-022 Thunderbird专项证据（已合入本地main，验收于2026-11-10）
 
 | 引擎/宿主 | 平台/版本 | 路线 | 结果与限制 |
 |---|---|---|---|

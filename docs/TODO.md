@@ -1,6 +1,35 @@
 # 任务入口
 
-T-022当前权威记录在本工作分支；T-021已关闭，保留原交付口径。T-020及以前是885b8b5的只读历史快照。此前权威来源为本地main；T-019交付历史保留，后续主分支集成状态以T-020为准。T-018及以前保留原验收口径。T-017保留独立工作树交付时的历史结论，后续主分支集成状态以T-018为准。保留完整定义与验收；默认从[任务索引](tasks.md)进入，按Task ID定向读取，不整读历史。
+当前权威来源为本地main。T-021/T-022原交付记录保留当时口径，后续接收状态以T-023为准；更早任务亦保留原验收事实。保留完整定义与证据，默认从[任务索引](tasks.md)按Task ID定向读取。
+
+## 最近完成的集成
+
+<a id="t-023"></a>
+### T-023 · Gecko 验证成果合入 main
+
+```tracking-task
+{
+  "id": "T-023",
+  "name": "Gecko 验证成果合入 main",
+  "version": "v1",
+  "mode": "lightweight",
+  "status": "done",
+  "goal": "将Firefox和Thunderbird已记录的实机验证成果快进合入本地main，保持支持边界和原始证据。",
+  "scope": "本地Git快进、主分支回归、当前集成状态文档；不推送、不重新启动应用、不改正式产品功能或历史验收结论。",
+  "acceptance": "main包含9531cad及前置2c0117c；make check/test-frida、脚本语法与文档任务检查通过；Thunderbird partial和正式Gecko后端未交付的边界保持；来源标记核验、两工作树干净。",
+  "execution_ref": "archive/T-023.md#t-023",
+  "acceptance_evidence": [
+    "main从885b8b5快进至9531cad，包含Firefox2c0117c和Thunderbird9531cad；无冲突，两边原未提交内容为空。",
+    "main上make check/test-frida通过：18 Rust、5 Web、8 WK host、23 Python；新增脚本语法与JSON、已测源码无差异核验通过。",
+    "Firefox验证通过、Thunderbird严格合同partial及HTML/BiDi限制原样保留；正式CLI未新增Gecko后端，未重启应用或重跑实机验证。",
+    "T-021/T-022提交来源标记核验；本条所在集成记录提交也带来源标记，随后快进main并核验两工作树干净；未推送。"
+  ],
+  "unplanned_reason": "用户明确要求合并到main。"
+}
+```
+
+本窗口/root、single-writer；输入9531cad，main输入885b8b5，均已核对干净。main已接收验证成果；当前记录随本次提交移交main，本窗口分支作为接收快照。[执行与核验](archive/T-023.md#t-023)。
+
 
 ## 本工作树最近完成
 

@@ -1,5 +1,12 @@
 # 版本与交付映射
 
+## T-021/T-022 · Gecko验证成果（未发布）
+
+- Firefox2c0117c、Thunderbird9531cad已由[T-023](TODO.md#t-023)快进合入本地main，尚未推送；未移动tag或创建发布。
+- 本次交付为官方下载/安装、可重复验证工具与证据；正式CLI仍只有CDP/Electron Gadget/WKWebView。
+- [Firefox160.0](gecko-validation.md)验证通过；[Thunderbird159.0](thunderbird-validation.md)内容页及主界面DOM路线通过，HTML按钮字符串与BiDi枚举限制保留，严格整组仍为partial。
+- make check不启动这些应用；make test-thunderbird当前仍以严格合同返回非0，不能因合入而改写其原始失败。
+
 ## T-019 · 控制端与目标设备边界解耦（未发布）
 
 - 已通过[T-020](TODO.md#t-020)快进合入本地main，尚未推送；未移动旧tag或创建发布。
