@@ -4,6 +4,29 @@
 
 ## 最近完成的验证
 
+<a id="t-029"></a>
+### T-029 · 抖音 Hook 触发主题插件预览
+
+```tracking-task
+{
+  "id": "T-029",
+  "name": "抖音 Hook 触发主题插件预览",
+  "version": "v1",
+  "mode": "lightweight",
+  "status": "done",
+  "goal": "让实际宿主Hook捕获调用后，通过已有Web桥接向抖音真实页面加载原图片/紫雾主题插件，并保留可见窗口供用户查看。",
+  "scope": "显式启动独立实例、读取独立插件库原bundle、Hook触发后CLI apply及页面主题切换/读回；不复制插件到Injectra，不改原包或系统设置，完成后保留窗口。",
+  "acceptance": "真实Hook调用非零后才apply，原插件和目标身份可定位；页面读回主题生效并提供可见窗口或截图；明确Hook/页面桥接分工与会话保留。",
+  "execution_ref": "archive/T-029.md#t-029",
+  "acceptance_evidence": [
+    "真实宿主Hook捕获5次调用后触发原主题加载（恢复时6/6完成）。独立实例PID53083的真实精选页面读回0.2.0/purple/enabled/control，原生截图确认紫雾外观及控件，窗口保留用户查看。CLI回执曾Unknown，停止悬挂主导航后原排队注入完成，未重放。"
+  ],
+  "unplanned_reason": "用户要求用当前Hook方案实际注入之前的抖音主题插件并查看效果。"
+}
+```
+
+[预览、保留窗口与执行证据](archive/T-029.md#t-029)
+
 <a id="t-028"></a>
 ### T-028 · 抖音实际宿主方法 Hook 验证
 
