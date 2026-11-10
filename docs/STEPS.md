@@ -57,8 +57,11 @@ CEF和NW.js独立宿主完整CDP验收。
   "task_id": "T-017",
   "task_version": "v1",
   "number": 3,
-  "status": "进行中",
-  "evidence": []
+  "status": "已完成",
+  "evidence": [
+    "CEF156.0.26和NW.js0.119.2官方Mac arm64独立宿主的共享主页面合同通过；run cef-qdvrcqtq/nwjs-ypuq07xm。",
+    "首次循环对象断言过强失败保留；按既有CDP协议错误Unknown合同修正测试，未更改产品错误语义。来源与校验清单、恢复入口及自审完成。"
+  ]
 }
 ```
 
@@ -73,7 +76,7 @@ CEF和NW.js独立宿主完整CDP验收。
   "task_id": "T-017",
   "task_version": "v1",
   "number": 4,
-  "status": "未开始",
+  "status": "进行中",
   "evidence": []
 }
 ```
@@ -112,7 +115,8 @@ CEF和NW.js独立宿主完整CDP验收。
   ],
   "evidence": [
     "基线make check与Electron10项通过；日志位于外部缓存t017/baseline.log和electron-baseline.log。",
-    "Gadget正式CLI、真实抖音/独立Electron36、控制端退出清理、默认CDP回归与4项会话单测通过。"
+    "Gadget正式CLI、真实抖音/独立Electron36、控制端退出清理、默认CDP回归与4项会话单测通过。",
+    "CEF/NW.js官方独立宿主已通过；开始WebKit并列后端。"
   ],
   "stop_reason": ""
 }

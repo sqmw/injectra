@@ -13,3 +13,7 @@ serde_json.workspace = true
 tungstenite = { version = "0.30", default-features = false, features = ["handshake"] }
 ureq = { version = "3.4", default-features = false }
 url = "2.5"
+
+[dev-dependencies]
+injectra-application.workspace = true
+tempfile = "3"

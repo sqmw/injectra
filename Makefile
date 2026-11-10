@@ -58,3 +58,10 @@ setup-gadget:
 
 test-frida:
 	"$${INJECTRA_FRIDA_PYTHON:-$${INJECTRA_CACHE_DIR:-$${XDG_CACHE_HOME:-$$HOME/.cache}/injectra}/frida/venv/bin/python3}" -B -m unittest discover -s tests/frida
+
+.PHONY: setup-host-tests test-hosts
+setup-host-tests:
+	python3 scripts/setup-host-tests.py
+
+test-hosts: build
+	python3 -B scripts/host-smoke.py

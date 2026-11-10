@@ -379,10 +379,12 @@ dependencies = [
 name = "injectra-cdp"
 version = "0.1.0"
 dependencies = [
+ "injectra-application",
  "injectra-core",
  "injectra-web",
  "serde",
  "serde_json",
+ "tempfile",
  "tungstenite",
  "ureq",
  "url",

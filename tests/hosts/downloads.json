@@ -1,0 +1,19 @@
+{
+  "cef": {
+    "version": "156.0.26+g8ea0c73+chromium-156.0.8078.88",
+    "url": "https://cef-builds.spotifycdn.com/cef_binary_156.0.26%2Bg8ea0c73%2Bchromium-156.0.8078.88_macosarm64_client.tar.bz2",
+    "filename": "cef-client.tar.bz2",
+    "sha1": "a312f1849fc0473b4755c70723e62c3f7b51429b",
+    "size": 135557146,
+    "source": "https://cef-builds.spotifycdn.com/index.json",
+    "license": "CEF BSD and bundled Chromium third-party licenses"
+  },
+  "nwjs": {
+    "version": "0.119.2",
+    "url": "https://dl.nwjs.io/v0.119.2/nwjs-sdk-v0.119.2-osx-arm64.zip",
+    "filename": "nwjs-sdk.zip",
+    "sha256": "a215af6f90e6daafff651e72a4711431f4aebed2516540a395a180d460168051",
+    "source": "https://dl.nwjs.io/v0.119.2/SHASUMS256.txt",
+    "license": "NW.js MIT and bundled Chromium/Node third-party licenses"
+  }
+}

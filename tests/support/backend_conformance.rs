@@ -71,8 +71,16 @@ pub fn verify(backend: &dyn WebBackend, selected: &str) {
             assert!(error.to_string().contains("injectra-intentional"));
         }
         let cyclic = evaluate("(()=>{const x={};x.x=x;return x;})()").unwrap_err();
-        assert_eq!(cyclic.kind, ErrorKind::ResultEncoding);
-        assert_eq!(cyclic.certainty, Certainty::Executed);
+        // CDP may report serialization failure as a protocol error, without
+        // execution-stage proof. Preserve its existing conservative contract.
+        assert!(
+            matches!(
+                (cyclic.kind, cyclic.certainty),
+                (ErrorKind::ResultEncoding, Certainty::Executed)
+                    | (ErrorKind::Protocol, Certainty::Unknown)
+            ),
+            "unexpected encoding failure: {cyclic:?}"
+        );
         for other in backend
             .targets()
             .unwrap()

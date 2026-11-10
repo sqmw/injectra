@@ -21,3 +21,5 @@
 当前Mac实施：[macOS多引擎交付](macos-delivery.md)。
 
 可选正式接入：[Frida后端](frida-backends.md)。
+
+宿主验证：[CEF/NW.js](host-validation.md)。
