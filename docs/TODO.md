@@ -4,6 +4,29 @@
 
 ## 最近完成的验证
 
+<a id="t-027"></a>
+### T-027 · 抖音 Frida Interceptor 授权重试
+
+```tracking-task
+{
+  "id": "T-027",
+  "name": "抖音 Frida Interceptor 授权重试",
+  "version": "v1",
+  "mode": "lightweight",
+  "status": "done",
+  "goal": "在用户可完成系统密码授权的条件下，重试原包外部Frida attach与Gadget optional两条Interceptor路线，区分授权未完成与目标代码签名限制。",
+  "scope": "独立home/profile、自有实例，观察系统授权由用户输入密码，纯abs函数Hook不改返回；原包、系统保护与旧证据不变，不接入账号或用户实例。",
+  "acceptance": "两条路线有新run及准确阶段结果；若出现授权窗口等待用户完成，记录授权是否实际发生；记录Hook回调/卸载或阻塞、签名/哈希与进程退出，不把缺少授权的失败外推成最终不兼容。",
+  "execution_ref": "archive/T-027.md#t-027",
+  "acceptance_evidence": [
+    "按用户要求重试：抖音外部attach两次PermissionDenied（截止180秒但立即拒绝），首次用户确认没有授权窗口；optional新PID44878在listener前CODESIGNING/Invalid Page。新增自有get-task-allow空进程外部attach及同agent Hook通过，补齐对照证据；4个测试PID退出，3次原包哈希/签名通过。旧run与未唯一定位的历史超时原因保留。"
+  ],
+  "unplanned_reason": "用户明确要求重试之前失败的两条Hook路线，并指出上次离开时未输入系统授权密码。"
+}
+```
+
+[复测与授权事实](compatibility/douyin-hook-auth-retry.md) · [执行与review](archive/T-027.md#t-027)
+
 <a id="t-026"></a>
 ### T-026 · 抖音 Frida Objective-C 分派 Hook 验证
 

@@ -56,6 +56,12 @@
 |---|---|---|
 | macOS arm64 / 抖音8.7.0原包 / Frida17.25.2 | Gadget required → Objective-C方法IMP替换 | 自有测试对象的两次回调、原结果保持、恢复及卸载通过；原包签名有效。未验证抖音业务方法、任意C/C++函数；不是正式CLI能力，不覆盖T-025的Interceptor限制。[证据](douyin-objc-hook.md) |
 
+## T-027 抖音Interceptor授权重试（2026-11-11）
+
+| 平台/版本 | 复测结果 | 证据边界 |
+|---|---|---|
+| macOS / 抖音8.7.0原包 / Frida17.25.2 | 外部attach两次仍PermissionDenied，首次用户确认无授权窗口；Gadget optional再次CODESIGNING/Invalid Page | 新的自有可调试进程外部attach→Interceptor通过，补齐旧对照缺口；不证明抖音原包支持，未改系统保护或应用签名。[复测](douyin-hook-auth-retry.md) |
+
 ## 历史应用矩阵
 
 | 应用 | 平台 | 应用版本 | 宿主／运行时 | 内核／协议实测值 | 接入路线与条件 | 当前验证状态与范围 | 证据／代码入口 |

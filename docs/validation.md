@@ -27,3 +27,5 @@ T-024：[Thunderbird主界面HTML装配路线](validation/thunderbird-html.md)�
 T-025：[抖音原生Interceptor新路线验证](compatibility/douyin-native-hook.md)，原包前置接入受限；自有进程Hook成功不外推为抖音支持。
 
 T-026：[抖音Objective-C分派Hook新路线](compatibility/douyin-objc-hook.md)，原包内自有测试对象的Hook/恢复通过；不等同于Interceptor或业务方法兼容。
+
+T-027：[抖音Interceptor授权重试](compatibility/douyin-hook-auth-retry.md)：原包两条路线仍未通过，新增外部attach控制成功；用户未见首次重试授权窗口，未修改系统保护。
