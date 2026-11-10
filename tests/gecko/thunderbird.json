@@ -1,0 +1,17 @@
+{
+  "version": "159.0",
+  "platform": "mac-universal",
+  "language": "en-US",
+  "url": "https://download-installer.cdn.mozilla.net/pub/thunderbird/releases/159.0/mac/en-US/Thunderbird%20159.0.dmg",
+  "checksums_url": "https://archive.mozilla.org/pub/thunderbird/releases/159.0/SHA512SUMS",
+  "sha512": "5e980eb33a3e4798d88952b4b18bc660bc87a486d33d87947e3da16e7ecb1522642a2602192eec3a1ca22b580b72657408ceca00f2da39f922f42ed91e51f419",
+  "license_url": "https://www.mozilla.org/MPL/2.0/",
+  "application": "Thunderbird.app",
+  "executable": "thunderbird",
+  "download_options": [
+    "--http1.1",
+    "--tlsv1.2",
+    "--tls-max",
+    "1.2"
+  ]
+}

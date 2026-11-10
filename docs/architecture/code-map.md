@@ -33,3 +33,7 @@ Frida内部边界：[控制端执行](../../crates/frida/src/controller.rs)、[�
 WK宿主边界：[Mac AppKit发现/调度](../../crates/webkit/helper/macos_appkit.js)与[WK执行/回调](../../crates/webkit/helper/webkit_agent.js)由[入口](../../crates/webkit/helper/agent.js)装配；[宿主合同](../../tests/webkit/host-contract.test.mjs)不代表手机实现。
 
 Gecko专项验证：[官方下载校验](../../scripts/setup-gecko-tests.py)、[Firefox实机测试](../../scripts/gecko-smoke.mjs)、[测试用BiDi连接](../../tests/gecko/bidi-client.mjs)；见[验证边界](../gecko-validation.md)，不属于正式CLI后端。
+
+Thunderbird验证：[宿主与内容页测试](../../scripts/thunderbird-smoke.mjs)、[Marionette测试连接](../../tests/gecko/marionette-client.mjs)、[共用runtime断言](../../tests/gecko/runtime-checks.mjs)；[说明](../thunderbird-validation.md)，不作为公开产品后端。
+
+Thunderbird宿主差异：[tabmail目标发现/世代核验](../../tests/gecko/thunderbird-host.mjs)、[原Window调试执行](../../tests/gecko/page-world.mjs)；仅测试用，标准BiDi发现限制及特权HTML过滤见上述验收。

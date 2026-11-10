@@ -19,3 +19,5 @@ T-017新增Mac后端与宿主验收见[Mac交付](macos-delivery.md)、[Frida](f
 T-019控制端/设备解耦的[验收与自审](validation/device-boundaries.md)，包括保留的失败和后续验证。
 
 T-021：[Firefox/Gecko实机验证](gecko-validation.md)，独立测试路线与正式CLI支持分别记录。
+
+T-022：[Thunderbird安装与验收](thunderbird-validation.md)，主界面DOM路线和内容页通过，HTML字符串限制与整组partial如实保留。

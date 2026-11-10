@@ -80,3 +80,10 @@ setup-gecko-tests:
 
 test-gecko: build
 	node scripts/gecko-smoke.mjs
+
+.PHONY: setup-thunderbird-tests test-thunderbird
+setup-thunderbird-tests:
+	/usr/bin/python3 -B scripts/setup-gecko-tests.py --host thunderbird
+
+test-thunderbird:
+	node scripts/thunderbird-smoke.mjs

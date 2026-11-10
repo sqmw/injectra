@@ -1,6 +1,36 @@
 # 任务入口
 
-T-021当前权威记录在本工作分支；T-020及以前是885b8b5的只读历史快照。此前权威来源为本地main；T-019交付历史保留，后续主分支集成状态以T-020为准。T-018及以前保留原验收口径。T-017保留独立工作树交付时的历史结论，后续主分支集成状态以T-018为准。保留完整定义与验收；默认从[任务索引](tasks.md)进入，按Task ID定向读取，不整读历史。
+T-022当前权威记录在本工作分支；T-021已关闭，保留原交付口径。T-020及以前是885b8b5的只读历史快照。此前权威来源为本地main；T-019交付历史保留，后续主分支集成状态以T-020为准。T-018及以前保留原验收口径。T-017保留独立工作树交付时的历史结论，后续主分支集成状态以T-018为准。保留完整定义与验收；默认从[任务索引](tasks.md)进入，按Task ID定向读取，不整读历史。
+
+## 本工作树最近完成
+
+<a id="t-022"></a>
+### T-022 · macOS Thunderbird 安装与实机验证
+
+```tracking-task
+{
+  "id": "T-022",
+  "name": "macOS Thunderbird 安装与实机验证",
+  "version": "v1",
+  "mode": "lightweight",
+  "status": "done",
+  "goal": "在Mac安装官方Thunderbird，在独立空配置验证宿主接入、共享runtime执行与清理。",
+  "scope": "官方正式版下载校验、用户Applications安装；独立HOME/profile下应用窗口及自有内容页的接入、JS/CSS/HTML、交互、更新移除、Promise/异常与隔离；脚本、文档和提交。不登录邮箱、不导入账号、不发送邮件、不改默认客户端，不新增公开产品后端。",
+  "acceptance": "精确版本/来源/hash/签名可追溯；真实Thunderbird实例有目标识别和逐项结果；失败及未测如实保留；只退出本次实例，保留安装；自审和项目检查通过。",
+  "execution_ref": "archive/T-022.md#t-022",
+  "acceptance_evidence": [
+    "Thunderbird159.0官方安装完成，用户Applications保留；SHA512、Mozilla签名与spctl验签通过，精确来源和下载参数锁定。",
+    "最终thunderbird-gecko-Ta3rSb有27项成功检查：内容页JS/CSS/HTML、主界面JS/CSS+DOM控件、更新移除、异常、隔离及失效目标拒绝通过；主界面HTML按钮字符串被清空，严格整组为partial/退出1，未伪报全通过。",
+    "已确认标准BiDi getTree不枚举Thunderbird标签页；原环境执行依赖显式系统访问、Thunderbird宿主枚举与Gecko调试接口，未修改正式后端或共享runtime。",
+    "两张实际截图已查看；10次检查/尝试的自有PID全部退出，路径复查无残留。测试账号均为空，安装及初始化默认配置保留；未导入账号、发送邮件或设置默认客户端。",
+    "make check、Firefox默认安装准备回归及脚本语法检查通过；原失败run、项目检查和自审留档；本条所在提交含来源标记并核验。成果在本工作分支，未合入main/推送。"
+  ],
+  "unplanned_reason": "用户要求Thunderbird在Mac安装并验证，并要求继续。"
+}
+```
+
+本窗口/root、single-writer，输入2c0117c；交付记录在本工作分支。已完成安装及范围内验证，严格整组为partial；该结果不冒充全量支持。[验证说明](thunderbird-validation.md) · [执行与关闭上下文](archive/T-022.md#t-022)。
+
 
 ## 本工作树最新完成
 
