@@ -73,6 +73,30 @@
 
 ## 最近完成的验证
 
+<a id="t-036"></a>
+### T-036 · pre-runtime 里程碑标记
+
+```tracking-task
+{
+  "id": "T-036",
+  "name": "pre-runtime 里程碑标记",
+  "version": "v1",
+  "mode": "lightweight",
+  "status": "done",
+  "goal": "为已验证的pre-runtime真实页面资源补丁进展创建可追溯的Git里程碑tag。",
+  "scope": "仅创建本地注解tag并同步映射和执行记录；标记已验证提交04a7013，不改变版本号、历史tag或远端。",
+  "acceptance": "tag对象为annotated tag，解引用精确指向04a7013e2b3838db635850daf12edb810f064b36，说明载明实机证据及适用条件。",
+  "execution_ref": "archive/T-036.md#t-036",
+  "acceptance_evidence": [
+    "milestone/pre-runtime-web-injection已创建，tag对象75a2b12a867866c2f07db648e5337127cd3fe732，类型tag；解引用04a7013e2b3838db635850daf12edb810f064b36。",
+    "注解说明真实本地登录壳页面loaded/applied/clicked证据、资源补丁/测试签名及隔离条件；本地标记，不外推生产后端或登录后业务。"
+  ],
+  "unplanned_reason": "用户明确将此进展认定为pre-runtime里程碑并要求打tag。"
+}
+```
+
+[里程碑映射](releases.md) · [执行记录](archive/T-036.md#t-036)
+
 <a id="t-035"></a>
 ### T-035 · 阿里云盘测试副本资源补丁验证
 

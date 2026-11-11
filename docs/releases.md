@@ -1,5 +1,12 @@
 # 版本与交付映射
 
+## milestone/pre-runtime-web-injection · 2026-11-11
+
+- 用户认定的pre-runtime里程碑，本地annotated tag；精确指向`04a7013e2b3838db635850daf12edb810f064b36`。标记创建见[T-036](TODO.md#t-036)。
+- 已验证：阿里云盘6.9.3独立测试副本的真实本地登录壳页面执行共享runtime，随机标记、计算样式和按钮交互回执通过。
+- 条件：资源补丁与ASAR完整性重建、本地测试签名允许库加载、独立目录及测试钥匙串；fuses和Hardened Runtime保留。原普通窗口已恢复。
+- [实机证据与复现](compatibility/adrive-resource-patch.md)；不外推原包runtime兼容、登录后业务或正式pre-runtime后端。该tag不改变CLI版本号。
+
 ## T-021/T-022 · Gecko验证成果（未发布）
 
 - Firefox2c0117c、Thunderbird9531cad已由[T-023](TODO.md#t-023)快进合入本地main，尚未推送；未移动tag或创建发布。
