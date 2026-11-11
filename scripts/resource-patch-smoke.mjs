@@ -14,6 +14,7 @@ import { evaluateProof } from "../tests/resource-patch/receipts.mjs";
 
 assert.equal(process.platform, "darwin"); assert.equal(process.arch, "arm64");
 const [mode, arg] = process.argv.slice(2);
+const sharedData = arg === "qq" && process.argv.includes("--shared-data");
 const recipes = {
   qq: { source: "/Applications/QQ.app", executable: "QQ", kind: "main-wrapper" },
   tencentvideo: { source: "/Applications/QQLive.app", executable: "QQLive", kind: "loose-html", html: "Contents/Resources/hd_lottie/demo.html" },
@@ -28,11 +29,11 @@ if (mode === "--prepare") {
   const app = resolve(run,"Injectra-Test.app");
   const critical = ["Contents/MacOS/"+recipe.executable,"Contents/Info.plist","Contents/_CodeSignature/CodeResources",...(recipe.kind === "asar-html"?["Contents/Resources/app.asar"]:recipe.kind === "main-wrapper"?["Contents/Resources/app/package.json","Contents/Resources/app/application.asar"]:[])];
   const originalHashes = Object.fromEntries(await Promise.all(critical.map(async path=>[path,await digest(resolve(recipe.source,path))])));
-  await writeFile(resolve(run,"ownership.json"),json({source:recipe.source,app,originalHashes,createdBy:"T-038/E-001"}));
+  await writeFile(resolve(run,"ownership.json"),json({source:recipe.source,app,originalHashes,createdBy:process.env.INJECTRA_EXECUTION_ID??"T-038/E-001",dataPolicy:sharedData?"shared":"isolated"}));
   for(const path of ["scripts/resource-patch-smoke.mjs","tests/resource-patch/page-proof.mjs","tests/resource-patch/sign-copy.py","tests/resource-patch/archive.mjs","tests/resource-patch/integrity-digest.py","web/runtime.js"]){await mkdir(dirname(resolve(run,"source",path)),{recursive:true});await copyFile(resolve(root,path),resolve(run,"source",path));}
   execFileSync("/usr/bin/rsync",["-a",recipe.source+"/",app+"/"]);
   const bundleId = "org.injectra.validation." + arg + "." + basename(run).split("-").at(-1).toLowerCase();
-  execFileSync("/usr/bin/python3",["-c","import plistlib,sys; p=sys.argv[1]; d=plistlib.load(open(p,'rb')); d['CFBundleIdentifier']=sys.argv[2]; plistlib.dump(d,open(p,'wb'))",resolve(app,"Contents/Info.plist"),bundleId]);
+  if(!sharedData) execFileSync("/usr/bin/python3",["-c","import plistlib,sys; p=sys.argv[1]; d=plistlib.load(open(p,'rb')); d['CFBundleIdentifier']=sys.argv[2]; plistlib.dump(d,open(p,'wb'))",resolve(app,"Contents/Info.plist"),bundleId]);
   await writeFile(resolve(run,"nested-signing.json"),json(sign(app)));
   const reservation=createServer();reservation.listen(0,"127.0.0.1");await once(reservation,"listening");const port=reservation.address().port;await new Promise(r=>reservation.close(r));
   const nonce=randomBytes(16).toString("hex"),endpoint=`http://127.0.0.1:${port}/proof/${nonce}`;
@@ -59,7 +60,7 @@ if (mode === "--prepare") {
     execFileSync("/usr/bin/codesign",["--force","--sign","-","--timestamp=none","--preserve-metadata=identifier,entitlements,flags",resolve(app,"Contents/Frameworks/Electron Framework.framework")]);
   }
   sign(app,true);execFileSync("/usr/bin/codesign",["--verify","--deep","--strict",app]);
-  const plan={run,app,recipe:arg,...recipe,bundleId,nonce,port,originalHashes,archive,proofHash:sha256(proof),localLibraryEntitlement:true,removedSharedAccountEntitlements:true};await writeFile(resolve(run,"plan.json"),json(plan));console.log(json({prepared:true,run,recipe:arg,noncePrefix:nonce.slice(0,10)}));
+  const plan={run,app,recipe:arg,...recipe,bundleId:sharedData?null:bundleId,dataPolicy:sharedData?"shared":"isolated",nonce,port,originalHashes,archive,proofHash:sha256(proof),localLibraryEntitlement:true,removedSharedAccountEntitlements:!sharedData};await writeFile(resolve(run,"plan.json"),json(plan));console.log(json({prepared:true,run,recipe:arg,noncePrefix:nonce.slice(0,10)}));
 } else if(mode === "--run") {
   const run=resolve(arg),plan=JSON.parse(await readFile(resolve(run,"plan.json"),"utf8"));assert.equal(plan.run,run);assert.equal(plan.app,resolve(run,"Injectra-Test.app"));
   await access(resolve(run,"launch.json")).then(()=>{throw Error("Prepare a new run for retries");},e=>{if(e.code!=="ENOENT")throw e;});

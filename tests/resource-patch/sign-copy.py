@@ -20,9 +20,11 @@ marker = app.parent / "ownership.json"
 if not marker.is_file():
     raise RuntimeError("Missing test ownership marker")
 ownership = json.loads(marker.read_text())
-if (ownership.get("app") != str(app) or ownership.get("createdBy") != ("T-035/E-001" if legacy else "T-038/E-001")
+if (ownership.get("app") != str(app) or ownership.get("createdBy") not in (("T-035/E-001",) if legacy else ("T-038/E-001", "T-039/E-001"))
         or not ownership.get("source") or Path(ownership["source"]).resolve() == app):
     raise RuntimeError("Test ownership marker does not match selected copy")
+if ownership.get("dataPolicy") == "shared" and Path(ownership["source"]).name != "QQ.app":
+    raise RuntimeError("Shared-data preview is only configured for QQ")
 for item in app.rglob("*"):
     if item.is_symlink() and not item.resolve().is_relative_to(app):
         raise RuntimeError("Test copy contains a symlink outside its ownership boundary")
@@ -33,7 +35,7 @@ def sign(path):
     if args.local_libraries and (path.suffix == ".app" or path.parent.name == "MacOS"):
         original = subprocess.run(["/usr/bin/codesign", "-d", "--entitlements", ":-", str(path)], capture_output=True)
         entitlements = plistlib.loads(original.stdout) if original.stdout.strip() else {}
-        if batch:
+        if batch and ownership.get("dataPolicy") != "shared":
             for key in ("com.apple.security.application-groups", "keychain-access-groups", "com.apple.application-identifier", "com.apple.developer.team-identifier", "com.apple.developer.associated-domains", "com.apple.security.get-task-allow", "get-task-allow"):
                 entitlements.pop(key, None)
         entitlements["com.apple.security.cs.disable-library-validation"] = True

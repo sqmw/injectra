@@ -51,3 +51,5 @@ Objective-C分派Hook专项：[受控启动测试](../../scripts/objc-hook-smoke
 资源补丁专项：[独立副本准备/启动](../../scripts/adrive-resource-smoke.mjs)、[ASAR重建](../../tests/resource-patch/archive.mjs)、[副本签名](../../tests/resource-patch/sign-copy.py)、[测试输入](../../tests/resource-patch/page-proof.mjs)、[回执判据](../../tests/resource-patch/receipts.mjs)；[阿里实机证据及签名条件](../compatibility/adrive-resource-patch.md)。make test-resource-patch仅验证工具边界，实机走可选prepare/test目标；不注册正式后端、不复制插件。
 
 批次资源验证：[QQ/腾讯视频/Claude配方与控制](../../scripts/resource-patch-smoke.mjs)、[Electron41+摘要更新](../../tests/resource-patch/integrity-digest.py)及[格式测试](../../tests/resource-patch/integrity-digest.test.mjs)；[顺序实测、共享容器限制和当前失败](../compatibility/three-app-resource-patch.md)。仍是测试工具，不增加正式适配器或复制共享runtime。
+
+QQ外部主题预览：[开发加载器](../../scripts/qq-theme-preview.mjs)复用资源准备和共享程序生成器，接受外部已编译程序；[共享数据授权、实机粉/紫/原样与预览边界](../compatibility/qq-pastel-preview.md)。配色、选择器与Bundle只在独立插件库。

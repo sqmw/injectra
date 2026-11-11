@@ -73,6 +73,30 @@
 
 ## 最近完成的验证
 
+<a id="t-039"></a>
+### T-039 · QQ粉紫主题资源补丁预览
+
+```tracking-task
+{
+  "id": "T-039",
+  "name": "QQ粉紫主题资源补丁预览",
+  "version": "v1",
+  "mode": "lightweight",
+  "status": "done",
+  "goal": "通过已验证QQ资源启动加载方案，在真实窗口预览粉色与紫色主题并保留用户查看。",
+  "scope": "按用户明确选择共享原QQ数据；仅新副本资源/签名与插件装配，不修改原安装包，不登录/发送消息；主题源码归独立插件库。",
+  "acceptance": "两套主题在真实QQ窗口可见且可切换，原生输入/DOM保持，恢复入口有效；测试/review/文档与提交完成。",
+  "execution_ref": "archive/T-039.md#t-039",
+  "acceptance_evidence": [
+    "User-approved shared-data QQ preview loaded qq.pastel-themes from the separate plugin library. Native UI switching through pink, purple, original and pink passed, computed colors matched, editorSame=true. Preview PID90625 retained.",
+    "Plugin commit eeaca6a contains the implementation and bundle. Plugin make check: 47 passed, including 5 QQ tests. Injectra make check and 10 resource-patch tests passed; documentation, tracking and diff reviewed."
+  ],
+  "unplanned_reason": "用户明确共享QQ原数据无问题，要求直接实现QQ粉色、紫色主题。"
+}
+```
+
+[Live validation](compatibility/qq-pastel-preview.md) - [Execution](archive/T-039.md#t-039)
+
 <a id="t-038"></a>
 ### T-038 · QQ腾讯视频Claude资源补丁顺序验证
 

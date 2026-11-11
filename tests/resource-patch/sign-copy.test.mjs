@@ -20,3 +20,11 @@ test("a test-like path requires a matching ownership record", async () => {
   await writeFile(resolve(run, "ownership.json"), JSON.stringify({ app, source: "/Applications/aDrive.app", createdBy: "wrong-task" }));
   assert.match(invoke(app).stderr, /does not match/);
 });
+
+test("shared-data signing is restricted to the QQ preview", async () => {
+  const run = await realpath(await mkdtemp(resolve(tmpdir(), "resource-patch-")));
+  const app = resolve(run, "Injectra-Test.app");
+  await mkdir(app);
+  await writeFile(resolve(run, "ownership.json"), JSON.stringify({ app, source: "/Applications/Claude.app", createdBy: "T-039/E-001", dataPolicy: "shared" }));
+  assert.match(invoke(app).stderr, /only configured for QQ/);
+});
