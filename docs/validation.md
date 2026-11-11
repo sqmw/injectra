@@ -4,6 +4,8 @@
 
 最新批次：[T-032十款macOS应用顺序验证](validation/macos-ten-apps.md)，五款已取得页面合同成功证据，五款接入未完成；含获授权后阿里6.9.3补测，未将批次完成误报为全部应用支持。
 
+后续路线：[T-033阿里云盘Frida验证](compatibility/adrive-frida.md)，Gadget加载未取得身份，直接附加被拒绝；Hook/页面未执行，清理与普通窗口恢复已核对。
+
 | 要核对什么 | 权威入口 |
 | --- | --- |
 | 当前各应用、平台、内核及路线结果 | [兼容性总表](compatibility/current-matrix.md) |

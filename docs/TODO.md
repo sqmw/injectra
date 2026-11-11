@@ -4,6 +4,30 @@
 
 ## 最近完成的验证
 
+<a id="t-033"></a>
+### T-033 · 阿里云盘 Frida Gadget 与原生 Hook 验证
+
+```tracking-task
+{
+  "id": "T-033",
+  "name": "阿里云盘 Frida Gadget 与原生 Hook 验证",
+  "version": "v1",
+  "mode": "lightweight",
+  "status": "done",
+  "goal": "按用户要求改走Frida Gadget/原生Hook，验证阿里云盘原包的接入、原生方法和页面注入，或定位阻止后续阶段的实际条件。",
+  "scope": "当前6.9.3、受控新HOME/profile、Gadget required及文档化原生接入；沿用正常退出原实例授权，结束后恢复普通窗口；不修改原包签名、fuse或系统保护。",
+  "acceptance": "取得真实身份及原生Hook/页面效果证据，或明确加载/附加前置失败；保留新run与包状态，清理自有实例并恢复普通窗口，不将CDP失败外推到Frida，也不把配置当实际加载成功。",
+  "execution_ref": "archive/T-033.md#t-033",
+  "acceptance_evidence": [
+    "阿里6.9.3真实Gadget required启动未建立监听或身份回执；同一核验测试PID直接Frida attach返回PermissionDeniedError。未进入原生Hook/页面执行，前置失败与静态权限条件分开记录。",
+    "临时控制器清理抛错导致初次附加回执未落盘，保留未知；后续单独保存附加结果。核验身份后结束未响应终止的自有测试PID31707，无该profile残留，普通窗口恢复并确认首页导航；文档与任务检查通过。"
+  ],
+  "unplanned_reason": "用户明确要求阿里云盘尝试Frida Gadget或Hook，不继续只测CDP。"
+}
+```
+
+[Frida实测](compatibility/adrive-frida.md) · [执行与review](archive/T-033.md#t-033)
+
 <a id="t-032"></a>
 ### T-032 · macOS 十款应用顺序注入验证
 
