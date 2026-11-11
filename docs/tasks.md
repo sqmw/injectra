@@ -12,6 +12,8 @@
 
 | 任务 | 标准名称 | 定义版本 |
 | --- | --- | --- |
+| <a id="t-038"></a>[T-038](TODO.md#t-038) | QQ腾讯视频Claude资源补丁顺序验证 | v1 |
+| <a id="t-037"></a>[T-037](TODO.md#t-037) | pre-runtime 里程碑远端同步 | v1 |
 | <a id="t-036"></a>[T-036](TODO.md#t-036) | pre-runtime 里程碑标记 | v1 |
 | <a id="t-035"></a>[T-035](TODO.md#t-035) | 阿里云盘测试副本资源补丁验证 | v1 |
 | <a id="t-033"></a>[T-033](TODO.md#t-033) | 阿里云盘 Frida Gadget 与原生 Hook 验证 | v1 |

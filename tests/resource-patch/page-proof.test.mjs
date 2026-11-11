@@ -1,0 +1,33 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
+import { resolve } from "node:path";
+import { requireTool, root } from "../../scripts/test-env.mjs";
+import { pageProof } from "./page-proof.mjs";
+const { JSDOM } = requireTool("jsdom");
+const runtime = await readFile(resolve(root, "web/runtime.js"), "utf8");
+test("proof text survives inherited legacy encoding and preserves the host DOM", async () => {
+  const source = pageProof({ runtime, nonce: "fixture-nonce", endpoint: "http://127.0.0.1:1234/proof", pageSuffixes: [], rootSelector: "body" });
+  assert.doesNotMatch(source, /[^\x00-\x7f]/);
+  const dom = new JSDOM('<div id="host">original</div>', { url: "app://./renderer/index.html", runScripts: "outside-only" });
+  const receipts = [];
+  dom.window.Image = class { set src(value) { receipts.push(new URL(value)); } };
+  dom.window.eval(Buffer.from(source).toString("latin1"));
+  await new Promise(resolve => setImmediate(resolve));
+  assert.equal(dom.window.document.getElementById("host").textContent, "original");
+  assert.equal(dom.window.document.querySelector("strong").textContent, "Injectra 页面执行成功");
+  dom.window.document.querySelector("button").click();
+  assert.equal(dom.window.document.querySelector('[role="status"]').textContent, "交互验证通过");
+  assert.deepEqual(receipts.map(url => url.searchParams.get("phase")), ["loaded", "applied", "clicked"]);
+  dom.window.close();
+});
+test("the original file-page restriction remains the default", async () => {
+  const dom = new JSDOM('<div id="root"></div>', { url: "https://unrelated.invalid/dist/index.html", runScripts: "outside-only" });
+  const receipts = [];
+  dom.window.Image = class { set src(value) { receipts.push(new URL(value)); } };
+  dom.window.eval(pageProof({ runtime, nonce: "fixture", endpoint: "http://127.0.0.1:1234/proof" }));
+  await new Promise(resolve => setImmediate(resolve));
+  assert.equal(receipts.at(-1).searchParams.get("phase"), "error");
+  assert.equal(dom.window.document.querySelector("button"), null);
+  dom.window.close();
+});

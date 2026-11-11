@@ -49,3 +49,5 @@ Objective-C分派Hook专项：[受控启动测试](../../scripts/objc-hook-smoke
 启动诊断：[观察入口](../../scripts/observe-macos-startup.py)、[进程/HTTP证据模块](../../tests/support/startup_observation.py)、[边界测试](../../tests/frida/test_startup_observation.py)、[真实交接夹具](../../tests/frida/test_startup_observation_process.py)；[工具合同](../validation/startup-observer.md)与[阿里实验](../compatibility/adrive-startup.md)。只观察、无载荷，不自动终止目标子树。
 
 资源补丁专项：[独立副本准备/启动](../../scripts/adrive-resource-smoke.mjs)、[ASAR重建](../../tests/resource-patch/archive.mjs)、[副本签名](../../tests/resource-patch/sign-copy.py)、[测试输入](../../tests/resource-patch/page-proof.mjs)、[回执判据](../../tests/resource-patch/receipts.mjs)；[阿里实机证据及签名条件](../compatibility/adrive-resource-patch.md)。make test-resource-patch仅验证工具边界，实机走可选prepare/test目标；不注册正式后端、不复制插件。
+
+批次资源验证：[QQ/腾讯视频/Claude配方与控制](../../scripts/resource-patch-smoke.mjs)、[Electron41+摘要更新](../../tests/resource-patch/integrity-digest.py)及[格式测试](../../tests/resource-patch/integrity-digest.test.mjs)；[顺序实测、共享容器限制和当前失败](../compatibility/three-app-resource-patch.md)。仍是测试工具，不增加正式适配器或复制共享runtime。

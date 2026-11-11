@@ -107,3 +107,10 @@ prepare-adrive-resource:
 
 test-adrive-resource:
 	node scripts/adrive-resource-smoke.mjs --run-mock-keychain $(ARGS)
+
+.PHONY: prepare-resource-app test-resource-app
+prepare-resource-app:
+	node scripts/resource-patch-smoke.mjs --prepare $(ARGS)
+
+test-resource-app:
+	node scripts/resource-patch-smoke.mjs --run $(ARGS)

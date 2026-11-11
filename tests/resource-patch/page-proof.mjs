@@ -1,5 +1,5 @@
 // Minimal test input, not a reusable plugin. The runtime is read from web/runtime.js.
-export function pageProof({ runtime, nonce, endpoint }) {
+export function pageProof({ runtime, nonce, endpoint, pageSuffixes = ["/dist/index.html"], rootSelector = "#root" }) {
   return `(() => {
     const nonce = ${JSON.stringify(nonce)};
     const endpoint = ${JSON.stringify(endpoint)};
@@ -15,7 +15,8 @@ export function pageProof({ runtime, nonce, endpoint }) {
     ${runtime}
     async function apply() {
       try {
-        if (location.protocol !== "file:" || !location.pathname.endsWith("/dist/index.html")) throw new Error("Unexpected page");
+        const suffixes = ${JSON.stringify(pageSuffixes)};
+        if (suffixes.length && (location.protocol !== "file:" || !suffixes.some(suffix => location.pathname.endsWith(suffix)))) throw new Error("Unexpected page");
         const request = { operation: "apply", id,
           css: '[data-injectra="' + id + '"] { position:fixed!important;top:20px!important;right:20px!important;z-index:2147483647!important;background:#35206b!important;color:#fff!important;padding:16px!important;border:2px solid #ba9aff!important;border-radius:12px!important;font:14px/1.7 system-ui!important;box-shadow:0 4px 24px #0005!important } [data-injectra="' + id + '"] button { background:#fff!important;color:#35206b!important;border:0!important;border-radius:6px!important;padding:6px 12px!important;cursor:pointer!important }',
           html: '<section aria-label="Injectra 页面执行验证"><strong>Injectra 页面执行成功</strong><div>测试标识：' + nonce.slice(0, 10) + '</div><button type="button">验证页面交互</button><div role="status">等待点击验证</div></section>' };
@@ -28,10 +29,10 @@ export function pageProof({ runtime, nonce, endpoint }) {
         });
         const node = document.querySelector('[data-injectra="' + id + '"][data-proof-nonce="' + nonce + '"]');
         report("applied", { status: result.status, connected: !!node?.isConnected,
-          appRootPresent: !!document.getElementById("root"), color: node ? getComputedStyle(node).backgroundColor : "" });
+          appRootPresent: !!document.querySelector(${JSON.stringify(rootSelector)}), color: node ? getComputedStyle(node).backgroundColor : "" });
       } catch (error) { report("error", { error: String(error).slice(0, 200) }); }
     }
     if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", apply, { once: true });
     else apply();
-  })();\n`;
+  })();\n`.replace(/[^\x00-\x7f]/g, character => "\\u" + character.charCodeAt(0).toString(16).padStart(4, "0"));
 }

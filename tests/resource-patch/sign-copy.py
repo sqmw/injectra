@@ -12,15 +12,20 @@ parser.add_argument("--outer", action="store_true")
 parser.add_argument("--local-libraries", action="store_true", help="Test-copy process entitlements for local ad-hoc library loading")
 args = parser.parse_args()
 app = args.app.resolve()
-if app.name != "aDrive-Test.app" or not app.parent.name.startswith("adrive-resource-"):
+legacy = app.name == "aDrive-Test.app" and app.parent.name.startswith("adrive-resource-")
+batch = app.name == "Injectra-Test.app" and app.parent.name.startswith("resource-patch-")
+if not (legacy or batch):
     raise RuntimeError("Not an owned test copy")
 marker = app.parent / "ownership.json"
 if not marker.is_file():
     raise RuntimeError("Missing test ownership marker")
 ownership = json.loads(marker.read_text())
-if (ownership.get("app") != str(app) or ownership.get("createdBy") != "T-035/E-001"
+if (ownership.get("app") != str(app) or ownership.get("createdBy") != ("T-035/E-001" if legacy else "T-038/E-001")
         or not ownership.get("source") or Path(ownership["source"]).resolve() == app):
     raise RuntimeError("Test ownership marker does not match selected copy")
+for item in app.rglob("*"):
+    if item.is_symlink() and not item.resolve().is_relative_to(app):
+        raise RuntimeError("Test copy contains a symlink outside its ownership boundary")
 
 def sign(path):
     command = ["/usr/bin/codesign", "--force", "--sign", "-", "--timestamp=none"]
@@ -28,6 +33,9 @@ def sign(path):
     if args.local_libraries and (path.suffix == ".app" or path.parent.name == "MacOS"):
         original = subprocess.run(["/usr/bin/codesign", "-d", "--entitlements", ":-", str(path)], capture_output=True)
         entitlements = plistlib.loads(original.stdout) if original.stdout.strip() else {}
+        if batch:
+            for key in ("com.apple.security.application-groups", "keychain-access-groups", "com.apple.application-identifier", "com.apple.developer.team-identifier", "com.apple.developer.associated-domains", "com.apple.security.get-task-allow", "get-task-allow"):
+                entitlements.pop(key, None)
         entitlements["com.apple.security.cs.disable-library-validation"] = True
         temporary = tempfile.NamedTemporaryFile(dir=app.parent, prefix="test-entitlements-", suffix=".plist")
         temporary.write(plistlib.dumps(entitlements)); temporary.flush()

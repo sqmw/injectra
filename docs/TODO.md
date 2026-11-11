@@ -73,6 +73,54 @@
 
 ## 最近完成的验证
 
+<a id="t-038"></a>
+### T-038 · QQ腾讯视频Claude资源补丁顺序验证
+
+```tracking-task
+{
+  "id": "T-038",
+  "name": "QQ腾讯视频Claude资源补丁顺序验证",
+  "version": "v1",
+  "mode": "lightweight",
+  "status": "done",
+  "goal": "按QQ、腾讯视频、Claude顺序在独立测试副本验证资源补丁代码执行。",
+  "scope": "仅测试副本资源/入口/完整性和本地签名修改；保留原安装包、原会话与账号数据；不登录或发送消息，不修改系统保护；不注册正式后端。",
+  "acceptance": "按指定顺序三款均有真实页面执行与交互证据，或准确保存实际失败阶段；保留原会话，核对原关键文件及测试副本进程。",
+  "execution_ref": "archive/T-038.md#t-038",
+  "acceptance_evidence": [
+    "按QQ、腾讯视频、Claude串行实际启动：QQ旧共享账号条件下取得标记/回执，不能计隔离通过；新身份去共享组后Mach注册拒绝。腾讯动画HTML候选首页未见执行。Claude重建完整性摘要后本地壳页面代码、可读中文及交互回执通过。",
+    "原QQ69729、Claude680原世代保留，所有已测副本路径无进程；各run原关键文件哈希一致，不代表整个原包逐字节核对。Claude远端内容与登录业务未测试；没有操作账号/消息。",
+    "make check及9项资源工具测试通过，Parent自审源/证据/范围，文档/代码地图同步；失败及旧原始结果保留。"
+  ],
+  "unplanned_reason": "用户明确要求推送里程碑tag，再依次尝试三款应用。"
+}
+```
+
+[执行与证据](archive/T-038.md#t-038)
+
+<a id="t-037"></a>
+### T-037 · pre-runtime 里程碑远端同步
+
+```tracking-task
+{
+  "id": "T-037",
+  "name": "pre-runtime 里程碑远端同步",
+  "version": "v1",
+  "mode": "lightweight",
+  "status": "done",
+  "goal": "推送并核验已创建的里程碑tag。",
+  "scope": "仅推送milestone/pre-runtime-web-injection并核对远端对象；不移动tag。",
+  "acceptance": "远端注解tag对象及解引用提交与本地一致。",
+  "execution_ref": "archive/T-037.md#t-037",
+  "acceptance_evidence": [
+    "git push成功；远端tag对象75a2b12a867866c2f07db648e5337127cd3fe732，解引用04a7013e2b3838db635850daf12edb810f064b36，与本地一致。"
+  ],
+  "unplanned_reason": "用户明确要求推送里程碑tag，再依次尝试三款应用。"
+}
+```
+
+[执行与证据](archive/T-037.md#t-037)
+
 <a id="t-036"></a>
 ### T-036 · pre-runtime 里程碑标记
 
