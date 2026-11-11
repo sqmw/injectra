@@ -45,3 +45,5 @@ Thunderbird HTML补充验证：[测试用装配器](../../tests/gecko/parsed-htm
 Objective-C分派Hook专项：[受控启动测试](../../scripts/objc-hook-smoke.py)、[自有对象IMP替换agent](../../tests/frida/objc-dispatch-hook.js)、[判定/所有权测试](../../tests/frida/test_objc_hook.py)；[抖音实机证据与限制](../compatibility/douyin-objc-hook.md)。不注册正式后端，不修改Web runtime。
 
 真实宿主Hook：[受控入口](../../scripts/host-hook-smoke.py)、[宿主事件agent](../../tests/frida/host-dispatch-hook.js)、[判定测试](../../tests/frida/test_host_hook.py)；与自有对象实验共享[启动/身份/释放夹具](../../tests/frida/gadget_probe.py)，[抖音实测](../compatibility/douyin-host-hook.md)，仅测试、不注册产品后端。
+
+启动诊断：[观察入口](../../scripts/observe-macos-startup.py)、[进程/HTTP证据模块](../../tests/support/startup_observation.py)、[边界测试](../../tests/frida/test_startup_observation.py)、[真实交接夹具](../../tests/frida/test_startup_observation_process.py)；[工具合同](../validation/startup-observer.md)与[阿里实验](../compatibility/adrive-startup.md)。只观察、无载荷，不自动终止目标子树。

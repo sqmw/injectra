@@ -8,6 +8,8 @@
 
 早期入口探索：[T-034阿里云盘pre-runtime核查](compatibility/adrive-preruntime.md)，只读候选证据与缺失接口分别记录，尚无新增实机注入成功。
 
+T-034继续：[启动观察器与自测](validation/startup-observer.md) · [阿里启动条件实测](compatibility/adrive-startup.md)。进程交接、HTTP原始回执与授权等待分别记录，观察器测试不作为目标应用注入成功。
+
 | 要核对什么 | 权威入口 |
 | --- | --- |
 | 当前各应用、平台、内核及路线结果 | [兼容性总表](compatibility/current-matrix.md) |

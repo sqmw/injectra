@@ -20,7 +20,8 @@
   "execution_ref": "TODO.md#t-034",
   "acceptance_evidence": [
     "已核查当前6.9.3的package入口、三个内部preload封装、内置syncapp清单、官方三方应用/Beta/PDS资料及公开菜单；未取得外部早期代码加载合同，不计新实机注入成功。",
-    "用户已回复暂时没有官方开发/调试构建或桌面扩展文档；当前缺少可执行的目标侧入口，实机验证未完成。"
+    "用户已回复暂时没有官方开发/调试构建或桌面扩展文档；当前缺少可执行的目标侧入口，实机验证未完成。",
+    "继续核查发现旧启动观察缺口，新增只读观察器与7项边界/交接测试；3次阿里6.9.3新观察取得监听、原始HTTP及线程栈证据，但仍无可注入页面。当前窗口核查被Mac锁定阻止，等待用户手动解锁。"
   ],
   "unplanned_reason": "用户在侧聊要求继续寻找阿里云盘方案，将pre-runtime也纳入候选，并明确由主窗口推进。"
 }
@@ -34,7 +35,7 @@
   "task_id": "T-034",
   "task_version": "v1",
   "status": "paused",
-  "authorization": "侧聊转交用户原话：继续找寻阿里云的注入方案，当前runtime也可考虑pre-runtime，并让主窗口推进。此前正常退出测试授权保留；本轮先只读查找明确扩展入口。",
+  "authorization": "侧聊转交用户原话：继续找寻阿里云的注入方案，当前runtime也可考虑pre-runtime，并让主窗口推进。此前正常退出测试授权保留；本轮先只读查找明确扩展入口。 用户再次明确要求继续深入找寻阿里云盘方案。",
   "scope": "只读核对安装包入口/扩展元数据与厂商文档；仅在明确提供受支持入口时执行验证。已有失败/保护条件保留，不修改签名、fuse、完整性校验或系统保护，不访问内部私有仓库或账号凭据。",
   "steps": [],
   "evidence": [
@@ -45,13 +46,23 @@
     "CUA核对帮助菜单及应用菜单；未见明确调试入口。偏好设置点击后未出现设置页，不将未读取内容伪报为已排除。最终仍为普通主页，未改设置或发送咨询。",
     "本轮只读核查及文档更新；pre-runtime进入候选范围但不自动绕过已观察的加载/附加/完整性保护。未修改应用包、签名、fuse、系统保护或产品代码。",
     "补充只读核对macOS外部接口元数据：未声明文档类型/脚本字典或AppleScript开关，未见sdef资源；smartdrive URL scheme存在但无早期代码注册合同。",
-    "自审保持静态证据/实机执行分开；doc-check、tracking-check、diff-check通过，execution_ref按Task锚点规范修正。任务仍受阻于实际外部入口，没有修改目标保护来制造成功。"
+    "自审保持静态证据/实机执行分开；doc-check、tracking-check、diff-check通过，execution_ref按Task锚点规范修正。任务仍受阻于实际外部入口，没有修改目标保护来制造成功。",
+    "续接82018ad，工作区干净。新核查重点为既有CDP监听后退出的启动工具/环境证据，以及已安装包完整性；只读子Agent adrive_harness_audit审查缓存工具与旧run，Parent唯一写入。当前进程环境未设置所检查的代理/Node/DYLD变量，不能回填旧run环境。",
+    "并行只读审查确认旧主PID退出0早于清理，但旧工具会马上清子树且丢弃原始HTTP/过滤理由，不能排除交接。新增观察器不提交载荷、不自动清子树，记录进程世代/当前父子关系/原始回执及时间。",
+    "review修复当前父PID/组快照、HTTP总截止与HTTPError保存、响应归属时序及僵尸计数；新工具7项边界和真实HTTP进程交接fixture测试通过。实际App兼容性不由fixture替代。",
+    "startup-observe-hhw0kuu3：隔离HOME，主PID41886及监听49303保持45秒，14次HTTP总截止。约150秒后的sample证明该PID当时主线程在SecKeychainAddGenericPassword/AuthorizationCopyRights同步等待，不推定全过程或密码写入成功。",
+    "startup-observe-s_gnv4xu：系统HOME＋临时Chromium profile（部分隔离）取得一次HTTP200/空列表，随后约1.09秒主PID43244退出0；归属复核未确认，无载荷。startup-observe-ci2dr51u无调试参数持续30秒，PID44943与renderer存在，后续sample见正常NSApplication事件循环。",
+    "当前190条封存资源（141hash2、10nested cdhash、39symlink）未发现差异；codesign明确列出4个额外同步运行文件，未读取内容、移动或删除；不将其直接当CDP退出根因。环境当前无代理env，系统代理存在但127.0.0.1绕过true，不回填旧run。",
+    "主入口编译资源仅作指定字面计数，openDevTools/toggleDevTools各1次；无控制流解码或调用，不当作可用接口。未知wss9227只作未识别服务线索，没有盲发操作。",
+    "CUA核对界面时报告Mac已锁定且自动解锁失败，已请用户手动解锁；此前钥匙串窗口状态问题仍未得到确认。未用其他渠道绕过锁屏或代替用户操作系统授权。",
+    "PID44943经独立profile/启动世代复核后仅SIGTERM结束主进程；最终同世代测试进程无残留，未自动清整树或结束原同步服务。原普通窗口恢复等待解锁，不能称已恢复。",
+    "make check通过18 Rust/5 Web/8 WK/3 Gecko HTML；make test-frida共38项通过。两位只读子Agent与Parent完成诊断/review，Source/文档同步；代码仍只是可选观察工具，没有新增正式注入后端或成功载荷。"
   ],
-  "stop_reason": "缺少已确认允许外部早期代码加载的目标接口或可调试构建；用户暂无这类资料。现有内部组件元数据不足以安全执行原客户端验证，等待该输入/外部条件变化。"
+  "stop_reason": "当前Mac锁定，窗口工具不能继续核对本地开发者入口或系统提示；已请求用户手动解锁。非UI检查已完成，测试进程已退出，普通窗口恢复及实机入口验证待解锁后继续。"
 }
 ```
 
-上下文r2：Parent/main，single-writer，基线abbf9da。只读核查见[pre-runtime记录](compatibility/adrive-preruntime.md)；本轮未启动新实验、未改应用或系统。用户暂无官方调试构建/扩展文档，当前阻塞于可用外部早期入口；若取得明确接口/构建，再核对身份、合同和测试范围后继续，不把内部preload或云API当作现成注入通道。
+上下文r4：Parent/main，single-writer，续接82018ad；[新诊断](compatibility/adrive-startup.md)与[观察器](validation/startup-observer.md)。当前阻塞为Mac锁定，用户手动解锁问题待回复；不得代替解锁或操作SecurityAgent。已核验测试进程均退出，普通阿里窗口尚待恢复。解锁后先重新核对版本/进程并恢复普通窗口，再核对系统实际提示和可见开发者工具入口；必要时在可交互环境复验相同CDP条件，不修改保护或重放Unknown。CUA仍处于解锁交接，待实际恢复观察后再完成其summary。原静态证据与三个新run各自保留源码哈希/快照。
 
 ## 最近完成的验证
 
