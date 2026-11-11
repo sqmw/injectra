@@ -6,6 +6,8 @@
 
 后续路线：[T-033阿里云盘Frida验证](compatibility/adrive-frida.md)，Gadget加载未取得身份，直接附加被拒绝；Hook/页面未执行，清理与普通窗口恢复已核对。
 
+早期入口探索：[T-034阿里云盘pre-runtime核查](compatibility/adrive-preruntime.md)，只读候选证据与缺失接口分别记录，尚无新增实机注入成功。
+
 | 要核对什么 | 权威入口 |
 | --- | --- |
 | 当前各应用、平台、内核及路线结果 | [兼容性总表](compatibility/current-matrix.md) |

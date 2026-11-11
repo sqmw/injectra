@@ -2,6 +2,57 @@
 
 当前权威来源为本地main。T-021/T-022原交付记录保留当时口径，后续接收状态以T-023为准；更早任务亦保留原验收事实。保留完整定义与证据，默认从[任务索引](tasks.md)按Task ID定向读取。
 
+## 当前执行
+
+<a id="t-034"></a>
+### T-034 · 阿里云盘 pre-runtime 入口核查
+
+```tracking-task
+{
+  "id": "T-034",
+  "name": "阿里云盘 pre-runtime 入口核查",
+  "version": "v1",
+  "mode": "lightweight",
+  "status": "blocked",
+  "goal": "承接用户经侧聊转交的要求，将pre-runtime纳入阿里云盘注入候选，核查原包实际提供的早期扩展接口及其可执行条件。",
+  "scope": "只读核对安装包入口/扩展元数据与厂商文档；仅在明确提供受支持入口时执行验证。已有失败/保护条件保留，不修改签名、fuse、完整性校验或系统保护，不访问内部私有仓库或账号凭据。",
+  "acceptance": "候选按实际入口/依赖/证据分类；找到受支持入口则验证正确上下文和可观察结果，否则明确缺少的接口或调试构建，不将自有fixture、云API或内部preload当原客户端注入成功。",
+  "execution_ref": "TODO.md#t-034",
+  "acceptance_evidence": [
+    "已核查当前6.9.3的package入口、三个内部preload封装、内置syncapp清单、官方三方应用/Beta/PDS资料及公开菜单；未取得外部早期代码加载合同，不计新实机注入成功。",
+    "用户已回复暂时没有官方开发/调试构建或桌面扩展文档；当前缺少可执行的目标侧入口，实机验证未完成。"
+  ],
+  "unplanned_reason": "用户在侧聊要求继续寻找阿里云盘方案，将pre-runtime也纳入候选，并明确由主窗口推进。"
+}
+```
+
+<a id="t-034-execution"></a>
+```tracking-execution
+{
+  "id": "T-034/E-001",
+  "name": "早期入口与适用条件核对",
+  "task_id": "T-034",
+  "task_version": "v1",
+  "status": "paused",
+  "authorization": "侧聊转交用户原话：继续找寻阿里云的注入方案，当前runtime也可考虑pre-runtime，并让主窗口推进。此前正常退出测试授权保留；本轮先只读查找明确扩展入口。",
+  "scope": "只读核对安装包入口/扩展元数据与厂商文档；仅在明确提供受支持入口时执行验证。已有失败/保护条件保留，不修改签名、fuse、完整性校验或系统保护，不访问内部私有仓库或账号凭据。",
+  "steps": [],
+  "evidence": [
+    "基线abbf9da，工作区干净；当前aDrive6.9.3，包main为dist/main/index.js，URL scheme smartdrive；旧runtime/Gadget/attach失败保持。",
+    "包内preload封装分别引用mainWindow/authWindow/transferWindow.compiled.jsc及bytenode；主入口引用index.compiled.jsc。仅文件/引用证据，未执行、解码或替换这些载荷。",
+    "plugin.json为内置syncapp0.2.16生命周期清单，不视为任意第三方页面代码接口，未执行其中命令。官方三方应用介绍的是Open接口客户端；Beta和PDS开发者版不冒充个人客户端调试构建。",
+    "用户明确回复暂时没有官方开发/调试构建或客户端扩展文档；没有进行新注入试验。",
+    "CUA核对帮助菜单及应用菜单；未见明确调试入口。偏好设置点击后未出现设置页，不将未读取内容伪报为已排除。最终仍为普通主页，未改设置或发送咨询。",
+    "本轮只读核查及文档更新；pre-runtime进入候选范围但不自动绕过已观察的加载/附加/完整性保护。未修改应用包、签名、fuse、系统保护或产品代码。",
+    "补充只读核对macOS外部接口元数据：未声明文档类型/脚本字典或AppleScript开关，未见sdef资源；smartdrive URL scheme存在但无早期代码注册合同。",
+    "自审保持静态证据/实机执行分开；doc-check、tracking-check、diff-check通过，execution_ref按Task锚点规范修正。任务仍受阻于实际外部入口，没有修改目标保护来制造成功。"
+  ],
+  "stop_reason": "缺少已确认允许外部早期代码加载的目标接口或可调试构建；用户暂无这类资料。现有内部组件元数据不足以安全执行原客户端验证，等待该输入/外部条件变化。"
+}
+```
+
+上下文r2：Parent/main，single-writer，基线abbf9da。只读核查见[pre-runtime记录](compatibility/adrive-preruntime.md)；本轮未启动新实验、未改应用或系统。用户暂无官方调试构建/扩展文档，当前阻塞于可用外部早期入口；若取得明确接口/构建，再核对身份、合同和测试范围后继续，不把内部preload或云API当作现成注入通道。
+
 ## 最近完成的验证
 
 <a id="t-033"></a>
