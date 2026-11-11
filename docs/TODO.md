@@ -73,6 +73,31 @@
 
 ## 最近完成的验证
 
+<a id="t-035"></a>
+### T-035 · 阿里云盘测试副本资源补丁验证
+
+```tracking-task
+{
+  "id": "T-035",
+  "name": "阿里云盘测试副本资源补丁验证",
+  "version": "v1",
+  "mode": "lightweight",
+  "status": "done",
+  "goal": "在阿里云盘独立测试副本中修改真实Web资源入口，验证最小bootstrap能否在原应用页面执行。",
+  "scope": "仅修改仓库外新建测试副本的Web资源、ASAR完整性信息和测试签名；独立HOME/profile，保留原安装包与账号数据；不修改fuse或系统保护，不注册正式产品后端，不加载实际插件。",
+  "acceptance": "真实副本页面正常打开，页面脚本返回本次随机标识并出现匹配的可见标记；或明确保存失败阶段及诊断。记录副本/原包身份、修改差异、签名与资源完整性条件；原普通窗口恢复，历史CDP/Frida结果不覆盖。",
+  "execution_ref": "archive/T-035.md#t-035",
+  "acceptance_evidence": [
+    "独立测试副本adrive-resource-ZEAQtJ在真实dist/index.html#/login执行共享runtime，nonce bfde8ea5e8；loaded/applied/clicked回执及CUA可见标记、按钮交互通过；范围限本地登录壳页面。",
+    "保留ASAR/fuses/runtime，副本采用ad-hoc签名并显式允许本地库加载；独立目录与测试钥匙串。失败run及原始回执保留，新增严格顺序/颜色检查复核通过。原普通首页80119恢复，副本进程无残留，4个原关键文件哈希一致。",
+    "make check及5项可选资源补丁单测通过，原包保护/归档写入完成/回执误报review问题已修正，文档与代码地图同步；无正式产品后端或插件变更。"
+  ],
+  "unplanned_reason": "用户明确要求直接在阿里云盘测试副本实施资源补丁，先验证代码在真实页面执行；与T-034只读外部入口核查分开。"
+}
+```
+
+[真实页面结果与构建条件](compatibility/adrive-resource-patch.md) · [执行与review](archive/T-035.md#t-035)
+
 <a id="t-033"></a>
 ### T-033 · 阿里云盘 Frida Gadget 与原生 Hook 验证
 

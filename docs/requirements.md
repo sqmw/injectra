@@ -20,6 +20,8 @@ runtime / pre-runtime描述注入时机；CDP、Hook等描述接入机制。当�
 
 2026-11-11用户将阿里云盘pre-runtime纳入探索与验证候选，由[T-034](TODO.md#t-034)推进。这是新增探索范围，不等于已交付pre-runtime产品后端；入口与所需条件见[核查记录](compatibility/adrive-preruntime.md)。
 
+同日用户明确授权[T-035测试副本资源补丁](TODO.md#t-035)。该路线修改独立副本的Web资源并重新签名，已验证真实登录壳页面执行；[条件与证据](compatibility/adrive-resource-patch.md)单列，不改变当前正式runtime交付，也不把修改后副本的结果外推原安装包兼容。
+
 macOS硬件范围：2026-11-11用户明确仅考虑Apple Silicon，Intel Mac不纳入后续支持或验证计划，见[D-011](DECISIONS.md#d-011)。历史“Intel未验证”保留为当时的证据边界，不继续列作待补项。硬件范围不等于目标进程架构：本次不据此扩张或变更Rosetta/x86_64目标的既有支持声明。
 
 ## 插件存放边界

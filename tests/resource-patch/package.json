@@ -1,0 +1,9 @@
+{
+  "name": "injectra-resource-patch-validation",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@electron/asar": "3.4.1"
+  }
+}

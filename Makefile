@@ -94,3 +94,16 @@ test-thunderbird-html:
 
 test-gecko-html-unit:
 	node --test tests/gecko/parsed-html.test.mjs
+
+.PHONY: setup-resource-tests test-resource-patch prepare-adrive-resource test-adrive-resource
+setup-resource-tests:
+	node scripts/setup-resource-tests.mjs
+
+test-resource-patch:
+	node --test tests/resource-patch/*.test.mjs
+
+prepare-adrive-resource:
+	node scripts/adrive-resource-smoke.mjs --prepare-local-signing $(ARGS)
+
+test-adrive-resource:
+	node scripts/adrive-resource-smoke.mjs --run-mock-keychain $(ARGS)
