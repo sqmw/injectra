@@ -117,6 +117,7 @@ fn owned_remote_electron_page_contract() {
         }
         Ok(json!({"remove":result,"after":inspected}))
     })();
+    evidence["events"] = json!(broker.events(0));
     match &attempt {
         Ok(value) => {
             evidence["passed"] = json!(true);

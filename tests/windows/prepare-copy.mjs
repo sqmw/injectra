@@ -9,7 +9,7 @@ import {createRequire} from 'node:module';
 import {inspectMain,delegateSource} from '../../crates/preparation/helper/entry.mjs';
 import {appendRewrite} from './append-asar.mjs';
 import {updateIntegrity} from './pe-integrity.mjs';
-const {values}=parseArgs({options:{exe:{type:'string'},output:{type:'string'},config:{type:'string'},package:{type:'string'}}});
+const {values}=parseArgs({options:{exe:{type:'string'},output:{type:'string'},config:{type:'string'},package:{type:'string'},strategy:{type:'string'}}});
 if(process.platform!=='win32')throw Error('Windows proof only');
 const tools=createRequire(path.join(process.env.INJECTRA_WIN_TEST_TOOLS,'package.json'));
 const pickle=tools('chromium-pickle-js'),asar=tools('@electron/asar'),acorn=tools('acorn'),pe=await import(pathToFileURL(tools.resolve('resedit')).href);
@@ -22,7 +22,7 @@ if(path.posix.isAbsolute(packageRelative)||packageRelative.includes(':')||packag
 const layout=packageRelative.endsWith('.asar')?'asar':'directory',base=path.join(source,packageRelative);
 const packageBytes=layout==='asar'?asar.extractFile(base,'package.json'):fs.readFileSync(path.join(base,'package.json'));
 if(layout==='asar'?!!asar.getRawHeader(base).header.files?.['.injectra']:fs.existsSync(path.join(base,'.injectra')))throw Error('Reserved namespace exists');
-const pkg=JSON.parse(packageBytes.toString('utf8').replace(/^\uFEFF/,''));if(pkg.main!==undefined&&typeof pkg.main!=='string')throw Error('Unsupported: non-string main');pkg.main=pkg.main?.replaceAll('\\','/');const entry=inspectMain(base,layout,pkg,{asar,acorn});
+const pkg=JSON.parse(packageBytes.toString('utf8').replace(/^\uFEFF/,''));if(pkg.main!==undefined&&typeof pkg.main!=='string')throw Error('Unsupported: non-string main');pkg.main=pkg.main?.replaceAll('\\','/');const entry=inspectMain(base,layout,pkg,{asar,acorn});if(values.strategy){if(!['cjs-insert','main-delegate'].includes(values.strategy))throw Error('Unknown entry strategy');if(values.strategy==='cjs-insert'&&entry.sourceText===undefined)throw Error('Unsupported: opaque source cannot use insertion');entry.strategy=values.strategy;}
 const sourceHash={exe:hash(fs.readFileSync(sourceExe)),package:hash(packageBytes)};
 if(layout==='asar')sourceHash.archive=hash(fs.readFileSync(base));
 else if(entry.archive)sourceHash.archive=hash(fs.readFileSync(entry.archive));

@@ -98,3 +98,5 @@ plan为显式外部JSON数组（name/exe/version/可选args），不在产品核
 Windows探测还发现@electron/asar 3.4.1的嵌套入口API需要原生路径分隔符；已在共享入口/归档层归一化并增加多层目录用例，避免把真实存在的.vite/build入口误报为缺失。Mac四项入口合同与make check通过，Windows复验继续。
 
 部分Windows包带有虚拟size条目或原本已缺失的unpacked可选文件；完整流重建不能假造这些内容。测试副本工具新增[保留原数据段的增量ASAR写入](../../tests/windows/append-asar.mjs)，只更新声明条目，其他元数据及原字节保留；[独立格式测试](../../tests/windows/append-asar.test.mjs)覆盖虚拟条目、缺失外置文件和原packed数据不变。该路径尚待Windows真实App复验，不回填先前失败。
+
+Windows Folo入口纠正：原根Folo.exe经7-Zip证实为Setup.exe，解出官方full.nupkg后在新app-1.17.0目录部署真实客户端，原安装器保留；新客户端Windows本机页面合同已通过，旧安装器No-CDP不作为Folo兼容失败。另有源包虚拟/缓存条目，Windows副本实验允许显式选择main-delegate以验证未命中编译缓存的工具入口，仍须单独取得实机结果。
