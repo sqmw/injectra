@@ -351,3 +351,32 @@ D-006参考归档边界补充：接入、桥接与验证工具可以保留，可
 ```
 
 补充D-012；其文档阶段事实保留，本轮按后续明确授权删除代码。[当前范围](architecture/dev-mode.md)。
+
+<a id="d-014"></a>
+## D-014 · 原宿主主模块委托
+
+```tracking-decision
+{
+  "id": "D-014",
+  "date": "2026-11-12",
+  "status": "accepted",
+  "conclusion": "准备入口按布局选择cjs-insert或main-delegate；嵌套/不透明CJS入口字节保留，shim通过宿主Module._load(original,null,true)建立原主模块身份。Electron框架按元数据识别，拒绝品牌名称分支。",
+  "trigger": "用户指出QQ既有成功路线，T040的Unsupported只是准备器覆盖不足。",
+  "context": "T042对照旧QQ成功包装器，发现嵌套ASAR与框架文件名假设；采用保持身份的通用委托而非普通require。",
+  "affects": [
+    "preparation入口探测/资源准备",
+    "框架身份识别",
+    "兼容性与验证记录"
+  ],
+  "alternatives": [
+    "将QQ永久列为不支持：与旧成功证据矛盾",
+    "按品牌写专用包装器：违背通用目标",
+    "普通require原入口：不保持主模块身份",
+    "解密改写原载荷：无必要且增加风险"
+  ],
+  "commit": "本条所在提交",
+  "supersedes": []
+}
+```
+
+补充D-013的准备器覆盖；保留旧Unsupported证据。[验证](validation/qq-cli-dev.md)。

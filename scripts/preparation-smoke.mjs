@@ -8,13 +8,13 @@ import {binary,root} from './test-env.mjs';
 const fixtures=JSON.parse(process.env.INJECTRA_FIXTURES_FILE?await readFile(process.env.INJECTRA_FIXTURES_FILE,'utf8'):execFileSync(process.execPath,[resolve(root,'scripts/preparation-fixtures.mjs')],{encoding:'utf8'}));
 const sha=async p=>createHash('sha256').update(await readFile(p)).digest('hex');
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
-for(const layout of ['directory','asar']) {
- const original=fixtures[layout]; const originalEntry=layout==='asar'?resolve(original,'Contents/Resources/app.asar'):resolve(original,'Contents/Resources/app/main.cjs');
+for(const layout of ['directory','asar','nested_asar']) {
+ const original=fixtures[layout]; const originalEntry=layout==='asar'?resolve(original,'Contents/Resources/app.asar'):resolve(original,layout==='nested_asar'?'Contents/Resources/app/nested.asar':'Contents/Resources/app/main.cjs');
  const before=await sha(originalEntry);
  const artifact=JSON.parse(execFileSync(binary,['prepare','--app',original,'--output',resolve(fixtures.run,'cli-artifacts'),'--data-mode','isolated'],{encoding:'utf8'}));
  assert.equal(await sha(originalEntry),before);
- const prepared=resolve(artifact.app,layout==='asar'?'Contents/Resources/app.asar':'Contents/Resources/app/main.cjs');
- const preparedHash=await sha(prepared);
+ const prepared=resolve(artifact.app,layout==='asar'?'Contents/Resources/app.asar':layout==='nested_asar'?'Contents/Resources/app/nested.asar':'Contents/Resources/app/main.cjs');
+ const preparedHash=await sha(prepared);if(layout==='nested_asar')assert.equal(preparedHash,before,'nested archive must remain unchanged');
  await assert.rejects(access(resolve(artifact.artifact_file,'../preflight-home/profile/entry.json')));
  const source=resolve(fixtures.run,'increments-'+layout);await mkdir(source,{recursive:true});
  const manifest=resolve(source,'manifest.json');

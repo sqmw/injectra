@@ -20,7 +20,7 @@
 | --- | --- | --- |
 | 自有Electron目录/ASAR | prepare→Bootstrap→共享runtime | 两类通过；包含多窗口隔离与免重打包检查 |
 | Claude4.23118.1 | 同上，isolated派生副本 | 真实本地壳页面两版HTML/CSS/JS及清理通过；不包含远端聊天，console事件未取得 |
-| QQ6.9.86 | 同上，shared配置 | Unsupported：当前主入口不能作为普通明文CJS读取，修改前拒绝；不覆盖旧QQ专用预览结果 |
+| QQ6.9.86 | 同上，shared配置 | T-042已通过真实主页面两版JS/HTML/CSS和清理；修复嵌套ASAR/框架元数据覆盖，原归档不改；[新证据](../validation/qq-cli-dev.md)。T-040当次拒绝保留为历史 |
 
 ## T-017新增宿主证据（已合入本地main，2026-11-10）
 

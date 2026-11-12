@@ -14,11 +14,11 @@
 ## 模块边界
 
 - application/dev：读取一致增量、内容版本、来源与通过Web契约执行。只读用户文件，不创建或维护完整工作区。
-- preparation：按Electron CommonJS、目录/ASAR、完整性格式识别入口；通过平台helper只修改派生副本。原入口身份、同步顺序和模块解析保持；不支持则明确拒绝。
+- preparation：按Electron CommonJS、目录/ASAR/嵌套归档、完整性格式识别入口；通过平台helper只修改派生副本。原入口身份、同步顺序和模块解析保持；不支持则明确拒绝。
 - Bootstrap：App内小型Node引导和独立Web后端，连接CLI回环服务；随机挑战/角色认证，拒绝浏览器Origin。没有浏览器文件API或界面。
 - CLI：prepare/dev装配、启动或连接精确派生实例、监听与JSONL回执。异步仅用于连接I/O，不反向改变core/Web/native契约。
 
-首版准备器限macOS Apple Silicon、Electron可解析CommonJS入口、目录与ASAR。纯ESM、模糊入口、无法保持语义/签名/资源条件的目标Unsupported。Node及锁定ASAR/Acorn工具只用于准备；runtime命令不要求这些工具已安装。
+准备器限macOS Apple Silicon、Electron CommonJS宿主、目录/ASAR及目录内嵌套ASAR。明文入口采用cjs-insert；嵌套/不透明JS或CJS通过main-delegate保留原字节，使用原宿主加载器建立原主模块身份。框架按元数据识别。纯ESM、模糊入口、无法保持语义/签名/资源条件的目标Unsupported。Node及锁定ASAR/Acorn工具只用于准备；runtime命令不要求这些工具已安装。
 
 ## 目标与更新
 
@@ -39,3 +39,5 @@ Studio、studio-ui和完整workspace已从当前产品删除；有效通道和�
 [v1方案](../archive/T-040-platform-v1.md)、[v1执行](../archive/T-040.md#t-040)、[v2定义](../archive/T-040-v2.md)及原应用实测不改写。core/Web/native分域、原生独立内存契约及第33个正式适配方案前插件装配约束保留。
 
 使用见[CLI开发说明](../dev.md)，验收见[CLI dev验证](../validation/cli-dev.md)。
+
+[T-042 QQ复验](../validation/qq-cli-dev.md)补齐嵌套入口覆盖，不将T-040当次Unsupported推断为QQ不可注入。

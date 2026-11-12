@@ -63,7 +63,7 @@ injectra dev --artifact "$ARTIFACT_JSON" --bundle "$MANIFEST"
 injectra dev --artifact "$ARTIFACT_JSON" --bundle "$MANIFEST" --target "$PAGE_ID"
 ```
 
-prepare输出artifact_file；将其作为ARTIFACT_JSON。APP为原应用路径，DERIVED_DIR为仓库外新副本父目录；manifest沿用v1格式，用户用现有编辑器修改声明的文件。shared需要用户明确接受该应用共享数据；isolated不是账号安全沙箱承诺，沙箱宿主无法建立条件时拒绝。首版不支持用户startup.cjs。
+prepare输出artifact_file；将其作为ARTIFACT_JSON。APP为原应用路径，DERIVED_DIR为仓库外新副本父目录；manifest沿用v1格式，用户用现有编辑器修改声明的文件。shared需要用户明确接受该应用共享数据；isolated不是账号安全沙箱承诺，沙箱宿主无法建立条件时拒绝。不支持用户startup.cjs。准备记录entry_strategy为cjs-insert或main-delegate；旧记录缺少此字段仍可加载。后者保留原归档，通过宿主加载器执行原主模块，见[QQ复验](validation/qq-cli-dev.md)。
 
 dev为前台命令，stdout为JSONL事件：dev-ready、目标列表/选择、execution、source-error和可关联log；stderr仍以injectra前缀报告最终失败。execution包含request_id、version、target、files、certainty、result/error与可确定的JS位置。窗口效果直接在App查看。
 

@@ -5,6 +5,19 @@ from pathlib import Path
 def load(path):
     with path.open('rb') as f:return plistlib.load(f)
 
+def electron_framework(app):
+    candidates=[]
+    for bundle in (app/'Contents/Frameworks').glob('*.framework'):
+        meta=bundle/'Resources/Info.plist'
+        if not meta.is_file():continue
+        info=load(meta)
+        if info.get('CFBundleIdentifier')!='com.github.Electron.framework':continue
+        executable=bundle/info.get('CFBundleExecutable','')
+        if not executable.is_file() or not executable.resolve().is_relative_to(app):raise RuntimeError('Unsupported: invalid Electron framework executable')
+        candidates.append({'bundle':str(bundle.relative_to(app)),'executable':str(executable.relative_to(app))})
+    if len(candidates)!=1:raise RuntimeError('Unsupported: expected one Electron framework identity')
+    return candidates[0]
+
 def described(app):
     info=load(app/'Contents/Info.plist')
     executable=app/'Contents/MacOS'/info['CFBundleExecutable']
@@ -54,7 +67,7 @@ def described(app):
             else:add(p)
     collect(app)
     sealed=sorted(allowed)
-    return {'info':{'CFBundleExecutable':info['CFBundleExecutable'],'CFBundleIdentifier':info.get('CFBundleIdentifier',''),'CFBundleShortVersionString':info.get('CFBundleShortVersionString',info.get('CFBundleVersion','unknown')),'ElectronAsarIntegrity':info.get('ElectronAsarIntegrity',{})},'sandboxed':bool(entitlements.get('com.apple.security.app-sandbox')),'sealed':sealed,'nested':nested}
+    return {'info':{'CFBundleExecutable':info['CFBundleExecutable'],'CFBundleIdentifier':info.get('CFBundleIdentifier',''),'CFBundleShortVersionString':info.get('CFBundleShortVersionString',info.get('CFBundleVersion','unknown')),'ElectronAsarIntegrity':info.get('ElectronAsarIntegrity',{})},'electron_framework':electron_framework(app),'sandboxed':bool(entitlements.get('com.apple.security.app-sandbox')),'sealed':sealed,'nested':nested}
 
 def owned(app):
     marker=app.parent/'ownership.json'
@@ -83,7 +96,7 @@ def sign(path,app,data_mode):
     if r.returncode:raise RuntimeError('Signing failed for '+str(path.relative_to(app))+': '+r.stderr)
 
 def integrity_digest(app,info):
-    framework=(app/'Contents/Frameworks/Electron Framework.framework/Electron Framework')
+    framework=app/electron_framework(app)['executable']
     if not framework.is_file():return None
     data=bytearray(framework.read_bytes());sentinel=b'AGbevlPCksUGKNL8TSn7wGmJEuJsXb2A';positions=[];cursor=0
     while True:
@@ -128,7 +141,7 @@ try:
             if update.get('asar_hash'):info.setdefault('ElectronAsarIntegrity',{})['Resources/app.asar']={'algorithm':'SHA256','hash':update['asar_hash']}
             with (app/'Contents/Info.plist').open('wb') as f:plistlib.dump(info,f)
             digest=integrity_digest(app,info)
-            if digest:sign(app/'Contents/Frameworks/Electron Framework.framework',app,mode)
+            if digest:sign(app/electron_framework(app)['bundle'],app,mode)
             sign(app,app,mode)
             r=subprocess.run(['/usr/bin/codesign','--verify','--deep','--strict',str(app)],capture_output=True,text=True)
             if r.returncode:raise RuntimeError('Derived signature validation failed: '+r.stderr)

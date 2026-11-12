@@ -4,6 +4,43 @@
 
 ## 当前执行
 
+<a id="t-042"></a>
+### T-042 · 嵌套归档与不透明入口接入
+
+```tracking-task
+{
+  "id": "T-042",
+  "name": "嵌套归档与不透明入口接入",
+  "version": "v1",
+  "mode": "lightweight",
+  "status": "in_progress",
+  "goal": "修复通用准备器将Electron嵌套ASAR入口当磁盘文件的覆盖缺口，以通用包入口委托策略接入QQ并验证CLI dev。",
+  "scope": "只改通用入口解析/策略及测试文档；保留原入口字节及原加载器，验证主模块身份/解析；派生副本、QQ已批准shared数据模式，不动原实例/原包。",
+  "acceptance": "普通目录/ASAR回归、嵌套归档与委托夹具保持main身份/相对解析；QQ真实主页面至少两版JS/CSS/HTML动态更新并验证包摘要；不增加品牌判断。",
+  "execution_ref": "TODO.md#t-042",
+  "acceptance_evidence": [],
+  "unplanned_reason": "用户指出QQ已有成功路线，新准备器方法覆盖不完整，要求继续纠正。"
+}
+```
+
+```tracking-execution
+{
+  "id": "T-042/E-001",
+  "name": "通用入口委托与QQ实机复验",
+  "task_id": "T-042",
+  "task_version": "v1",
+  "status": "running",
+  "authorization": "2026-11-12用户指出QQ肯定支持、当前方法不对；承接已授权的通用CLI dev与QQ shared副本验证。",
+  "scope": "只改通用入口解析/策略及测试文档；保留原入口字节及原加载器，验证主模块身份/解析；派生副本、QQ已批准shared数据模式，不动原实例/原包。",
+  "steps": [],
+  "evidence": [
+    "main干净基线a7bae7c；旧T039成功包装入口，新准备器读取application.asar/app_launcher/index.js为普通文件失败；归档头可读，80字节入口非普通UTF8。"
+  ],
+  "stop_reason": ""
+}
+```
+
+
 <a id="t-034"></a>
 ### T-034 · 阿里云盘 pre-runtime 入口核查
 

@@ -120,4 +120,5 @@ setup-preparation:
 	node scripts/setup-preparation-tools.mjs
 
 test-preparation: build
+	node --test crates/preparation/tests/entry.test.mjs
 	node scripts/preparation-smoke.mjs

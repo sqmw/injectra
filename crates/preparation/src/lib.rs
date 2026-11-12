@@ -57,6 +57,7 @@ fn cache() -> Result<PathBuf> {
 pub(crate) fn helper() -> Result<PathBuf> {
     let sources = [
         ("prepare.mjs", include_str!("../helper/prepare.mjs")),
+        ("entry.mjs", include_str!("../helper/entry.mjs")),
         ("platform.py", include_str!("../helper/platform.py")),
         ("bootstrap.cjs", injectra_bootstrap::BOOTSTRAP_SOURCE),
         ("evaluation.cjs", injectra_bootstrap::EVALUATION_SOURCE),
@@ -183,6 +184,7 @@ pub fn prepare(request: &PrepareRequest) -> Result<PreparedArtifact> {
         json!({"operation":"prepare","source_app":source,"app":app,"data_mode":request.data_mode,"config":{"version":1,"artifact":id,"key":key,"controller_origin":origin}}),
     )?;
     let artifact = PreparedArtifact {
+        entry_strategy: plan.probe.entry_strategy,
         version: 1,
         id,
         source_app: source,

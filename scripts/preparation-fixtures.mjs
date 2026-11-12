@@ -17,17 +17,17 @@ fs.mkdirSync(app.getPath('userData'),{recursive:true});fs.writeFileSync(path.joi
 app.whenReady().then(async()=>{const win=new BrowserWindow({show:false,width:600,height:400,webPreferences:{contextIsolation:true,sandbox:true}});await win.loadFile(path.join(__dirname,'index.html'));await win.webContents.executeJavaScript('globalThis.fixture='+JSON.stringify(identity));const peer=new BrowserWindow({show:false,webPreferences:{contextIsolation:true,sandbox:true}});await peer.loadFile(path.join(__dirname,'index.html'));setInterval(async()=>{try{const count=await peer.webContents.executeJavaScript('document.querySelectorAll(\"[data-injectra]\").length');fs.writeFileSync(path.join(app.getPath('userData'),'peer.json'),JSON.stringify({count}));}catch{}},250).unref();});
 app.on('window-all-closed',()=>app.quit());
 `;
-for(const kind of ['directory','asar']){
+for(const kind of ['directory','asar','nested_asar']){
  const app=resolve(run,kind+'.app');execFileSync('/usr/bin/rsync',['-a',original+'/',app+'/']);
  const source=resolve(run,kind+'-source');await mkdir(source);
  await writeFile(resolve(source,'package.json'),JSON.stringify({name:'injectra-fixture-'+kind,version:'1.0.0',main:'main.cjs'}));
  await writeFile(resolve(source,'main.cjs'),main);await writeFile(resolve(source,'sibling.cjs'),'module.exports="relative-module";');
  await writeFile(resolve(source,'index.html'),'<!doctype html><meta charset="utf-8"><title>Owned source fixture</title><div id="root">Original fixture</div>');
  if(kind==='directory')execFileSync('/usr/bin/rsync',['-a',source+'/',resolve(app,'Contents/Resources/app')+'/']);
- else {const output=await asar.createPackage(source,resolve(app,'Contents/Resources/app.asar'));if(output&&typeof output.on==='function')await finished(output);}
+ else {const directory=resolve(app,'Contents/Resources/app');if(kind==='nested_asar'){await mkdir(directory,{recursive:true});await writeFile(resolve(directory,'package.json'),JSON.stringify({name:'nested-fixture',main:'./nested.asar/main.cjs'}));}const output=await asar.createPackage(source,kind==='nested_asar'?resolve(directory,'nested.asar'):resolve(app,'Contents/Resources/app.asar'));if(output&&typeof output.on==='function')await finished(output);}
  async function bundles(directory){const out=[];for(const e of await readdir(directory,{withFileTypes:true})){if(!e.isDirectory()||e.isSymbolicLink())continue;const p=resolve(directory,e.name);out.push(...await bundles(p));if(/\.(app|framework|xpc)$/.test(e.name))out.push(p);}return out;}
  for(const bundle of [...await bundles(app),app])execFileSync('/usr/bin/codesign',['--force','--sign','-','--timestamp=none','--preserve-metadata=identifier,entitlements,flags',bundle]);
  await writeFile(resolve(app,'Contents/unsealed-account-fixture.txt'),'MUST_NOT_COPY_THIS_RUNTIME_DATA');
 }
-await writeFile(resolve(run,'fixtures.json'),JSON.stringify({run,directory:resolve(run,'directory.app'),asar:resolve(run,'asar.app')},null,2));
-console.log(JSON.stringify({run,directory:resolve(run,'directory.app'),asar:resolve(run,'asar.app')},null,2));
+await writeFile(resolve(run,'fixtures.json'),JSON.stringify({run,directory:resolve(run,'directory.app'),asar:resolve(run,'asar.app'),nested_asar:resolve(run,'nested_asar.app')},null,2));
+console.log(JSON.stringify({run,directory:resolve(run,'directory.app'),asar:resolve(run,'asar.app'),nested_asar:resolve(run,'nested_asar.app')},null,2));

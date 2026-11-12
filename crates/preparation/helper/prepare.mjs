@@ -1,4 +1,5 @@
 import fs from 'node:fs';
+import {inspectMain,delegateSource} from './entry.mjs';
 import fsp from 'node:fs/promises';
 import path from 'node:path';
 import crypto from 'node:crypto';
@@ -23,27 +24,14 @@ function probe(source){
  if(hasAsar===hasDirectory)throw Error('Unsupported: expected exactly one app.asar or directory package');
  const layout=hasAsar?'asar':'directory',packageRoot=hasAsar?'Contents/Resources/app.asar':'Contents/Resources/app',base=path.join(app,packageRoot);
  if(hasAsar){const header=asar.getRawHeader(base).header;entries(header);if(header.files?.['.injectra'])throw Error('Unsupported: package already contains reserved .injectra namespace');}else if(fs.existsSync(path.join(base,'.injectra')))throw Error('Unsupported: package already contains reserved .injectra namespace');
- const pkg=JSON.parse(entryData(base,layout,'package.json').toString('utf8'));
- let main=pkg.main??'index.js';if(typeof main!=='string')throw Error('Unsupported: main must be a string');main=main.replace(/^\.\//,'');
- if(!relative(main))throw Error('Unsupported: main escapes package');
- const candidates=path.posix.extname(main)?[main]:[main,main+'.js',main+'.cjs',main+'/index.js'];
- let bytes=null;
- for(const candidate of candidates){try{bytes=entryData(base,layout,candidate);main=candidate;break;}catch{}}
- if(!bytes)throw Error('Unsupported: main is not a readable regular CJS entry');
- if(!['.js','.cjs'].includes(path.posix.extname(main))||(pkg.type==='module'&&!main.endsWith('.cjs')))throw Error('Unsupported: ESM or non-JavaScript main');
- if(bytes.length>16*1024*1024)throw Error('Unsupported: CJS entry exceeds parser bound');
- const sourceText=new TextDecoder('utf-8',{fatal:true,ignoreBOM:true}).decode(bytes);
- const bom=sourceText.charCodeAt(0)===0xfeff?1:0,parseText=sourceText.slice(bom);
- let ast;try{ast=acorn.parse(parseText,{ecmaVersion:'latest',sourceType:'script',allowHashBang:true,allowReturnOutsideFunction:true});}catch(e){throw Error('Unsupported: main is not parseable CommonJS: '+e.message);}
- if(ast.body.some(n=>n.type==='FunctionDeclaration'&&n.id?.name==='module'))throw Error('Unsupported: main shadows the module entry API');
- let insert=parseText.startsWith('#!')?bom+parseText.indexOf('\n')+1:bom;
- for(const statement of ast.body){if(!statement.directive)break;insert=bom+statement.end;}
+ const packageBytes=entryData(base,layout,'package.json'),pkg=JSON.parse(packageBytes.toString('utf8')),packageHash=hash(packageBytes);
+ const entry=inspectMain(base,layout,pkg,{asar,acorn}),main=entry.main,bytes=entry.bytes;
  const critical=['Contents/Info.plist','Contents/MacOS/'+description.info.CFBundleExecutable,'Contents/_CodeSignature/CodeResources',layout==='asar'?packageRoot:packageRoot+'/package.json'];
- const baseline=Object.fromEntries(critical.map(p=>[p,fileHash(path.join(app,p))]));baseline['entry:'+main]=hash(bytes);
- const framework=path.join(app,'Contents/Frameworks/Electron Framework.framework/Electron Framework');
+ const baseline=Object.fromEntries(critical.map(p=>[p,fileHash(path.join(app,p))]));baseline['entry:'+main]=hash(bytes);if(entry.archive)baseline[path.relative(app,entry.archive)]=fileHash(entry.archive);
+ const framework=path.join(app,description.electron_framework.executable);
  if(!fs.existsSync(framework))throw Error('Unsupported: Electron Framework was not found');
  const digest=fs.readFileSync(framework).includes(Buffer.from('AGbevlPCksUGKNL8TSn7wGmJEuJsXb2A'));
- return {public:{source_app:app,executable:path.join(app,'Contents/MacOS',description.info.CFBundleExecutable),bundle_id:description.info.CFBundleIdentifier,version:description.info.CFBundleShortVersionString,layout,package_root:packageRoot,main_entry:main,sandboxed:description.sandboxed,baseline,integrity_digest:digest},description,sourceText,insert};
+ return {public:{source_app:app,executable:path.join(app,'Contents/MacOS',description.info.CFBundleExecutable),bundle_id:description.info.CFBundleIdentifier,version:description.info.CFBundleShortVersionString,layout,package_root:packageRoot,main_entry:main,sandboxed:description.sandboxed,baseline,integrity_digest:digest,entry_strategy:entry.strategy},description,...entry,pkg,packageHash};
 }
 async function rebuild(source,dest,replacements){
  const original=entries(asar.getRawHeader(source).header),remaining=new Map(replacements),streams=[];
@@ -79,7 +67,7 @@ try{
  const p=probe(input.source_app);
  if(input.operation==='probe'){console.log(JSON.stringify({ok:true,value:p.public}));process.exit(0);}
  if(input.data_mode==='isolated'&&p.public.sandboxed)throw Error('Unsupported: sandbox container isolation requires a supported target profile; select explicitly approved shared data');
- if(input.operation==='plan'){console.log(JSON.stringify({ok:true,value:{probe:p.public,data_mode:input.data_mode,changes:[{path:p.public.package_root+'/'+p.public.main_entry,origin:'injectra',reason:'Load bootstrap after directives, preserving original CJS module identity',before:p.public.baseline['entry:'+p.public.main_entry],after:null},{path:p.public.package_root+'/.injectra',origin:'injectra',reason:'Owned generic bootstrap and configuration',before:null,after:null}],signing_policy:'local ad-hoc with local-library entitlement; existing runtime and ASAR/fuses retained'}}));process.exit(0);}
+ if(input.operation==='plan'){console.log(JSON.stringify({ok:true,value:{probe:p.public,data_mode:input.data_mode,changes:[{path:p.public.package_root+'/'+(p.strategy==='main-delegate'?'package.json':p.public.main_entry),origin:'injectra',reason:p.strategy==='main-delegate'?'Delegate original main through host loader; preserve original entry bytes':'Load bootstrap after directives, preserving original CJS module identity',before:p.strategy==='main-delegate'?p.packageHash:p.public.baseline['entry:'+p.public.main_entry],after:null},{path:p.public.package_root+'/.injectra',origin:'injectra',reason:'Owned generic bootstrap and configuration',before:null,after:null}],signing_policy:'local ad-hoc with local-library entitlement; existing runtime and ASAR/fuses retained'}}));process.exit(0);}
  const dest=input.app,owner=JSON.parse(fs.readFileSync(path.join(path.dirname(dest),'ownership.json'),'utf8'));
  if(owner.owner!=='injectra.preparation.v1'||owner.app!==dest||owner.source_app!==p.public.source_app||path.resolve(dest)===p.public.source_app)throw Error('Invalid owned destination');
  if(fs.existsSync(dest))throw Error('Destination already exists');
@@ -90,8 +78,11 @@ try{
  const entry=p.public.main_entry;
  const requirePath=path.posix.relative(path.posix.dirname(entry),'.injectra/bootstrap.cjs');
  const addition='\n;module.require('+JSON.stringify(requirePath.startsWith('./')||requirePath.startsWith('../')?requirePath:'./'+requirePath)+');\n';
- const changed=Buffer.from(p.sourceText.slice(0,p.insert)+addition+p.sourceText.slice(p.insert));
- const replacements=new Map([[entry,changed],['.injectra/bootstrap.cjs',bootstrap],['.injectra/evaluation.cjs',fs.readFileSync(path.join(here,'evaluation.cjs'))],['.injectra/config.json',config]]);
+ const replacements=new Map([['.injectra/bootstrap.cjs',bootstrap],['.injectra/evaluation.cjs',fs.readFileSync(path.join(here,'evaluation.cjs'))],['.injectra/config.json',config]]);
+ if(p.strategy==='main-delegate'){
+  replacements.set('package.json',Buffer.from(JSON.stringify({...p.pkg,main:'./.injectra/entry.cjs'},null,2)+'\n'));
+  replacements.set('.injectra/entry.cjs',Buffer.from(delegateSource(entry)));
+ }else replacements.set(entry,Buffer.from(p.sourceText.slice(0,p.insert)+addition+p.sourceText.slice(p.insert)));
  let asarHash=null;
  if(p.public.layout==='asar'){
   const src=path.join(dest,p.public.package_root),rebuilt=path.join(path.dirname(dest),'rebuilt.asar');
@@ -101,7 +92,7 @@ try{
  const signed=platform('finish',dest,{asar_hash:asarHash});
  const again=probe(input.source_app).public;
  if(JSON.stringify(again.baseline)!==JSON.stringify(p.public.baseline))throw Error('Source application changed during preparation');
- const changes=[...replacements].map(([file,bytes])=>({path:p.public.package_root+'/'+file,origin:'injectra',reason:file===entry?'Bootstrap insertion after CJS directives':'Owned preparation resource',before:file===entry?p.public.baseline['entry:'+entry]:null,after:hash(bytes)}));
+ const changes=[...replacements].map(([file,bytes])=>({path:p.public.package_root+'/'+file,origin:'injectra',reason:file===entry?'Bootstrap insertion after CJS directives':'Owned preparation resource',before:file==='package.json'?p.packageHash:file===entry?p.public.baseline['entry:'+entry]:null,after:hash(bytes)}));
  for(const signedPath of signing.signed)changes.push({path:signedPath,origin:'injectra',reason:'Local test signing of nested native code',before:null,after:null});
  changes.push({path:'Contents/MacOS/'+p.description.info.CFBundleExecutable,origin:'injectra',reason:'Local test signing of app executable',before:p.public.baseline['Contents/MacOS/'+p.description.info.CFBundleExecutable],after:fileHash(path.join(dest,'Contents/MacOS',p.description.info.CFBundleExecutable))});
  changes.push({path:'Contents/Info.plist',origin:'injectra',reason:'Derived identity and integrity metadata',before:p.public.baseline['Contents/Info.plist'],after:fileHash(path.join(dest,'Contents/Info.plist'))});

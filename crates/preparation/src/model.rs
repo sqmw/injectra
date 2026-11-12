@@ -25,6 +25,7 @@ pub struct Probe {
     pub sandboxed: bool,
     pub baseline: BTreeMap<String, String>,
     pub integrity_digest: bool,
+    pub entry_strategy: String,
 }
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct PreparationPlan {
@@ -35,6 +36,8 @@ pub struct PreparationPlan {
 }
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct PreparedArtifact {
+    #[serde(default)]
+    pub entry_strategy: String,
     pub version: u32,
     pub id: String,
     pub source_app: PathBuf,

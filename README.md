@@ -2,7 +2,7 @@
 
 面向桌面 Web UI 的**通用代码注入 CLI**：runtime连接已运行App执行JS/HTML/CSS；pre-runtime先准备少量dev引导，再使用现有编辑器修改外部增量，在真实App查看更新。
 
-独立`prepare/dev`已实现；目录/ASAR Electron夹具及Claude本地壳页面通过当前验收，QQ当前主入口明确Unsupported，详见[范围与证据](docs/validation/cli-dev.md)。工作台、Studio和完整workspace已选择性删除；原生独立边界及历史代码/实验保留。
+独立`prepare/dev`已实现；目录/ASAR/嵌套ASAR Electron夹具、Claude本地壳及QQ主页面通过当前验收，详见[范围与证据](docs/validation/cli-dev.md)。工作台、Studio和完整workspace已选择性删除；原生独立边界及历史代码/实验保留。
 
 长期架构已建立执行域隔离：通用核心、Web／原生契约、可复用应用用例及平台／宿主职责分离。原生内存读写执行域仍仅有契约测试；已实现的Frida桥接用于Web页面执行，不等同于交付通用进程内存接口，见[架构](docs/architecture/boundaries.md)。
 
