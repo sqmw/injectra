@@ -5,8 +5,16 @@ const path = require('node:path');
 const http = require('node:http');
 const crypto = require('node:crypto');
 const { app, webContents } = require('electron');
+const { guardedSource } = require('./evaluation.cjs');
 const config = JSON.parse(fs.readFileSync(path.join(__dirname, 'config.json'), 'utf8'));
 const VERSION = 1;
+if (process.env.INJECTRA_PREFLIGHT_NONCE) {
+  try { JSON.parse(fs.readFileSync(path.join(config.stage_root,'current.json'),'utf8')); fs.writeSync(1,'INJECTRA_PREFLIGHT:'+JSON.stringify({artifact:config.artifact,nonce:process.env.INJECTRA_PREFLIGHT_NONCE})+'\n'); process.exit(0); }
+  catch(error) { fs.writeSync(2,'INJECTRA_PREFLIGHT_ERROR:'+String(error)+'\n'); process.exit(1); }
+  throw Error('Preflight must not continue into original entry');
+}
+const documentKey = 'injectra.document.' + config.artifact;
+const executionSources = new Map();
 const instance = crypto.randomBytes(32).toString('hex');
 const pages = new Map();
 let session = null, closing = false, polling = false, reporting = false;
@@ -53,10 +61,15 @@ function matchesSelector(url) {
 function track(wc) {
   if (pages.has(wc.id) || !['window','browserView','webview','offscreen'].includes(wc.getType())) return;
   const p = { wc, generation: nonce(), ready: false, exported: false }; pages.set(wc.id, p);
-  function ready() {
+  async function ready() {
     if (wc.isDestroyed()) return;
     const f = frame(wc); if (!f || !wc.getURL() || wc.getURL() === 'about:blank') return;
-    p.generation = nonce(); p.ready = true; p.routing = f.routing; p.process = f.process;
+    p.generation = nonce(); p.ready = false; p.routing = f.routing; p.process = f.process;
+    const generation = p.generation;
+    try { await wc.executeJavaScript('globalThis[Symbol.for('+JSON.stringify(documentKey)+')]='+JSON.stringify(generation)); }
+    catch { return; }
+    if (wc.isDestroyed() || p.generation !== generation || !sameFrame(p)) return;
+    p.ready = true;
     if (config.mode === 'export' && !p.exported && exportProgram && matchesSelector(wc.getURL())) {
       p.exported = true;
       wc.executeJavaScript(exportProgram).catch(error => process.stderr.write('INJECTRA_EXPORT_ERROR:' + String(error) + '\n'));
@@ -73,8 +86,9 @@ function track(wc) {
   wc.once('destroyed', () => { pages.delete(wc.id); flush().catch(() => {}); });
   wc.on('console-message', (_event, level, message, line, source) => {
     if (level && typeof level === 'object') { const d = level; level = d.level; message = d.message; line = d.lineNumber; source = d.sourceId; }
-    if (typeof source !== 'string' || !source.startsWith('injectra://')) return;
-    if (logs.length < 100) logs.push({page:String(wc.id),generation:p.generation,level:String(level),message:String(message).slice(0,8192),source:source + ':' + (line || 0)});
+    const context = executionSources.get(source);
+    if (!context || context.page !== String(wc.id)) return;
+    if (logs.length < 100) logs.push({...context,level:String(level),message:String(message).slice(0,8192),source,line:Number(line)||0});
   });
   if (app.isReady() && !wc.isLoadingMainFrame()) ready();
 }
@@ -99,14 +113,15 @@ async function execute(command) {
     catch(e) {receipt.error=String(e);receipt.certainty='Unknown';}
   } else if (command.operation === 'evaluate') {
     try {
-      const source = command.source.includes('//# sourceURL=injectra://') ? command.source : command.source + '\n//# sourceURL=injectra://bridge/' + command.request_id;
-      const value = await p.wc.executeJavaScript(source);
-      receipt.certainty = 'Executed';
-      try {
-        const encoded = JSON.stringify(value === undefined ? null : value);
-        if (encoded === undefined || Buffer.byteLength(encoded) > 4 * 1024 * 1024) throw Error('Result encoding exceeds bridge limits');
-        receipt.value = JSON.parse(encoded); receipt.ok = true;
-      } catch(e) {receipt.error = 'Result encoding: ' + String(e);}
+      const evaluation = guardedSource(command, documentKey);
+      executionSources.set(evaluation.url,evaluation.context);
+      while(executionSources.size>256)executionSources.delete(executionSources.keys().next().value);
+      const result = await p.wc.executeJavaScript(evaluation.source);
+      receipt.certainty = result.certainty;
+      if(result.ok){
+        if(typeof result.encoded!=='string'||Buffer.byteLength(result.encoded)>512*1024)throw Error('Result encoding exceeds bridge limits');
+        receipt.value=JSON.parse(result.encoded);receipt.ok=true;
+      }else receipt.error=result.error+(result.stack?'\n'+result.stack:'');
     } catch(e) { receipt.certainty = p.wc.isDestroyed() || p.generation !== command.generation || !sameFrame(p) ? 'Unknown' : 'Executed'; receipt.error = String(e); }
   } else receipt.error = 'Unsupported operation';
   if (session === current) { receipts.push(receipt); await flush(); }

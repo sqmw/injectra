@@ -71,6 +71,10 @@ pub struct Report {
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct AgentLog {
+    pub request_id: String,
+    pub revision: String,
+    pub user_source: String,
+    pub line: u32,
     pub page: String,
     pub generation: String,
     pub level: String,

@@ -266,3 +266,158 @@ fn node_and_rust_use_the_same_proof_bytes() {
     assert!(out.status.success());
     assert_eq!(String::from_utf8(out.stdout).unwrap(), expected);
 }
+
+#[test]
+fn target_ids_never_disclose_session_bearers() {
+    let (b, s, _) = connected();
+    let t = b.targets().remove(0);
+    assert!(!t.id.contains(&s));
+    assert!(b.poll(t.id.split(':').next().unwrap()).is_err());
+}
+#[test]
+fn newer_uncertain_or_executed_failure_clears_old_applied_revision() {
+    for certainty in ["Executed", "Unknown", "NotExecuted"] {
+        let (b, s, p) = connected();
+        let id = b.targets().remove(0).id;
+        let worker = {
+            let b = b.clone();
+            let id = id.clone();
+            thread::spawn(move || b.submit(&id, "v1", "1", Duration::from_secs(1)))
+        };
+        let c = receive(&b, &s);
+        b.report(
+            &s,
+            Report {
+                pages: vec![p.clone()],
+                receipts: vec![ack(&c)],
+                logs: vec![],
+                startup: None,
+            },
+        )
+        .unwrap();
+        worker.join().unwrap().unwrap();
+        let worker = {
+            let b = b.clone();
+            let id = id.clone();
+            thread::spawn(move || b.submit(&id, "v2", "2", Duration::from_secs(1)))
+        };
+        let c = receive(&b, &s);
+        let mut r = ack(&c);
+        r.ok = false;
+        r.error = Some("failure".into());
+        r.certainty = certainty.into();
+        b.report(
+            &s,
+            Report {
+                pages: vec![p],
+                receipts: vec![r],
+                logs: vec![],
+                startup: None,
+            },
+        )
+        .unwrap();
+        assert!(worker.join().unwrap().is_err());
+        assert_eq!(
+            b.targets()[0].applied_revision.as_deref(),
+            if certainty == "NotExecuted" {
+                Some("v1")
+            } else {
+                None
+            }
+        );
+    }
+}
+#[test]
+fn old_revision_is_preserved_only_until_a_new_request_is_dispatched() {
+    let (b, s, p) = connected();
+    let id = b.targets().remove(0).id;
+    let worker = {
+        let b = b.clone();
+        let id = id.clone();
+        thread::spawn(move || b.submit(&id, "v1", "1", Duration::from_secs(1)))
+    };
+    let c = receive(&b, &s);
+    b.report(
+        &s,
+        Report {
+            pages: vec![p],
+            receipts: vec![ack(&c)],
+            logs: vec![],
+            startup: None,
+        },
+    )
+    .unwrap();
+    worker.join().unwrap().unwrap();
+    assert_eq!(
+        b.submit(&id, "v2", "2", Duration::from_millis(2))
+            .unwrap_err()
+            .certainty,
+        Certainty::NotExecuted
+    );
+    assert_eq!(b.targets()[0].applied_revision.as_deref(), Some("v1"));
+    let worker = {
+        let b = b.clone();
+        thread::spawn(move || b.submit(&id, "v3", "3", Duration::from_millis(40)))
+    };
+    receive(&b, &s);
+    assert_eq!(
+        worker.join().unwrap().unwrap_err().certainty,
+        Certainty::Unknown
+    );
+    assert_eq!(b.targets()[0].applied_revision, None);
+}
+#[test]
+fn late_logs_keep_the_original_document_and_cannot_claim_the_new_one() {
+    let (b, s, p) = connected();
+    let id = b.targets().remove(0).id;
+    let worker = {
+        let b = b.clone();
+        thread::spawn(move || b.submit(&id, "v1", "1", Duration::from_secs(1)))
+    };
+    let c = receive(&b, &s);
+    b.report(
+        &s,
+        Report {
+            pages: vec![p.clone()],
+            receipts: vec![ack(&c)],
+            logs: vec![],
+            startup: None,
+        },
+    )
+    .unwrap();
+    worker.join().unwrap().unwrap();
+    let newer = Page {
+        generation: "document2".into(),
+        ..p
+    };
+    let log = AgentLog {
+        request_id: c.request_id,
+        revision: c.revision,
+        page: c.page,
+        generation: c.generation,
+        level: "log".into(),
+        message: "late callback".into(),
+        source: "injectra://request".into(),
+        user_source: "injectra://user/page.js".into(),
+        line: 1,
+    };
+    let mut wrong = log.clone();
+    wrong.generation = newer.generation.clone();
+    b.report(
+        &s,
+        Report {
+            pages: vec![newer],
+            receipts: vec![],
+            logs: vec![wrong, log],
+            startup: None,
+        },
+    )
+    .unwrap();
+    let logs = b
+        .events(0)
+        .into_iter()
+        .filter(|e| e.kind == "console")
+        .collect::<Vec<_>>();
+    assert_eq!(logs.len(), 1);
+    assert_eq!(logs[0].generation.as_deref(), Some("document1"));
+}

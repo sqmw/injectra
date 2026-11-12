@@ -13,3 +13,7 @@ Commands bind request, revision, page and generation. Each command is delivered 
 The synchronous Broker API is for worker threads, not an async executor's event loop. `submit`/`reload` have explicit deadlines. Existing WebSession remains page-only; native contracts are unaffected. The agent's export mode uses fixed embedded startup/page inputs and never contacts the controller.
 
 Tests: `cargo test -p injectra-bootstrap`; real owned Electron validation is performed with the preparation module. Contract tests alone do not prove app compatibility.
+
+Protocol review: public target IDs use independent public connection IDs, never session bearer tokens. The agent installs a per-document nonce and checks it atomically in the same evaluation as the generated expression; workspace-generated expression programs retain their original line numbers (the guard adds no preceding newline). Direct statement source must first be compiled by the workspace/program layer, as with the existing Gadget expression convention. Own logs carry request/revision/original-document metadata and a separate user source URL; the broker validates these against dispatched request history, retaining old-document attribution for late logs. Dispatched Unknown or Executed failure clears prior applied revision; NotExecuted preserves it.
+
+Run the document-guard/source-line regression with `node --test crates/bootstrap/tests/evaluation.test.cjs` in addition to Rust tests.

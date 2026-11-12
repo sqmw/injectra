@@ -16,6 +16,7 @@ use std::time::Duration;
 pub const PAGE_RELOAD: Capability = Capability("web.page.reload");
 pub const PAGE_LOGS: Capability = Capability("web.page.logs");
 const CAPABILITIES: &[Capability] = &[PAGE_EVALUATE, PAGE_RELOAD, PAGE_LOGS];
+pub const EVALUATION_SOURCE: &str = include_str!("../helper/evaluation.cjs");
 pub const BOOTSTRAP_SOURCE: &str = include_str!("../helper/bootstrap.cjs");
 
 pub struct BootstrapBackend {

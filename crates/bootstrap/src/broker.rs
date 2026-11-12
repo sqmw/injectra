@@ -15,6 +15,8 @@ struct PendingChallenge {
     at: Instant,
 }
 struct Connection {
+    public_id: String,
+    history: VecDeque<(String, String, String, String)>,
     artifact: String,
     instance: String,
     pid: u32,
@@ -186,6 +188,8 @@ impl Broker {
         i.connections.insert(
             session.clone(),
             Connection {
+                public_id: uuid::Uuid::new_v4().to_string(),
+                history: VecDeque::new(),
                 artifact: c.hello.artifact,
                 instance: instance.clone(),
                 pid: c.hello.pid,
@@ -207,6 +211,17 @@ impl Broker {
             .ok_or_else(|| invalid("Unknown bridge session"))?;
         c.last_seen = Instant::now();
         let command = c.queue.pop_front();
+        if let Some(ref command) = command {
+            c.history.push_back((
+                command.request_id.clone(),
+                command.page.clone(),
+                command.generation.clone(),
+                command.revision.clone(),
+            ));
+            while c.history.len() > 256 {
+                c.history.pop_front();
+            }
+        }
         if let Some(ref command) = command
             && let Some(p) = i.pending.get_mut(&command.request_id)
         {
@@ -273,7 +288,7 @@ impl Broker {
             c.queue.retain(|q| !expired.contains(&q.page));
         }
         for log in report.logs {
-            record_log(&mut i, &artifact, &instance, log);
+            record_log(&mut i, session, &artifact, &instance, log);
         }
         if let Some(startup) = report.startup {
             let changed =
@@ -299,9 +314,9 @@ impl Broker {
         sweep(&mut i);
         i.connections
             .iter()
-            .flat_map(|(s, c)| {
+            .flat_map(|(_, c)| {
                 c.pages.values().map(|p| TargetStatus {
-                    id: target_key(s, p),
+                    id: target_key(&c.public_id, p),
                     artifact: c.artifact.clone(),
                     instance: c.instance.clone(),
                     pid: c.pid,
@@ -363,7 +378,7 @@ impl Broker {
                 .find_map(|(s, c)| {
                     c.pages
                         .values()
-                        .find(|p| target_key(s, p) == target)
+                        .find(|p| target_key(&c.public_id, p) == target)
                         .map(|p| (s.clone(), p.clone()))
                 })
                 .ok_or_else(|| {
@@ -405,6 +420,9 @@ impl Broker {
                 if let Some(p) = i.pending.remove(&request) {
                     if let Some(c) = i.connections.get_mut(&p.session) {
                         c.queue.retain(|q| q.request_id != request);
+                        if p.dispatched {
+                            c.applied.remove(&p.command.page);
+                        }
                     }
                     return Err(Error::new(
                         ErrorKind::Timeout,
@@ -454,6 +472,9 @@ fn complete(i: &mut Inner, session: &str, r: Receipt) -> Result<()> {
     let c = i.connections.get_mut(session).unwrap();
     let artifact = c.artifact.clone();
     let instance = c.instance.clone();
+    if !r.ok && r.certainty != "NotExecuted" {
+        c.applied.remove(&r.page);
+    }
     if r.ok
         && p.command.operation == "evaluate"
         && c.pages
@@ -511,7 +532,22 @@ fn event(
         i.events.pop_front();
     }
 }
-fn record_log(i: &mut Inner, artifact: &str, instance: &str, mut log: AgentLog) {
+fn record_log(i: &mut Inner, session: &str, artifact: &str, instance: &str, mut log: AgentLog) {
+    let Some(c) = i.connections.get(session) else {
+        return;
+    };
+    if !c
+        .history
+        .iter()
+        .any(|(request, page, generation, revision)| {
+            request == &log.request_id
+                && page == &log.page
+                && generation == &log.generation
+                && revision == &log.revision
+        })
+    {
+        return;
+    }
     log.message.truncate(log.message.floor_char_boundary(8192));
     event(
         i,
