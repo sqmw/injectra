@@ -1,6 +1,6 @@
 # T-040 · CLI收敛与dev闭环
 
-<a id="t-040-e-002"></a>
+<a id="t-040"></a>
 
 [当前Task](../TODO.md#t-040) · [验收](../validation/cli-dev.md)
 

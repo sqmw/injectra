@@ -86,7 +86,7 @@
   "goal": "选择性撤回平台化代码，保留通用runtime并交付CLI prepare/dev页面增量闭环。",
   "scope": "删除工作台、Studio、完整workspace及启动增量/导出；提取Bootstrap、最小来源及执行正确性；精简准备器，只改派生副本，保留历史和运行数据。",
   "acceptance": "runtime合同回归；目录/ASAR准备、CLI动态更新、多目标/Unknown正确性；QQ/Claude优先实机验证并如实限定证据；无平台依赖。",
-  "execution_ref": "archive/T-040-cli.md#t-040-e-002",
+  "execution_ref": "archive/T-040-cli.md#t-040",
   "acceptance_evidence": [
     "CLI平台删减与prepare/dev闭环完成，代码提交a403982、323db43；源代码与历史WIP有仓库外恢复快照。",
     "make check、Electron、双布局dev、多窗口/错误/Unknown合同、core/native独立构建及Frida回归通过。Claude本地页面实机通过，QQ Unsupported及console限制如实记录。"
@@ -103,7 +103,7 @@
 
 [当前范围](architecture/dev-mode.md) · [v1历史与退役执行](archive/T-040.md#t-040)。v3已按用户批准的CLI收敛计划完成；[v2定义](archive/T-040-v2.md)保留。
 
-[CLI收敛执行与证据](archive/T-040-cli.md#t-040-e-002)。
+[CLI收敛执行与证据](archive/T-040-cli.md#t-040)。
 
 
 <a id="t-041"></a>
