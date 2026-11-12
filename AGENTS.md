@@ -10,7 +10,7 @@
 
 ## 项目约束
 
-- 当前定位为通用代码注入工具／核心：已有runtime能力及pre-runtime实验，后续收敛为小型dev入口、外置增量更新、真实App查看效果；通用dev尚未整体验收。使用现有编辑器，不建设工作台、内置编辑器或完整工作区系统。使用者负责载荷及界面适配；管理平台、Agent、自动恢复和任意JS撤销不在当前范围。边界见[需求](docs/requirements.md)与[dev模式](docs/architecture/dev-mode.md)。
+- 当前定位为通用代码注入工具／核心：runtime保留CDP/Gadget/WKWebView；pre-runtime提供CLI prepare/dev的小型入口、外置页面增量更新、真实App查看效果，支持条件与实测边界见验收文档。使用现有编辑器，不建设工作台、内置编辑器或完整工作区系统。使用者负责载荷及界面适配；管理平台、Agent、自动恢复和任意JS撤销不在当前范围。边界见[需求](docs/requirements.md)与[dev模式](docs/architecture/dev-mode.md)。
 - MVP 首个支持组合是 macOS + Electron 宿主；不据此推定 Injectra 自身使用 Electron 构建。
 - 所有实际插件、示例插件及可复用插件Bundle归独立web-ui-plugins库；本仓库不得存放插件或其副本。仅保留注入runtime、接入实现和最小测试夹具，测试不得依赖插件库，详见[产品边界](docs/requirements.md)。
 - 共享 Web 注入代码保留单一来源；平台、宿主体系、目标应用差异分别隔离，禁止复制成各平台版本。
@@ -23,4 +23,4 @@
 
 ## 检查入口
 
-`make build`构建；`make setup-tests`准备仓库外测试依赖；`make check`运行格式、lint、Rust/Web测试与文档检查；`make test-electron`运行独立真实Electron验证。工具版本见mise.toml；禁止将测试通过外推为全部应用兼容。
+`make build`构建；`make setup-tests`准备仓库外测试依赖；`make check`运行格式、lint、Rust/Web测试与文档检查；`make test-electron`运行独立真实Electron验证；`make setup-preparation`安装可选准备工具，`make test-preparation`验收CLI dev。工具版本见mise.toml；禁止将测试通过外推为全部应用兼容。

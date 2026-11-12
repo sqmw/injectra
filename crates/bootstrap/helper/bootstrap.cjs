@@ -5,7 +5,7 @@ const path = require('node:path');
 const http = require('node:http');
 const crypto = require('node:crypto');
 const { app, webContents } = require('electron');
-const { guardedSource } = require('./evaluation.cjs');
+const { guardedSource, installDocumentNonce } = require('./evaluation.cjs');
 const config = JSON.parse(fs.readFileSync(path.join(__dirname, 'config.json'), 'utf8'));
 const VERSION = 1;
 if (process.env.INJECTRA_PREFLIGHT_NONCE) {
@@ -53,13 +53,13 @@ function visiblePages() {
 }
 function track(wc) {
   if (pages.has(wc.id) || !['window','browserView','webview','offscreen'].includes(wc.getType())) return;
-  const p = { wc, generation: nonce(), ready: false, exported: false }; pages.set(wc.id, p);
+  const p = { wc, generation: nonce(), ready: false }; pages.set(wc.id, p);
   async function ready() {
     if (wc.isDestroyed()) return;
     const f = frame(wc); if (!f || !wc.getURL() || wc.getURL() === 'about:blank') return;
     p.generation = nonce(); p.ready = false; p.routing = f.routing; p.process = f.process;
     const generation = p.generation;
-    try { await wc.executeJavaScript('globalThis[Symbol.for('+JSON.stringify(documentKey)+')]='+JSON.stringify(generation)); }
+    try { await wc.executeJavaScript(installDocumentNonce(documentKey,generation)); }
     catch { return; }
     if (wc.isDestroyed() || p.generation !== generation || !sameFrame(p)) return;
     p.ready = true;

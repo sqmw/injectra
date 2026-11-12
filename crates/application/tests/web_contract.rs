@@ -131,3 +131,34 @@ fn unknown_execution_and_source_survive_without_retry() {
     assert!(std::error::Error::source(&error).is_some());
     assert_eq!(backend.programs.borrow().len(), 1);
 }
+
+#[test]
+fn dev_revisions_track_content_and_keep_unknown_attempts_distinct_from_saves() {
+    use injectra_application::dev::{Revision, Updates};
+    let fixture = fixture::BundleFixture::new();
+    let first = Revision::load(&fixture.manifest).unwrap();
+    assert_eq!(first.hash, Revision::load(&fixture.manifest).unwrap().hash);
+    std::fs::write(
+        fixture.manifest.parent().unwrap().join("style.css"),
+        "body {color: pink}",
+    )
+    .unwrap();
+    let next = Revision::load(&fixture.manifest).unwrap();
+    assert_ne!(first.hash, next.hash);
+    let mut backend = Backend::page();
+    backend.fail = true;
+    let mut updates = Updates::default();
+    assert!(updates.changed(&next));
+    assert_eq!(
+        updates
+            .apply(&backend, &backend.target(), &next)
+            .unwrap_err()
+            .certainty,
+        Certainty::Unknown
+    );
+    assert!(!updates.changed(&next));
+    assert!(updates.changed(&first));
+    assert_eq!(backend.programs.borrow().len(), 1);
+    std::fs::write(&fixture.manifest, "{").unwrap();
+    assert!(Revision::load(&fixture.manifest).is_err());
+}

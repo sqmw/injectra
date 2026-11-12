@@ -1,6 +1,6 @@
 # 开发与核心使用
 
-本页主要记录已有runtime CLI用法，完整职责见[产品边界](requirements.md)。当前方向为[pre-runtime dev模式](architecture/dev-mode.md)：现有编辑器改外置增量，真实App看效果，通用链路仍待实施收口。旧Studio命令/界面虽有局部代码，不是当前推荐入口。使用者编写载荷并处理应用控件、重渲染覆盖和再次注入；本页的remove及清理回调是既有辅助接口，不是任意JS撤销或一键回滚承诺。
+本页主要记录已有runtime CLI用法，完整职责见[产品边界](requirements.md)。当前方向为[pre-runtime dev模式](architecture/dev-mode.md)：现有编辑器改外置增量，真实App看效果，CLI prepare/dev实现见下文；旧平台命令已移除。使用者编写载荷并处理应用控件、重渲染覆盖和再次注入；本页的remove及清理回调是既有辅助接口，不是任意JS撤销或一键回滚承诺。
 
 ## 环境与构建
 
@@ -51,3 +51,28 @@ CSS/HTML以JSON数据嵌入共享程序，任意引号不应改变生成程序�
 ## 可选Mac后端
 
 默认CDP命令保持兼容。新增后端、会话准备和锁定依赖见[Frida](frida-backends.md)；WKWebView执行与边界见[WebKit](webkit-backend.md)。构建产物可以离开源目录，第一方helper已嵌入Rust可执行文件；外部可选依赖与缓存仍须准备。开发工作树可通过CARGO_TARGET_DIR选择独立编译缓存，避免不同窗口覆盖同一个开发可执行文件。
+
+## pre-runtime CLI dev
+
+先运行make setup-preparation安装锁定工具到仓库外缓存，然后使用构建的injectra：
+
+```sh
+injectra prepare --app "$APP" --output "$DERIVED_DIR" --data-mode isolated
+injectra dev --artifact "$ARTIFACT_JSON" --bundle "$MANIFEST"
+# 有多个页面时交互选择，或显式指定该开发实例的网页ID：
+injectra dev --artifact "$ARTIFACT_JSON" --bundle "$MANIFEST" --target "$PAGE_ID"
+```
+
+prepare输出artifact_file；将其作为ARTIFACT_JSON。APP为原应用路径，DERIVED_DIR为仓库外新副本父目录；manifest沿用v1格式，用户用现有编辑器修改声明的文件。shared需要用户明确接受该应用共享数据；isolated不是账号安全沙箱承诺，沙箱宿主无法建立条件时拒绝。首版不支持用户startup.cjs。
+
+dev为前台命令，stdout为JSONL事件：dev-ready、目标列表/选择、execution、source-error和可关联log；stderr仍以injectra前缀报告最终失败。execution包含request_id、version、target、files、certainty、result/error与可确定的JS位置。窗口效果直接在App查看。
+
+页面重建/关闭后重新运行dev；已运行的精确派生实例会复用，不自动退出原实例。Ctrl-C停止监听但不退出App、不撤销代码。文件改变不会重新准备应用包。端口在prepare时选择并保存，冲突明确失败，不自动修改已签名配置。
+
+Unknown或上次异常退出遗留pending时，先核对App实际效果；明确接受新一次执行后使用：
+
+```sh
+injectra dev --artifact "$ARTIFACT_JSON" --bundle "$MANIFEST" --acknowledge-unknown "$REQUEST_ID"
+```
+
+这会开始新请求，不是重放旧请求。准备记录、配对密钥、最新回执、锁和进程日志在仓库外派生目录；不要将pairing.json或带密钥的包内config.json发布。make test-preparation运行自有目录/ASAR Electron验收，不触碰安装应用。

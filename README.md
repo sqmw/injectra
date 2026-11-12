@@ -1,8 +1,8 @@
 # Injectra
 
-面向桌面 Web UI 的**通用代码注入工具／核心**：向明确目标加载用户增量JS/HTML/CSS。已有runtime后端及pre-runtime实验；当前方向是[通用注入核心与轻量dev模式](docs/architecture/dev-mode.md)，通用dev尚未整体验收。
+面向桌面 Web UI 的**通用代码注入 CLI**：runtime连接已运行App执行JS/HTML/CSS；pre-runtime先准备少量dev引导，再使用现有编辑器修改外部增量，在真实App查看更新。
 
-dev目标：首次准备小型入口，现有编辑器改外置增量，真实App看更新；初始化修改可重载/重启，普通修改不反复打包。**不开发工作台、内置编辑器或完整工作区系统。** 既有相关代码仅为旧方案留存实现，不是当前交付要求。
+独立`prepare/dev`已实现；目录/ASAR Electron夹具及Claude本地壳页面通过当前验收，QQ当前主入口明确Unsupported，详见[范围与证据](docs/validation/cli-dev.md)。工作台、Studio和完整workspace已选择性删除；原生独立边界及历史代码/实验保留。
 
 长期架构已建立执行域隔离：通用核心、Web／原生契约、可复用应用用例及平台／宿主职责分离。原生内存读写执行域仍仅有契约测试；已实现的Frida桥接用于Web页面执行，不等同于交付通用进程内存接口，见[架构](docs/architecture/boundaries.md)。
 
@@ -14,7 +14,7 @@ dev目标：首次准备小型入口，现有编辑器改外置增量，真实Ap
 
 ## 快速入口
 
-工具版本由 [mise.toml](mise.toml) 声明：Rust 1.93.0、Node 24.6.0。已有匹配工具可直接使用；Node 只用于开发验证，编译后的 CLI 不依赖 Node。Rust 与测试依赖分别由 Cargo.lock、tests/package-lock.json 锁定。
+工具版本由 [mise.toml](mise.toml) 声明：Rust 1.93.0、Node 24.6.0。已有匹配工具可直接使用；Node用于开发验证和可选pre-runtime准备工具；编译后的runtime命令不依赖Node。Rust、测试与准备工具分别通过Cargo.lock及各package-lock.json锁定。
 
 ```sh
 make build
@@ -30,6 +30,8 @@ make run ARGS="remove --port 9222 --target TARGET_ID --id injectra.accent"
 ```
 
 插件效果由插件库中的实现决定；再次 apply 替换同 ID 的已有内容；remove 删除拥有的节点并执行脚本登记的清理回调。CLI 成功输出 JSON，失败退出码为 1，参数错误为 2。
+
+pre-runtime使用：先`make setup-preparation`，然后运行`injectra prepare --app "$APP" --output "$DERIVED_DIR" --data-mode isolated`；将输出artifact_file传给`injectra dev --artifact "$ARTIFACT_JSON" --bundle "$BUNDLE_MANIFEST"`。详细参数、共享数据和未知结果处理见[CLI说明](docs/dev.md)。
 
 ## 验证与源码导航
 

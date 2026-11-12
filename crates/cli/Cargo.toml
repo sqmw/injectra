@@ -21,3 +21,10 @@ clap = { version = "4.6", features = ["derive"] }
 
 injectra-electron-gadget.workspace = true
 injectra-webkit.workspace = true
+
+injectra-bootstrap.workspace = true
+injectra-preparation.workspace = true
+tokio = { version = "1", features = ["rt-multi-thread", "net", "signal", "sync", "time"] }
+axum = "0.8"
+fs2 = "0.4"
+libc = "0.2"

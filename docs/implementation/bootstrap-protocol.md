@@ -1,6 +1,6 @@
 # Bootstrap bridge contract
 
-> 状态校准（2026-11-12）：此页记录T-040@v1的Bootstrap通信实现，不是当前交付要求。用户已将目标收敛到[通用注入核心与dev模式](../architecture/dev-mode.md)。 其中通道/身份/逐目标确认可作为复用候选；当前与Studio的装配事实不等于v2已完成解耦或通用实机验收。 本页技术事实保留，不据此继续旧范围开发。
+> 状态校准（2026-11-12）：此页记录T-040@v1的Bootstrap通信实现，不是当前交付要求。用户已将目标收敛到[通用注入核心与dev模式](../architecture/dev-mode.md)。 其中通道/身份/逐目标确认可作为复用候选；当前已解除Studio依赖并装配为CLI dev；下文旧版workspace/startup/export叙述已由当前dev文档替代。 本页技术事实保留，不据此继续旧范围开发。
 
 
 Part of [T-040 platform implementation](platform-v1.md). This module is not an application-brand adapter and does not certify arbitrary apps.
@@ -20,3 +20,5 @@ Tests: `cargo test -p injectra-bootstrap`; real owned Electron validation is per
 Protocol review: public target IDs use independent public connection IDs, never session bearer tokens. The agent installs a per-document nonce and checks it atomically in the same evaluation as the generated expression; workspace-generated expression programs retain their original line numbers (the guard adds no preceding newline). Direct statement source must first be compiled by the workspace/program layer, as with the existing Gadget expression convention. Own logs carry request/revision/original-document metadata and a separate user source URL; the broker validates these against dispatched request history, retaining old-document attribution for late logs. Dispatched Unknown or Executed failure clears prior applied revision; NotExecuted preserves it.
 
 Run the document-guard/source-line regression with `node --test crates/bootstrap/tests/evaluation.test.cjs` in addition to Rust tests.
+
+当前CLI合同：[dev模式](../architecture/dev-mode.md)。引导只做页面发现/执行/回执，无startup/export和workspace读取；application生成带内容版本的程序，CLI通过for_submission绑定请求。

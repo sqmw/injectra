@@ -38,7 +38,7 @@
   "scope": "删除工作台、Studio、完整workspace及启动增量/导出；提取Bootstrap、最小来源及执行正确性；精简准备器，只改派生副本，保留历史和运行数据。",
   "steps": [],
   "evidence": [
-    "删除前main及4个platform工作树源码快照、HEAD、patch保存在仓库外recovery/t040-cli-20261112；不改其他工作树。已移除平台模块，提取application dev输入版本及Bootstrap请求绑定；cargo check通过。"
+    "删除前main及4个platform工作树源码快照、HEAD、patch保存在仓库外recovery/t040-cli-20261112；不改其他工作树。已移除平台模块，提取application dev输入版本及Bootstrap请求绑定；cargo check通过。独立prepare/dev与最小未决记录已实现，make check、独立Electron、38项Frida测试、目录/ASAR两类dev夹具及Claude本地壳实机通过；QQ当前CJS入口Unsupported如实保留。"
   ],
   "stop_reason": ""
 }

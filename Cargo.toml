@@ -1,5 +1,5 @@
 [workspace]
-members = ["crates/core", "crates/web", "crates/application", "crates/native", "crates/hosts", "crates/cdp", "crates/platform-macos", "crates/cli", "crates/frida", "crates/electron-gadget", "crates/webkit", "crates/bootstrap"]
+members = ["crates/core", "crates/web", "crates/application", "crates/native", "crates/hosts", "crates/cdp", "crates/platform-macos", "crates/cli", "crates/frida", "crates/electron-gadget", "crates/webkit", "crates/bootstrap", "crates/preparation"]
 resolver = "3"
 
 [workspace.package]
@@ -25,3 +25,5 @@ injectra-electron-gadget = { path = "crates/electron-gadget" }
 injectra-webkit = { path = "crates/webkit" }
 
 injectra-bootstrap = { path = "crates/bootstrap" }
+
+injectra-preparation = { path = "crates/preparation" }

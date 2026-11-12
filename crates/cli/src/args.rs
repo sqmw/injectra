@@ -3,7 +3,7 @@ use std::path::PathBuf;
 #[derive(Parser)]
 #[command(
     version,
-    about = "Injectra: runtime Web code injection into accessible pages"
+    about = "Injectra: runtime Web injection and pre-runtime CLI dev"
 )]
 pub struct Args {
     #[command(subcommand)]
@@ -37,6 +37,27 @@ pub struct Endpoint {
 }
 #[derive(Subcommand)]
 pub enum Command {
+    /// Prepare a derived Electron app with a small dev entry.
+    Prepare {
+        #[arg(long)]
+        app: PathBuf,
+        #[arg(long)]
+        output: PathBuf,
+        #[arg(long,value_parser=["shared","isolated"])]
+        data_mode: String,
+    },
+    /// Watch external page increments and apply them in the real development app.
+    Dev {
+        #[arg(long)]
+        artifact: PathBuf,
+        #[arg(long)]
+        bundle: PathBuf,
+        #[arg(long)]
+        target: Option<String>,
+        /// Explicitly allow a new attempt after this unresolved request.
+        #[arg(long)]
+        acknowledge_unknown: Option<String>,
+    },
     /// Discover main pages using the explicitly selected backend.
     Targets {
         #[command(flatten)]

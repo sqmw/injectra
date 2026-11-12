@@ -2,7 +2,7 @@
 
 ## 产品与长期边界
 
-本页维护注入核心与执行域契约，产品责任见[需求](../requirements.md)。长期执行域边界已经按[D-004](../DECISIONS.md#d-004)建立，不把页面JS假设写入通用核心。产品native crate只有契约及测试内缓冲区；[references](../../references/README.md)中的真实应用参考脚本不构成产品后端。T-040已按用户澄清升为v2，当前方向为[通用注入核心与dev模式](dev-mode.md)，使用现有编辑器、真实App反馈；通用能力尚未验收。工作台、内置编辑器、完整工作区、管理平台、Agent和自动恢复不在范围内。
+本页维护注入核心与执行域契约，产品责任见[需求](../requirements.md)。长期执行域边界已经按[D-004](../DECISIONS.md#d-004)建立，不把页面JS假设写入通用核心。产品native crate只有契约及测试内缓冲区；[references](../../references/README.md)中的真实应用参考脚本不构成产品后端。T-040已按用户批准计划升为v3，当前方向为[通用注入核心与dev模式](dev-mode.md)，使用现有编辑器、真实App反馈；当前验收范围见[CLI dev](../validation/cli-dev.md)。工作台、内置编辑器、完整工作区、管理平台、Agent和自动恢复不在范围内。
 
 ## 模块与依赖
 
@@ -143,6 +143,6 @@ WKWebView适配器仅依赖core/web/frida，与Electron Gadget并列；不将Obj
 
 T-019在frida内部区分控制端运行环境、目标device/process身份与连接器；页面ID携带设备/进程作用域，目标路径与进程世代由provider解释。当前只实现Mac本机provider；未知或手机设备不回退本机核验。core/Web公开契约不变，见[控制端/设备边界](device-boundaries.md)。
 
-## v1留存实现与v2装配边界
+## CLI与dev装配
 
-workspace、Bootstrap、Studio服务/前端代码仍存在；模块合同只描述现有代码。v2不以Studio或完整workspace系统为依赖前提，通道/目标确认/必要来源能力是否提取由后续实现决定，文档校准不冒充代码已经解耦。旧方案见[历史入口](../implementation/platform-v1.md)。
+Studio、前端和完整workspace已删除。CLI分别装配现有runtime与prepare/dev；application增量流程只依赖Web契约，Bootstrap和preparation是具体实现。异步限连接I/O，core/native不引入Web或准备工具依赖。[流程与迁移](dev-mode.md)。

@@ -115,3 +115,9 @@ prepare-resource-app:
 test-resource-app:
 	node scripts/resource-patch-smoke.mjs --run $(ARGS)
 
+.PHONY: setup-preparation test-preparation
+setup-preparation:
+	node scripts/setup-preparation-tools.mjs
+
+test-preparation: build
+	node scripts/preparation-smoke.mjs

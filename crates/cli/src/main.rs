@@ -1,5 +1,6 @@
 mod args;
 mod backend;
+mod dev;
 use args::{Args, Command};
 use clap::Parser;
 use injectra_core::{Result, TargetRef};
@@ -7,6 +8,36 @@ use serde_json::{Value, json};
 
 fn run(args: Args) -> Result<Value> {
     match args.command {
+        Command::Prepare {
+            app,
+            output,
+            data_mode,
+        } => {
+            let data_mode = if data_mode == "shared" {
+                injectra_preparation::DataMode::Shared
+            } else {
+                injectra_preparation::DataMode::Isolated
+            };
+            Ok(serde_json::to_value(injectra_preparation::prepare(
+                &injectra_preparation::PrepareRequest {
+                    source_app: app,
+                    output_root: output,
+                    data_mode,
+                },
+            )?)
+            .expect("artifact serializes"))
+        }
+        Command::Dev {
+            artifact,
+            bundle,
+            target,
+            acknowledge_unknown,
+        } => dev::run(
+            &artifact,
+            &bundle,
+            target.as_deref(),
+            acknowledge_unknown.as_deref(),
+        ),
         Command::Targets { endpoint } => {
             let backend = backend::create(endpoint)?;
             let targets = injectra_application::targets(backend.as_ref())?;

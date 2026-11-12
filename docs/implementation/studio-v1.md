@@ -1,6 +1,6 @@
 # Studio local service contract
 
-> 状态校准（2026-11-12）：此页记录T-040@v1的Studio服务与工作流，不是当前交付要求。用户已将目标收敛到[通用注入核心与dev模式](../architecture/dev-mode.md)。 工作台与完整工作区不再推进；现有实现保留，尚未完成v1整体验收。 本页技术事实保留，不据此继续旧范围开发。
+> 状态校准（2026-11-12）：此页记录T-040@v1的Studio服务与工作流，不是当前交付要求。用户已将目标收敛到[通用注入核心与dev模式](../architecture/dev-mode.md)。 工作台与完整工作区不再推进；v1整体验收未完成；用户后续批准删减，平台模块已从当前产品删除，历史源码由Git/恢复快照保留。 本页技术事实保留，不据此继续旧范围开发。
 
 
 Part of [T-040](platform-v1.md); Parent owns overall delivery and task status.

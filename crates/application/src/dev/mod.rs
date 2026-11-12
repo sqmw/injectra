@@ -9,13 +9,33 @@ pub struct Revision {
     pub hash: String,
     pub files: Value,
     pub program: String,
+    pub js_start_line: usize,
+    pub js_lines: usize,
 }
 fn content(bundle: &Bundle) -> Value {
     json!([bundle.id, bundle.js, bundle.css, bundle.html])
 }
 impl Revision {
+    pub fn source_location(&self, error: &str) -> Option<Value> {
+        for frame in error.lines().filter(|l| {
+            l.contains("injectra://request/") && l.contains(&format!("?revision={}&", self.hash))
+        }) {
+            let mut parts = frame.trim_end_matches(')').rsplitn(3, ':');
+            let column = parts.next()?.parse::<usize>().ok()?;
+            let line = parts.next()?.parse::<usize>().ok()?;
+            if line >= self.js_start_line && line < self.js_start_line + self.js_lines {
+                return Some(
+                    json!({"file":self.files["js"],"line":line-self.js_start_line+1,"column":column}),
+                );
+            }
+        }
+        None
+    }
     /// Double capture refuses edits observed during reading; callers debounce saves.
     pub fn load(manifest: &Path) -> Result<Self> {
+        if fs::metadata(manifest)?.len() > 1024 * 1024 {
+            return Err("Manifest exceeds 1 MiB".into());
+        }
         let before = fs::read(manifest)?;
         let bundle = Bundle::load(manifest)?;
         let again = Bundle::load(manifest)?;
@@ -35,7 +55,7 @@ impl Revision {
         let mut program = injectra_web::apply(&bundle)?;
         // The shared generator places user JS immediately after the last wrapper prefix.
         let prefix = program
-            .rfind("async (context) => {\n")
+            .find("async (context) => {\n")
             .ok_or("Missing shared runtime source boundary")?;
         let line = program[..prefix].bytes().filter(|b| *b == b'\n').count() + 2;
         program.push_str(&format!(
@@ -45,6 +65,8 @@ impl Revision {
             hash,
             files,
             program,
+            js_start_line: line,
+            js_lines: bundle.js.lines().count(),
         })
     }
 }

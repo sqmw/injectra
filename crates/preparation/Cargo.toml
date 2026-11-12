@@ -1,0 +1,13 @@
+[package]
+name = "injectra-preparation"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish = false
+[dependencies]
+injectra-core.workspace = true
+injectra-bootstrap.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+sha2 = "0.10"
+uuid = { version = "1", features = ["v4"] }

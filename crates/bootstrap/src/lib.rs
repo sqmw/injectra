@@ -23,6 +23,7 @@ pub struct BootstrapBackend {
     id: BackendId,
     broker: Arc<Broker>,
     timeout: Duration,
+    submission: Option<(String, String)>,
 }
 impl BootstrapBackend {
     pub fn new(broker: Arc<Broker>) -> Self {
@@ -30,6 +31,16 @@ impl BootstrapBackend {
             id: BackendId::fresh(),
             broker,
             timeout: Duration::from_secs(15),
+            submission: None,
+        }
+    }
+    /// Attach request provenance without changing the backend/target identity.
+    pub fn for_submission(&self, request: &str, revision: &str) -> Self {
+        Self {
+            id: self.id.clone(),
+            broker: self.broker.clone(),
+            timeout: self.timeout,
+            submission: Some((request.into(), revision.into())),
         }
     }
     pub fn with_timeout(mut self, timeout: Duration) -> Self {
@@ -83,6 +94,7 @@ impl WebBackend for BootstrapBackend {
             target: target.clone(),
             broker: self.broker.clone(),
             timeout: self.timeout,
+            submission: self.submission.clone(),
         }))
     }
 }
@@ -90,6 +102,7 @@ struct Session {
     target: TargetRef,
     broker: Arc<Broker>,
     timeout: Duration,
+    submission: Option<(String, String)>,
 }
 impl WebSession for Session {
     fn target(&self) -> &TargetRef {
@@ -99,7 +112,17 @@ impl WebSession for Session {
         CAPABILITIES
     }
     fn evaluate_page(&mut self, source: &str) -> Result<Value> {
-        self.broker
-            .submit(self.target.key(), "adhoc", source, self.timeout)
+        match &self.submission {
+            Some((request, revision)) => self.broker.submit_with_request_id(
+                self.target.key(),
+                revision,
+                source,
+                request,
+                self.timeout,
+            ),
+            None => self
+                .broker
+                .submit(self.target.key(), "adhoc", source, self.timeout),
+        }
     }
 }

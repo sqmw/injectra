@@ -64,6 +64,8 @@ QQ外部主题预览：[开发加载器](../../scripts/qq-theme-preview.mjs)复�
 | 能力 | 当前入口 |
 | --- | --- |
 | 页面增量版本与执行 | [application dev](../../crates/application/src/dev/mod.rs)，复用Web契约与共享runtime |
+| 通用准备 | [preparation](../../crates/preparation/src/lib.rs)、[平台helper](../../crates/preparation/helper/platform.py)，probe/plan/prepare与派生实例启动；[验收](../validation/cli-dev.md) |
+| CLI dev装配 | [dev](../../crates/cli/src/dev.rs)、[最小未决记录](../../crates/cli/src/dev/journal.rs)；[夹具](../../scripts/preparation-smoke.mjs) |
 | App引导与认证通信 | [Bootstrap](../../crates/bootstrap/src/lib.rs)，没有浏览器工作台API |
 
 当前范围见[dev模式](dev-mode.md)，旧方案见[历史入口](../implementation/platform-v1.md)。

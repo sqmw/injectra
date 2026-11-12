@@ -322,3 +322,32 @@ D-006参考归档边界补充：接入、桥接与验证工具可以保留，可
 ```
 
 [当前边界](architecture/dev-mode.md) · [T-040旧版记录](archive/T-040.md#t-040)。补充既有长期边界，不改写D-003/D-004/D-010及已取得的实测/tag证据。
+
+<a id="d-013"></a>
+## D-013 · CLI收敛与平台化代码删减
+
+```tracking-decision
+{
+  "id": "D-013",
+  "date": "2026-11-12",
+  "status": "accepted",
+  "conclusion": "仅提供CLI，runtime与pre-runtime分路；选择性删除Studio/前端/完整workspace，保留通用准备器、Bootstrap和最小增量来源/执行正确性。页面保存直接应用，暂不做用户startup、导出、自动重启。",
+  "trigger": "用户明确批准Injectra CLI路线收敛与平台化代码删减计划。",
+  "context": "T-040 v3接续v1退役与v2文档范围；4cf736e为对照，不整段git revert。",
+  "affects": [
+    "CLI",
+    "准备器和Bootstrap",
+    "平台模块删除",
+    "构建与验证"
+  ],
+  "alternatives": [
+    "恢复工作台：用户明确排除",
+    "整段回退：会丢失有效通道及正确性改进",
+    "只改文档：达不到获批闭环"
+  ],
+  "commit": "本条所在提交",
+  "supersedes": []
+}
+```
+
+补充D-012；其文档阶段事实保留，本轮按后续明确授权删除代码。[当前范围](architecture/dev-mode.md)。
