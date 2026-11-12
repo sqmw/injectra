@@ -31,3 +31,7 @@ Electron组优先统一实际资源根、主模块加载方式、缓存/完整�
 ## v2 复验工具边界
 
 E-002按Windows实际入口复验。实验副本复制器新增[包内链接复制](../../tests/windows/copy-tree.mjs)：先验证链接最终目标位于源包内且属于复制范围，再重建指向派生副本的链接；外部目标、循环与既有目的目录明确拒绝。不得保留回指原安装的Junction。`make test-windows-format`覆盖链接隔离、外部拒绝、PE摘要和ASAR保留；格式测试不代表Cocos等实机通过。
+
+CEF启动实验：[启动器](../../tests/windows/cef-spawn.py)、[初始化探针](../../tests/windows/cef-init.js)。仅在明确的CEF 86/91/107版本、目标架构及完整settings尺寸同时匹配时，替换本次cef_initialize参数为临时副本并设置调试端口，不修改原settings、安装文件或沙箱选项；未知版本/尺寸拒绝。布局依据CEF官方分支[4240](https://github.com/chromiumembedded/cef/blob/4240/include/internal/cef_types.h)、[4472](https://github.com/chromiumembedded/cef/blob/4472/include/internal/cef_types.h)、[5304](https://github.com/chromiumembedded/cef/blob/5304/include/internal/cef_types.h)。这是实机入口探索工具，不是正式后端或页面成功证明。
+
+包内Junction先读取显式目标再规范化，规避Windows libuv对尾部分隔符Junction的UNKNOWN；目标仍须canonical化且限制在源包。实验prepare-copy的`--exclude <相对路径>`仅配置明确的运行数据/锁目录，并写入proof清单，不能排除应用package；不因EBUSY静默跳过未知文件。

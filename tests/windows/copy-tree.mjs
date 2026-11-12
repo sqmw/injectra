@@ -19,7 +19,10 @@ export async function copyTree(source, destination, include = () => true) {
       if (!include(item)) continue;
       const stat = await fs.lstat(item);
       if (stat.isSymbolicLink()) {
-        const target = await fs.realpath(item);
+        // Some installed Windows junctions carry a trailing separator that
+        // libuv cannot stat through. Canonicalize their explicit target instead.
+        const raw = await fs.readlink(item);
+        const target = await fs.realpath(path.resolve(path.dirname(item), raw));
         if (!inside(source, target) || !include(target)) throw Error('Unsupported: link leaves copied package');
         const directory = (await fs.stat(target)).isDirectory();
         if (inside(target, path.dirname(item))) throw Error('Unsupported: cyclic directory link');

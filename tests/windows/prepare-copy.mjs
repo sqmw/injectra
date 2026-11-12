@@ -10,7 +10,7 @@ import {inspectMain,delegateSource} from '../../crates/preparation/helper/entry.
 import {appendRewrite} from './append-asar.mjs';
 import {updateIntegrity} from './pe-integrity.mjs';
 import {copyTree} from './copy-tree.mjs';
-const {values}=parseArgs({options:{exe:{type:'string'},output:{type:'string'},config:{type:'string'},package:{type:'string'},strategy:{type:'string'}}});
+const {values}=parseArgs({options:{exe:{type:'string'},output:{type:'string'},config:{type:'string'},package:{type:'string'},strategy:{type:'string'},exclude:{type:'string',multiple:true,default:[]}}});
 if(process.platform!=='win32')throw Error('Windows proof only');
 const tools=createRequire(path.join(process.env.INJECTRA_WIN_TEST_TOOLS,'package.json'));
 const pickle=tools('chromium-pickle-js'),asar=tools('@electron/asar'),acorn=tools('acorn'),pe=await import(pathToFileURL(tools.resolve('resedit')).href);
@@ -25,10 +25,18 @@ const packageBytes=layout==='asar'?asar.extractFile(base,'package.json'):fs.read
 if(layout==='asar'?!!asar.getRawHeader(base).header.files?.['.injectra']:fs.existsSync(path.join(base,'.injectra')))throw Error('Reserved namespace exists');
 const pkg=JSON.parse(packageBytes.toString('utf8').replace(/^\uFEFF/,''));if(pkg.main!==undefined&&typeof pkg.main!=='string')throw Error('Unsupported: non-string main');pkg.main=pkg.main?.replaceAll('\\','/');const entry=inspectMain(base,layout,pkg,{asar,acorn});if(values.strategy){if(!['cjs-insert','main-delegate'].includes(values.strategy))throw Error('Unknown entry strategy');if(values.strategy==='cjs-insert'&&entry.sourceText===undefined)throw Error('Unsupported: opaque source cannot use insertion');entry.strategy=values.strategy;}
 const sourceHash={exe:hash(fs.readFileSync(sourceExe)),package:hash(packageBytes)};
+const excluded=values.exclude.map(value=>{
+ const relative=value.replaceAll('\\','/');
+ if(!relative||path.posix.isAbsolute(relative)||relative.includes(':')||relative.split('/').some(p=>p==='..'||p==='.'||p===''))throw Error('Unsafe copy exclusion');
+ if(packageRelative===relative||packageRelative.startsWith(relative+'/'))throw Error('Cannot exclude application package');
+ return relative;
+});
 if(layout==='asar')sourceHash.archive=hash(fs.readFileSync(base));
 else if(entry.archive)sourceHash.archive=hash(fs.readFileSync(entry.archive));
 const copiedLinks=await copyTree(source,destination,input=>{
  const relative=path.relative(source,input),top=relative.split(path.sep)[0];
+ const portable=relative.split(path.sep).join('/');
+ if(excluded.some(p=>portable===p||portable.startsWith(p+'/')))return false;
  if(['Files','User Data','userdata','Crashpad','Cache','logs'].includes(top)&&!packageRelative.startsWith(top+'/'))return false;
  if(relative.endsWith('.log'))return false;
  return true;
@@ -63,5 +71,5 @@ if(hash(fs.readFileSync(sourceExe))!==sourceHash.exe)throw Error('Original execu
 const recheck=layout==='asar'?asar.extractFile(base,'package.json'):fs.readFileSync(path.join(base,'package.json'));
 if(hash(recheck)!==sourceHash.package)throw Error('Original package changed');
 const originalArchive=layout==='asar'?base:entry.archive;if(originalArchive&&hash(fs.readFileSync(originalArchive))!==sourceHash.archive)throw Error('Original archive baseline changed');
-const result={source,app:destination,exe:path.join(destination,path.basename(sourceExe)),package:packageRelative,originalMain:entry.main,sourceHash,strategy:entry.strategy,nativeChanges,copiedLinks,productBackend:false};
+const result={source,app:destination,exe:path.join(destination,path.basename(sourceExe)),package:packageRelative,originalMain:entry.main,sourceHash,strategy:entry.strategy,nativeChanges,copiedLinks,excluded,productBackend:false};
 await fsp.writeFile(destination+'.proof.json',JSON.stringify(result,null,2));console.log(JSON.stringify(result));

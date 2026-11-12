@@ -125,4 +125,4 @@ test-preparation: build
 
 .PHONY: test-windows-format
 test-windows-format:
-	node --test tests/windows/pe-integrity.test.mjs tests/windows/append-asar.test.mjs tests/windows/copy-tree.test.mjs
+	node --test tests/windows/pe-integrity.test.mjs tests/windows/append-asar.test.mjs tests/windows/copy-tree.test.mjs tests/windows/cef-init.test.mjs
