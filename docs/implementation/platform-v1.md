@@ -13,6 +13,8 @@
 - 前端：studio-ui，TypeScript/CodeMirror6/esbuild，依赖锁定并在缓存安装。真实App呈现效果；界面只显示文件/来源/目标/执行/日志。默认显式运行。
 - Parent：Axum本地服务、CLI装配、跨后端调用、完整回归与实机；core/native不得被Web假设污染。
 
+前端实现与产物集成见[Studio UI说明](studio-ui.md)。
+
 ## 接口对齐
 
 前端调用 /api/state、/api/files?path=、PUT /api/files（path/content）、POST /api/run（target/revision）、POST /api/connect（backend/port/session）、POST /api/prepare（app/data_mode）、POST /api/dev、POST /api/reload、POST /api/restart、POST /api/export。/api/events提供WebSocket事件。HTTP统一返回JSON；失败含error/message/certainty，暂不支持操作返回明确错误，不能假成功。
