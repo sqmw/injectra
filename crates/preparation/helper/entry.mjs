@@ -6,15 +6,15 @@ export function inspectMain(base,layout,pkg,{asar,acorn}) {
  const safe=p=>p&&!path.posix.isAbsolute(p)&&!p.includes('\\')&&!p.includes('\0')&&path.posix.normalize(p)===p&&!p.startsWith('../');
  if(!safe(main))throw Error('Unsupported: main escapes package');
  const read=file=>{
-  if(layout==='asar')return {bytes:asar.extractFile(base,file)};
+  if(layout==='asar')return {bytes:asar.extractFile(base,path.normalize(file))};
   const parts=file.split('/');
   for(let i=0;i<parts.length-1;i++) {
    const archive=path.join(base,...parts.slice(0,i+1));
    if(parts[i].endsWith('.asar')&&fs.existsSync(archive)&&fs.statSync(archive).isFile()) {
     const real=fs.realpathSync(archive);if(!real.startsWith(fs.realpathSync(base)+path.sep))throw Error('Unsupported: nested archive leaves package');
-    const inside=parts.slice(i+1).join('/');const node=asar.statFile(real,inside,false);
+    const inside=parts.slice(i+1).join('/');const node=asar.statFile(real,path.normalize(inside),false);
     if(!node||node.files||node.link||node.size>16*1024*1024)throw Error('Unsupported: invalid nested main');
-    return {bytes:asar.extractFile(real,inside),archive:real};
+    return {bytes:asar.extractFile(real,path.normalize(inside)),archive:real};
    }
   }
   const real=fs.realpathSync(path.join(base,file));if(!real.startsWith(fs.realpathSync(base)+path.sep))throw Error('Unsupported: entry resolves outside package');

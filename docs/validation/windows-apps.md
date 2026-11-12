@@ -94,3 +94,5 @@ plan为显式外部JSON数组（name/exe/version/可选args），不在产品核
 截至跨日继续，Windows原生CLI已有21款以上页面正向证据；腾讯视频通过子进程WebView2/Qt回环环境候选也取得页面合同，不能用Mac原CEF失败覆盖Windows新成功。Frida探针的aDrive13/13、Douyin6/6及字节恢复均通过，但目标是指定启动/宿主进程，不宣称相应网页已注入。Firefox的启动器子进程校验调整后仍需复跑。
 
 本检查点review：Parent检查回环地址、源文件保留、hash基线、PE记录匹配及协议/Hook非页面结果的隔离。共享ASAR代码提取后make check和Mac目录/ASAR/嵌套三类回归通过；PE32/PE64序列化与错基线拒绝通过。Windows副本工具仍是实验，需实机确认后才能计入兼容性。
+
+Windows探测还发现@electron/asar 3.4.1的嵌套入口API需要原生路径分隔符；已在共享入口/归档层归一化并增加多层目录用例，避免把真实存在的.vite/build入口误报为缺失。Mac四项入口合同与make check通过，Windows复验继续。

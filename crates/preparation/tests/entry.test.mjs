@@ -34,3 +34,10 @@ test('plain CJS retains directive insertion; ESM and path escapes remain rejecte
  assert.throws(()=>inspectMain(base,'directory',{main:'../main.js'},{asar,acorn}),/escapes/);
  assert.equal(await readFile(resolve(base,'main.js'),'utf8'),"'use strict';\nmodule.exports=1;");
 });
+
+test('multi-level ASAR entries use native API separators on every host',async()=>{
+ const base=await root(),content=resolve(base,'content');await mkdir(resolve(content,'.vite/build'),{recursive:true});
+ await writeFile(resolve(content,'.vite/build/index.js'),"'use strict';module.exports=1;");await writeFile(resolve(content,'package.json'),JSON.stringify({main:'.vite/build/index.js'}));
+ const archive=resolve(base,'app.asar');await asar.createPackage(content,archive);
+ const entry=inspectMain(archive,'asar',{main:'.vite/build/index.js'},{asar,acorn});assert.equal(entry.strategy,'cjs-insert');assert.equal(entry.main,'.vite/build/index.js');
+});
