@@ -6,7 +6,7 @@ Inventory/paths, remote endpoint and output roots are explicit inputs, not adapt
 from types import SimpleNamespace
 import argparse, base64, gzip, json, re, os, pathlib, socket, subprocess, time, urllib.request, uuid
 
-from windows_remote import run_powershell, quoted
+from windows_remote import run_powershell, powershell_command, quoted
 
 def main():
     parser=argparse.ArgumentParser(__doc__)
@@ -50,9 +50,9 @@ def main():
                     "$stamp=0;try{$stamp=$p.StartTime.ToUniversalTime().Ticks}catch{};[IO.File]::WriteAllText("+quoted(out)+",(@{pid=$p.Id;started=$stamp;exe="+quoted(spec['exe'])+";profile="+quoted(profile)+"}|ConvertTo-Json -Compress));"+
                     "for($i=0;$i -lt 180;$i++){if(Test-Path "+quoted(root+'\\stop')+"){break};Start-Sleep -Seconds 1};$p.Refresh();$closed=$false;if(!$p.HasExited){$closed=$p.CloseMainWindow()};[IO.File]::WriteAllText("+quoted(root+'\\cleanup.json')+",(@{closed_requested=$closed}|ConvertTo-Json -Compress))")
             launch="try{"+launch+"}catch{[IO.File]::WriteAllText("+quoted(root+'\\launch-error.txt')+",[string]$_.Exception.Message)}"
-            encoded=base64.b64encode(launch.encode('utf-16le')).decode()
-            create=("New-Item -ItemType Directory -Force "+quoted(root)+"|Out-Null;"+
-                    "$a=New-ScheduledTaskAction -Execute 'powershell.exe' -Argument '-NoProfile -EncodedCommand "+encoded+"';"+
+            encoded='-NoProfile -NonInteractive -EncodedCommand '+base64.b64encode(('Invoke-Expression ([IO.File]::ReadAllText('+quoted(root+'\\launch-code.txt')+'))').encode('utf-16le')).decode()
+            create=("New-Item -ItemType Directory -Force "+quoted(root)+"|Out-Null;[IO.File]::WriteAllText("+quoted(root+'\\launch-code.txt')+","+quoted(launch)+");"+
+                    "$a=New-ScheduledTaskAction -Execute 'powershell.exe' -Argument '"+encoded+"';"+
                     "$p=New-ScheduledTaskPrincipal -UserId ([Security.Principal.WindowsIdentity]::GetCurrent().Name) -LogonType Interactive -RunLevel Limited;"+
                     "Register-ScheduledTask -TaskName "+quoted(task)+" -Action $a -Principal $p -Force|Out-Null;Start-ScheduledTask -TaskName "+quoted(task)+";"+
                     "for($i=0;$i -lt 60;$i++){if((Test-Path "+quoted(out)+") -or (Test-Path "+quoted(root+'\\launch-error.txt')+")){break};Start-Sleep -Milliseconds 250};"+
@@ -75,11 +75,12 @@ def main():
                     if pages and time.monotonic()-stable_since>=1 and time.monotonic()-start>=3:ready=True;break
                 except Exception:pass
                 time.sleep(.5)
-            report['pages']=[{k:p.get(k) for k in ['id','type','title','url']} for p in pages]
+            if protocol=='cdp':report['pages']=[{k:p.get(k) for k in ['id','type','title','url']} for p in pages]
+            else:report['probe_kind']=protocol
             if not pages:report['status']='no-cdp-page'
             elif not ready:report['status']='page-not-stable'
             else:
-                page=next((p for p in pages if p.get('url','').startswith(('file:','app:','chrome:','edge:'))),pages[0]);report['selected']=page['id']
+                page=next((p for p in pages if spec.get('target_url') and p.get('url')==spec['target_url']),None) or next((p for p in pages if p.get('url','').startswith(('file:','app:','chrome:','edge:'))),pages[0]);report['selected']=page['id']
                 verify_args=['scripts/verify-live.mjs','--no-screenshot','--port',str(port),'--target',page['id']]+(['--dom'] if args.dom else [])
                 if protocol!='cdp':
                     verify_args=['scripts/windows-gecko-verify.mjs','--port',str(port),'--protocol',protocol,'--owner',out]

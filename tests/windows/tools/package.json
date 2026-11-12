@@ -1,0 +1,1 @@
+{"name":"injectra-windows-validation-tools","version":"1.0.0","private":true,"dependencies":{"@electron/asar":"3.4.1","acorn":"8.15.0","resedit":"3.1.0"}}

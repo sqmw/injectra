@@ -58,6 +58,7 @@ pub(crate) fn helper() -> Result<PathBuf> {
     let sources = [
         ("prepare.mjs", include_str!("../helper/prepare.mjs")),
         ("entry.mjs", include_str!("../helper/entry.mjs")),
+        ("archive.mjs", include_str!("../helper/archive.mjs")),
         ("platform.py", include_str!("../helper/platform.py")),
         ("bootstrap.cjs", injectra_bootstrap::BOOTSTRAP_SOURCE),
         ("evaluation.cjs", injectra_bootstrap::EVALUATION_SOURCE),

@@ -1,5 +1,6 @@
 // Optional native Windows Gecko verification; reuses the Mac test protocol/host contracts.
 import assert from 'node:assert/strict';
+import {execFileSync} from 'node:child_process';
 import {parseArgs} from 'node:util';
 import {readFile} from 'node:fs/promises';
 import {createServer} from 'node:http';
@@ -13,7 +14,18 @@ import {root} from './test-env.mjs';
 const {values}=parseArgs({options:{port:{type:'string'},protocol:{type:'string'},owner:{type:'string'}}});
 assert.equal(process.platform,'win32');assert(['bidi','marionette'].includes(values.protocol));
 const owner=JSON.parse(await readFile(values.owner,'utf8'));
-const verifyOwner=session=>{assert.equal(session.capabilities['moz:processID'],owner.pid);assert.equal(resolve(session.capabilities['moz:profile']).toLowerCase(),resolve(owner.profile).toLowerCase());assert.equal(session.capabilities['moz:headless'],false);};
+let verifiedOwner=false, browserPid;
+const verifyOwner=session=>{
+ assert.equal(resolve(session.capabilities['moz:profile']).toLowerCase(),resolve(owner.profile).toLowerCase());assert.equal(session.capabilities['moz:headless'],false);
+ browserPid=session.capabilities['moz:processID'];assert(Number.isInteger(browserPid)&&browserPid>0);
+ if(browserPid!==owner.pid){
+  const script=`$p=Get-CimInstance Win32_Process -Filter 'ProcessId=${browserPid}';@{parent=$p.ParentProcessId;exe=$p.ExecutablePath;command=$p.CommandLine;started=$p.CreationDate.ToUniversalTime().Ticks}|ConvertTo-Json -Compress`;
+  const metadata=JSON.parse(execFileSync('powershell.exe',['-NoProfile','-EncodedCommand',Buffer.from('[Console]::OutputEncoding=[Text.Encoding]::UTF8;'+script,'utf16le').toString('base64')],{encoding:'utf8'}));
+  assert.equal(metadata.parent,owner.pid);assert.equal(resolve(metadata.exe).toLowerCase(),resolve(owner.exe).toLowerCase());
+  assert(metadata.started>=owner.started);assert(metadata.command.includes(owner.profile.split(/[\\/]+/).at(-2)));
+ }
+ verifiedOwner=true;
+};
 const port=Number(values.port),runtime=await readFile(resolve(root,'web/runtime.js'),'utf8');
 const result={passed:false,platform:process.platform,protocol:values.protocol,productBackend:false,checks:[]};
 const check=async(name,action)=>{await action();result.checks.push(name);};
@@ -50,4 +62,4 @@ try {
  }
  await verifyRuntime({evaluate,other,runtime,id:'injectra.win.content',check});result.passed=true;
 } catch(error){result.error=String(error);process.exitCode=1;}
-finally{try{await closeContent?.();}catch(error){result.cleanupError=String(error);result.passed=false;process.exitCode=1;}client?.close();await new Promise(r=>server.close(r));console.log(JSON.stringify(result));}
+finally{try{await closeContent?.();if(verifiedOwner&&values.protocol==='bidi'){try{await client.command('browser.close');}catch{}}}catch(error){result.cleanupError=String(error);result.passed=false;process.exitCode=1;}client?.close();await new Promise(r=>server.close(r));console.log(JSON.stringify(result));}

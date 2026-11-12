@@ -82,3 +82,15 @@ plan为显式外部JSON数组（name/exe/version/可选args），不在产品核
 [Windows Gecko测试客户端](../../scripts/windows-gecko-verify.mjs)复用原BiDi、Marionette和Thunderbird宿主合同，尚待Windows实测；不注册正式CLI后端。窗口启动参数、临时user.js和子进程环境均由显式外部plan提供，不修改用户全局配置。新测试客户端在Mac完成语法及共享合同检查后经Git部署到Windows验证。
 
 2026-11-12用户补充授权：允许结束经PID、启动时间和路径核验的本轮残留测试进程，初始会话不动。已据初始running快照排除原进程，强制清理证据单独保存在force-owned-*.json；此前只请求正常退出的记录不改写。
+
+## pre-runtime实验准备（尚未等同正式Windows prepare/dev）
+
+新增[受控副本工具](../../tests/windows/prepare-copy.mjs)，按显式包路径处理目录/ASAR及版本化资源根；入口和[共享ASAR重建](../../crates/preparation/helper/archive.mjs)复用原准备器，不按软件品牌分支。[Windows PE完整性](../../tests/windows/pe-integrity.mjs)按[Electron官方格式](https://www.electronjs.org/docs/latest/tutorial/asar-integrity)更新匹配的原头摘要，不关闭fuse；变更PE资源的副本不承诺保留原Authenticode签名，原文件不修改。
+
+[PE32/PE64格式测试](../../tests/windows/pe-integrity.test.mjs)验证只更新匹配记录、错误基线不写、拒绝越界。依赖由[独立锁文件](../../tests/windows/tools/package.json)声明，安装到仓库外；既有runtime CLI不因此要求Node。[可选远程Electron合同](../../crates/bootstrap/tests/remote_live.rs)使用真实Bootstrap/WebBackend和单一Web runtime验证更新与清理，默认ignored，需要显式私有配置及回环SSH桥。
+
+以上工具先在Mac完成语法/编译/格式测试，共享ASAR提取后Mac三类Electron回归通过；Windows实机结果随后单列，不将测试源码或PE往返测试当作应用兼容证明。
+
+截至跨日继续，Windows原生CLI已有21款以上页面正向证据；腾讯视频通过子进程WebView2/Qt回环环境候选也取得页面合同，不能用Mac原CEF失败覆盖Windows新成功。Frida探针的aDrive13/13、Douyin6/6及字节恢复均通过，但目标是指定启动/宿主进程，不宣称相应网页已注入。Firefox的启动器子进程校验调整后仍需复跑。
+
+本检查点review：Parent检查回环地址、源文件保留、hash基线、PE记录匹配及协议/Hook非页面结果的隔离。共享ASAR代码提取后make check和Mac目录/ASAR/嵌套三类回归通过；PE32/PE64序列化与错基线拒绝通过。Windows副本工具仍是实验，需实机确认后才能计入兼容性。

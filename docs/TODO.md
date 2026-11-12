@@ -7,6 +7,8 @@
 <a id="t-043"></a>
 ### T-043 · Windows 全应用注入复验
 
+[恢复上下文 r1](tasks/T-043-context.md) · [逐应用证据](validation/windows-apps.md)。
+
 ```tracking-task
 {
   "id": "T-043",

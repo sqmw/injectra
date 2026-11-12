@@ -122,3 +122,7 @@ setup-preparation:
 test-preparation: build
 	node --test crates/preparation/tests/entry.test.mjs
 	node scripts/preparation-smoke.mjs
+
+.PHONY: test-windows-format
+test-windows-format:
+	node --test tests/windows/pe-integrity.test.mjs

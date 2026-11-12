@@ -70,3 +70,5 @@ QQ外部主题预览：[开发加载器](../../scripts/qq-theme-preview.mjs)复�
 | App引导与认证通信 | [Bootstrap](../../crates/bootstrap/src/lib.rs)，没有浏览器工作台API |
 
 当前范围见[dev模式](dev-mode.md)，旧方案见[历史入口](../implementation/platform-v1.md)。
+
+Windows复验：[逐应用证据](../validation/windows-apps.md)、[交互启动/原生CLI编排](../../scripts/windows-cdp-smoke.py)、[共享ASAR格式](../../crates/preparation/helper/archive.mjs)。Windows Gecko/Hook/资源副本目前是测试工具，不额外宣称正式产品后端支持。

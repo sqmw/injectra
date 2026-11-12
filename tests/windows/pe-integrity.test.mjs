@@ -1,0 +1,24 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import {createRequire} from 'node:module';
+import {updateIntegrity} from './pe-integrity.mjs';
+const tools=createRequire(path.join(process.env.INJECTRA_WIN_TEST_TOOLS??path.join(os.homedir(),'.cache/injectra/windows-test-tools'),'package.json'));
+const library=tools('resedit');
+for(const is32 of [true,false])test(`PE${is32?32:64} updates only matching archive resource and refuses an unknown baseline`,()=>{
+ const root=fs.mkdtempSync(path.join(os.tmpdir(),'injectra-pe-')),binary=path.join(root,'Host.exe'),archive=path.join(root,'resources/app.asar');
+ const exe=library.NtExecutable.createEmpty(is32,false),resource=library.NtExecutableResource.from(exe);
+ const entries=[{file:'resources\\app.asar',alg:'sha256',value:'a'.repeat(64)},{file:'resources\\other.asar',alg:'sha256',value:'b'.repeat(64)}];
+ resource.entries.push({type:'INTEGRITY',id:'ELECTRONASAR',lang:1033,codepage:1200,bin:new TextEncoder().encode(JSON.stringify(entries)).buffer});
+ resource.outputResource(exe);fs.writeFileSync(binary,Buffer.from(exe.generate()));
+ const before=fs.readFileSync(binary);
+ assert.throws(()=>updateIntegrity({library,binary,archive,before:'d'.repeat(64),after:'c'.repeat(64),ownedRoot:root}),/baseline/);
+ assert.deepEqual(fs.readFileSync(binary),before);
+ const result=updateIntegrity({library,binary,archive,before:'a'.repeat(64),after:'c'.repeat(64),ownedRoot:root});assert.equal(result.updates,1);
+ const output=library.NtExecutableResource.from(library.NtExecutable.from(fs.readFileSync(binary)));
+ const actual=JSON.parse(Buffer.from(output.entries.find(e=>e.type==='INTEGRITY').bin).toString('utf8'));
+ assert.equal(actual[0].value,'c'.repeat(64));assert.equal(actual[1].value,'b'.repeat(64));
+ assert.throws(()=>updateIntegrity({library,binary,archive,before:'c'.repeat(64),after:'e'.repeat(64),ownedRoot:path.join(root,'other')}),/outside owned/);
+});
