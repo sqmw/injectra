@@ -4,6 +4,44 @@
 
 ## 当前执行
 
+<a id="t-040"></a>
+### T-040 · 通用注入与增量开发平台 v1
+
+```tracking-task
+{
+  "id": "T-040",
+  "name": "通用注入与增量开发平台 v1",
+  "version": "v1",
+  "mode": "lightweight",
+  "status": "in_progress",
+  "goal": "交付通用入口准备、统一页面会话与本地Web工作台，实现增量代码免反复打包的真实App开发及独立导出。",
+  "scope": "macOS arm64 Electron CJS目录/ASAR准备；外置页面增量及同步startup.cjs；来源区分、认证、目标世代、编辑执行与导出。保留现有CLI/后端及core/native边界。",
+  "acceptance": "用户批准计划的七项验收均完成：跨应用复用、免重包、入口语义、逐目标正确性、来源、离线导出、全量回归与两真实App验证。",
+  "execution_ref": "TODO.md#t-040",
+  "acceptance_evidence": [],
+  "unplanned_reason": "用户明确要求实施已确认的通用平台v1计划。"
+}
+```
+
+```tracking-execution
+{
+  "id": "T-040/E-001",
+  "name": "平台实现与验收",
+  "task_id": "T-040",
+  "task_version": "v1",
+  "status": "running",
+  "authorization": "2026-11-12用户PLEASE IMPLEMENT THIS PLAN，完整批准通用注入与增量开发平台v1。",
+  "scope": "macOS arm64 Electron CJS目录/ASAR准备；外置页面增量及同步startup.cjs；来源区分、认证、目标世代、编辑执行与导出。保留现有CLI/后端及core/native边界。",
+  "steps": [],
+  "evidence": [
+    "基线4cf736e，工作区干净；保留现有QQ预览窗口，不操作用户进程。"
+  ],
+  "stop_reason": ""
+}
+```
+
+[实施接口与恢复上下文](implementation/platform-v1.md)
+
 <a id="t-034"></a>
 ### T-034 · 阿里云盘 pre-runtime 入口核查
 
