@@ -37,3 +37,5 @@ CEF启动实验：[启动器](../../tests/windows/cef-spawn.py)、[初始化探�
 包内Junction先读取显式目标再规范化，规避Windows libuv对尾部分隔符Junction的UNKNOWN；目标仍须canonical化且限制在源包。实验prepare-copy的`--exclude <相对路径>`仅配置明确的运行数据/锁目录，并写入proof清单，不能排除应用package；不因EBUSY静默跳过未知文件。
 
 Windows x64 V8 ABI实验：[agent](../../tests/windows/v8-x64.js)、[自有Node隔离验证](../../tests/windows/v8-fixture.py)。只选择明确引擎模块和完整MSVC导出符号，在目标I/O线程尝试受控执行；必须先通过自有进程验证，不能将Mac ABI或符号存在当作执行证明。32位目标不进入此实验，尚不是正式WebBackend。
+
+受控Node Windows x64 V8验证已取得目标进程内marker（42、实际PID、win32），随后显式目标[附加器](../../tests/windows/v8-attach.py)核对exe/PID世代，调用同一agent。只派发引导加载，不终止现有App；派发成功仍不等于页面成功，后者独立用Bootstrap共享Web合同验收。
