@@ -2,7 +2,7 @@
 
 ## 产品与长期边界
 
-当前是runtime代码注入工具／核心；本页统一维护架构与执行域契约。产品责任见[需求](../requirements.md)。长期执行域边界已经按[D-004](../DECISIONS.md#d-004)建立，不把页面JS假设写入通用核心。产品native crate只有契约及测试内缓冲区；[references](../../references/README.md)中的真实应用参考脚本不构成产品后端。管理平台、Agent、pre-runtime及自动恢复不属当前交付。
+本页维护注入核心与执行域契约，产品责任见[需求](../requirements.md)。长期执行域边界已经按[D-004](../DECISIONS.md#d-004)建立，不把页面JS假设写入通用核心。产品native crate只有契约及测试内缓冲区；[references](../../references/README.md)中的真实应用参考脚本不构成产品后端。T-040正在建设通用pre-runtime准备与本地Web工作台，见[实施合同](../implementation/platform-v1.md)，完成状态按任务验收；管理平台、Agent和自动恢复仍不在范围内。
 
 ## 模块与依赖
 
