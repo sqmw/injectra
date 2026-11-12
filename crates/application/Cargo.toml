@@ -9,3 +9,5 @@ publish.workspace = true
 injectra-core.workspace = true
 injectra-web.workspace = true
 serde_json.workspace = true
+
+sha2 = "0.10"

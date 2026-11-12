@@ -10,7 +10,6 @@ const packages = new Map(JSON.parse(command.stdout).packages.map(p => [p.name, p
 const allowed = {
   "injectra-core": [],
   "injectra-web": ["injectra-core"],
-  "injectra-workspace": ["injectra-core", "injectra-web"],
   "injectra-bootstrap": ["injectra-core", "injectra-web"],
   "injectra-native": ["injectra-core"],
   "injectra-application": ["injectra-core", "injectra-web"],
@@ -21,8 +20,7 @@ const allowed = {
   "injectra-electron-gadget": ["injectra-core", "injectra-web", "injectra-frida"],
   "injectra-webkit": ["injectra-core", "injectra-web", "injectra-frida"],
   "injectra-bootstrap": ["injectra-core", "injectra-web"],
-  "injectra-studio": ["injectra-core", "injectra-web", "injectra-application", "injectra-workspace", "injectra-bootstrap", "injectra-cdp", "injectra-electron-gadget", "injectra-webkit"],
-  "injectra-cli": ["injectra-studio", "injectra-workspace", "injectra-bootstrap", "injectra-webkit", "injectra-electron-gadget", "injectra-core", "injectra-web", "injectra-application", "injectra-cdp", "injectra-hosts"],
+  "injectra-cli": ["injectra-bootstrap", "injectra-webkit", "injectra-electron-gadget", "injectra-core", "injectra-web", "injectra-application", "injectra-cdp", "injectra-hosts"],
 };
 for (const name of packages.keys()) assert.ok(Object.hasOwn(allowed, name), `unregistered architectural role: ${name}`);
 for (const [name, dependencies] of Object.entries(allowed)) {

@@ -52,7 +52,6 @@ fn connected() -> (Arc<Broker>, String, Page) {
             pages: vec![p.clone()],
             receipts: vec![],
             logs: vec![],
-            startup: None,
         },
     )
     .unwrap();
@@ -111,7 +110,6 @@ fn targets_ack_independently_and_old_generations_cannot_execute() {
             pages: vec![p.clone(), p2.clone()],
             receipts: vec![],
             logs: vec![],
-            startup: None,
         },
     )
     .unwrap();
@@ -128,7 +126,6 @@ fn targets_ack_independently_and_old_generations_cannot_execute() {
             pages: vec![p.clone(), p2.clone()],
             receipts: vec![ack(&c)],
             logs: vec![],
-            startup: None,
         },
     )
     .unwrap();
@@ -161,7 +158,6 @@ fn targets_ack_independently_and_old_generations_cannot_execute() {
             pages: vec![new, p2],
             receipts: vec![],
             logs: vec![],
-            startup: None,
         },
     )
     .unwrap();
@@ -197,7 +193,6 @@ fn timeout_does_not_redeliver_and_late_receipt_cannot_claim_applied() {
             pages: vec![p],
             receipts: vec![ack(&c)],
             logs: vec![],
-            startup: None,
         },
     )
     .unwrap();
@@ -221,7 +216,6 @@ fn wrong_revision_is_rejected_without_completing_request() {
                 pages: vec![p.clone()],
                 receipts: vec![wrong],
                 logs: vec![],
-                startup: None
             }
         )
         .is_err()
@@ -232,7 +226,6 @@ fn wrong_revision_is_rejected_without_completing_request() {
             pages: vec![p],
             receipts: vec![ack(&c)],
             logs: vec![],
-            startup: None,
         },
     )
     .unwrap();
@@ -291,7 +284,6 @@ fn newer_uncertain_or_executed_failure_clears_old_applied_revision() {
                 pages: vec![p.clone()],
                 receipts: vec![ack(&c)],
                 logs: vec![],
-                startup: None,
             },
         )
         .unwrap();
@@ -312,7 +304,6 @@ fn newer_uncertain_or_executed_failure_clears_old_applied_revision() {
                 pages: vec![p],
                 receipts: vec![r],
                 logs: vec![],
-                startup: None,
             },
         )
         .unwrap();
@@ -343,7 +334,6 @@ fn old_revision_is_preserved_only_until_a_new_request_is_dispatched() {
             pages: vec![p],
             receipts: vec![ack(&c)],
             logs: vec![],
-            startup: None,
         },
     )
     .unwrap();
@@ -381,7 +371,6 @@ fn late_logs_keep_the_original_document_and_cannot_claim_the_new_one() {
             pages: vec![p.clone()],
             receipts: vec![ack(&c)],
             logs: vec![],
-            startup: None,
         },
     )
     .unwrap();
@@ -409,7 +398,6 @@ fn late_logs_keep_the_original_document_and_cannot_claim_the_new_one() {
             pages: vec![newer],
             receipts: vec![],
             logs: vec![wrong, log],
-            startup: None,
         },
     )
     .unwrap();

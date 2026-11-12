@@ -114,3 +114,4 @@ prepare-resource-app:
 
 test-resource-app:
 	node scripts/resource-patch-smoke.mjs --run $(ARGS)
+

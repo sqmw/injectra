@@ -4,7 +4,7 @@ use crate::{
 };
 use injectra_core::{Certainty, Error, ErrorKind, Phase, Result};
 use serde_json::{Value, json};
-use std::collections::{HashMap, VecDeque};
+use std::collections::{HashMap, HashSet, VecDeque};
 use std::sync::{Mutex, mpsc};
 use std::time::{Duration, Instant};
 
@@ -24,7 +24,6 @@ struct Connection {
     applied: HashMap<String, String>,
     queue: VecDeque<Command>,
     last_seen: Instant,
-    startup: Option<Value>,
 }
 struct Pending {
     session: String,
@@ -38,6 +37,7 @@ struct Inner {
     challenges: HashMap<String, PendingChallenge>,
     connections: HashMap<String, Connection>,
     pending: HashMap<String, Pending>,
+    used_requests: HashSet<String>,
     events: VecDeque<Event>,
     sequence: u64,
 }
@@ -197,10 +197,30 @@ impl Broker {
                 applied: HashMap::new(),
                 queue: VecDeque::new(),
                 last_seen: Instant::now(),
-                startup: None,
             },
         );
         Ok(Registered { session, instance })
+    }
+    pub fn touch(&self, session: &str) -> Result<()> {
+        let mut i = self.inner.lock().unwrap();
+        sweep(&mut i);
+        i.connections
+            .get_mut(session)
+            .ok_or_else(|| invalid("Unknown bridge session"))?
+            .last_seen = Instant::now();
+        Ok(())
+    }
+    pub fn invalidate_instance(&self, artifact: &str, instance: &str) {
+        let mut i = self.inner.lock().unwrap();
+        let ids = i
+            .connections
+            .iter()
+            .filter(|(_, c)| c.artifact == artifact && c.instance == instance)
+            .map(|(id, _)| id.clone())
+            .collect::<Vec<_>>();
+        for id in ids {
+            invalidate(&mut i, &id, "Owned process exited");
+        }
     }
     pub fn poll(&self, session: &str) -> Result<Option<Command>> {
         let mut i = self.inner.lock().unwrap();
@@ -209,7 +229,6 @@ impl Broker {
             .connections
             .get_mut(session)
             .ok_or_else(|| invalid("Unknown bridge session"))?;
-        c.last_seen = Instant::now();
         let command = c.queue.pop_front();
         if let Some(ref command) = command {
             c.history.push_back((
@@ -290,16 +309,7 @@ impl Broker {
         for log in report.logs {
             record_log(&mut i, session, &artifact, &instance, log);
         }
-        if let Some(startup) = report.startup {
-            let changed =
-                i.connections.get(session).and_then(|c| c.startup.as_ref()) != Some(&startup);
-            if changed {
-                if let Some(c) = i.connections.get_mut(session) {
-                    c.startup = Some(startup.clone());
-                }
-                event(&mut i, &artifact, &instance, None, None, "startup", startup);
-            }
-        }
+
         Ok(())
     }
     pub fn disconnect(&self, session: &str) {
@@ -351,10 +361,27 @@ impl Broker {
         source: &str,
         timeout: Duration,
     ) -> Result<Value> {
-        self.dispatch(target, revision, "evaluate", source, timeout)
+        self.dispatch(target, revision, "evaluate", source, timeout, None)
+    }
+    pub fn submit_with_request_id(
+        &self,
+        target: &str,
+        revision: &str,
+        source: &str,
+        request_id: &str,
+        timeout: Duration,
+    ) -> Result<Value> {
+        self.dispatch(
+            target,
+            revision,
+            "evaluate",
+            source,
+            timeout,
+            Some(request_id),
+        )
     }
     pub fn reload(&self, target: &str, timeout: Duration) -> Result<Value> {
-        self.dispatch(target, "", "reload", "", timeout)
+        self.dispatch(target, "", "reload", "", timeout, None)
     }
     fn dispatch(
         &self,
@@ -363,15 +390,28 @@ impl Broker {
         operation: &str,
         source: &str,
         timeout: Duration,
+        requested_id: Option<&str>,
     ) -> Result<Value> {
         if source.len() > 4 * 1024 * 1024 || revision.len() > 256 {
             return Err(invalid("Execution input exceeds bounds"));
         }
         let (tx, rx) = mpsc::channel();
-        let request = auth::random_token();
+        let request = requested_id
+            .map(String::from)
+            .unwrap_or_else(auth::random_token);
+        if !token(&request) {
+            return Err(invalid("Invalid request identity"));
+        }
         {
             let mut i = self.inner.lock().unwrap();
             sweep(&mut i);
+            if i.used_requests.contains(&request) {
+                return Err(invalid("Request identity was already used; not replayed"));
+            }
+            if i.used_requests.len() >= 100_000 {
+                return Err(invalid("Controller request history limit reached"));
+            }
+            i.used_requests.insert(request.clone());
             let found = i
                 .connections
                 .iter()

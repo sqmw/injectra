@@ -11,22 +11,40 @@
 {
   "id": "T-040",
   "name": "通用注入核心与 pre-runtime dev 模式",
-  "version": "v2",
+  "version": "v3",
   "mode": "lightweight",
-  "status": "pending",
-  "goal": "将入口准备和运行期增量加载按协议、宿主、资源格式复用；一次准备dev入口后，在现有编辑器修改外置增量，在目标App真实页面查看效果。",
-  "scope": "通用注入核心、必要的dev loader/更新通道和轻量来源信息；页面增量在线执行，初始化改动允许必要的重载或开发实例重启而不反复打包。不建设工作台、内置编辑器、文件管理器或完整工作区系统；本轮仅文档校准，不恢复功能实现或回退已有代码。",
-  "acceptance": "同类目标复用接入实现而非品牌分支；普通增量修改不重打包；在真实App核验效果；能识别增量文件、版本及执行结果；保留Web/native隔离和Unknown不重放。具体实施拆分以后续执行记录为准。",
-  "execution_ref": "archive/T-040.md#t-040",
+  "status": "in_progress",
+  "goal": "选择性撤回平台化代码，保留通用runtime并交付CLI prepare/dev页面增量闭环。",
+  "scope": "删除工作台、Studio、完整workspace及启动增量/导出；提取Bootstrap、最小来源及执行正确性；精简准备器，只改派生副本，保留历史和运行数据。",
+  "acceptance": "runtime合同回归；目录/ASAR准备、CLI动态更新、多目标/Unknown正确性；QQ/Claude优先实机验证并如实限定证据；无平台依赖。",
+  "execution_ref": "TODO.md#t-040",
   "acceptance_evidence": [],
   "unplanned_reason": "用户纠正查看平台含义：先注入少量dev代码，在原App看实时更新，先更新文档。",
   "previous_versions": [
-    "v1"
+    "v1",
+    "v2"
   ]
 }
 ```
 
-[当前范围](architecture/dev-mode.md) · [v1历史与退役执行](archive/T-040.md#t-040)。v2待启动，本轮仅由T-041校准文档。
+```tracking-execution
+{
+  "id": "T-040/E-002",
+  "name": "CLI 收敛与 dev 闭环",
+  "task_id": "T-040",
+  "task_version": "v3",
+  "status": "running",
+  "authorization": "2026-11-12用户明确PLEASE IMPLEMENT THIS PLAN，批准选择性删除平台化并打通CLI dev；页面增量、直接应用、无startup。",
+  "scope": "删除工作台、Studio、完整workspace及启动增量/导出；提取Bootstrap、最小来源及执行正确性；精简准备器，只改派生副本，保留历史和运行数据。",
+  "steps": [],
+  "evidence": [
+    "删除前main及4个platform工作树源码快照、HEAD、patch保存在仓库外recovery/t040-cli-20261112；不改其他工作树。已移除平台模块，提取application dev输入版本及Bootstrap请求绑定；cargo check通过。"
+  ],
+  "stop_reason": ""
+}
+```
+
+[当前范围](architecture/dev-mode.md) · [v1历史与退役执行](archive/T-040.md#t-040)。v3按用户批准的CLI收敛计划实施；[v2定义](archive/T-040-v2.md)保留。
 
 <a id="t-034"></a>
 ### T-034 · 阿里云盘 pre-runtime 入口核查

@@ -57,13 +57,13 @@ Objective-C分派Hook专项：[受控启动测试](../../scripts/objc-hook-smoke
 
 QQ外部主题预览：[开发加载器](../../scripts/qq-theme-preview.mjs)复用资源准备和共享程序生成器，接受外部已编译程序；[共享数据授权、实机粉/紫/原样与预览边界](../compatibility/qq-pastel-preview.md)。配色、选择器与Bundle只在独立插件库。
 
-## T-040 v1留存代码（未完成整体交付）
+## T-040 CLI收敛
 
-| 现存模块 | 导航与状态 |
+工作台、Studio与完整workspace已移除；旧代码由Git与仓库外恢复快照保留。
+
+| 能力 | 当前入口 |
 | --- | --- |
-| workspace | [来源/快照合同](../implementation/workspace-v1.md)、[源码](../../crates/workspace/src/lib.rs)；完整工作区不在v2范围，必要来源能力仅作复用候选 |
-| Bootstrap | [协议](../implementation/bootstrap-protocol.md)、[源码](../../crates/bootstrap/src/lib.rs)；有局部协议测试，尚不能称通用dev已实机验收 |
-| Studio服务 | [留存合同](../implementation/studio-v1.md)、[源码](../../crates/studio/src/lib.rs)；工作台装配停止推进，代码保留 |
-| Studio前端 | [留存说明](../implementation/studio-ui.md)；只记录曾实现的界面，不是当前入口或依赖 |
+| 页面增量版本与执行 | [application dev](../../crates/application/src/dev/mod.rs)，复用Web契约与共享runtime |
+| App引导与认证通信 | [Bootstrap](../../crates/bootstrap/src/lib.rs)，没有浏览器工作台API |
 
-后续只按[当前任务定义](../TODO.md#t-040)收敛通用准备与dev更新链路；本轮不删除、回退或重命名这些源码模块。
+当前范围见[dev模式](dev-mode.md)，旧方案见[历史入口](../implementation/platform-v1.md)。

@@ -74,6 +74,7 @@ async fn poll(
 ) -> std::result::Result<Json<Value>, Failure> {
     no_browser(&headers)?;
     let token = session(&headers)?;
+    b.touch(token).map_err(failure)?;
     let start = Instant::now();
     loop {
         if let Some(command) = b.poll(token).map_err(failure)? {

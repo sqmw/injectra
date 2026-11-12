@@ -30,3 +30,5 @@ pub fn execute(backend: &dyn WebBackend, target: &TargetRef, program: &str) -> R
     require_capability(session.capabilities(), PAGE_EVALUATE)?;
     session.evaluate_page(program)
 }
+
+pub mod dev;

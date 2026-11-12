@@ -36,6 +36,6 @@ Read-only flags are accidental-write protection, not protection from the OS acco
 
 ## Tests and code map
 
-[Filesystem](../../crates/workspace/src/filesystem.rs), [workspace/import](../../crates/workspace/src/workspace.rs), [snapshots/mapping](../../crates/workspace/src/snapshot.rs), [source types](../../crates/workspace/src/model.rs), [execution ledger](../../crates/workspace/src/execution.rs), [contract tests](../../crates/workspace/tests/contracts.rs).
+Filesystem（历史源码：`../../crates/workspace/src/filesystem.rs`，main提交`07d55a3`；已从当前产品删除）, workspace/import（历史源码：`../../crates/workspace/src/workspace.rs`，main提交`07d55a3`；已从当前产品删除）, snapshots/mapping（历史源码：`../../crates/workspace/src/snapshot.rs`，main提交`07d55a3`；已从当前产品删除）, source types（历史源码：`../../crates/workspace/src/model.rs`，main提交`07d55a3`；已从当前产品删除）, execution ledger（历史源码：`../../crates/workspace/src/execution.rs`，main提交`07d55a3`；已从当前产品删除）, contract tests（历史源码：`../../crates/workspace/tests/contracts.rs`，main提交`07d55a3`；已从当前产品删除）.
 
 `cargo test -p injectra-workspace` covers source preservation, content revisions, startup dependencies, conflicts, traversal/size/symlink rejection, hardlink replacement, snapshot tampering and per-target/Unknown behavior. Twelve focused contract tests and clippy with warnings denied pass. These are library guarantees, not real application compatibility evidence. Full doc-check in the isolated worktree is blocked by an existing cross-repository plugin link whose relative checkout layout is absent here; Parent runs it from the main checkout.

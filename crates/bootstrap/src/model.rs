@@ -65,8 +65,6 @@ pub struct Report {
     pub receipts: Vec<Receipt>,
     #[serde(default)]
     pub logs: Vec<AgentLog>,
-    #[serde(default)]
-    pub startup: Option<Value>,
 }
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]

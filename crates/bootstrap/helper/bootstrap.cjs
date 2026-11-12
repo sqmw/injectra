@@ -9,7 +9,7 @@ const { guardedSource } = require('./evaluation.cjs');
 const config = JSON.parse(fs.readFileSync(path.join(__dirname, 'config.json'), 'utf8'));
 const VERSION = 1;
 if (process.env.INJECTRA_PREFLIGHT_NONCE) {
-  try { JSON.parse(fs.readFileSync(path.join(config.stage_root,'current.json'),'utf8')); fs.writeSync(1,'INJECTRA_PREFLIGHT:'+JSON.stringify({artifact:config.artifact,nonce:process.env.INJECTRA_PREFLIGHT_NONCE})+'\n'); process.exit(0); }
+  try { fs.writeSync(1,'INJECTRA_PREFLIGHT:'+JSON.stringify({artifact:config.artifact,nonce:process.env.INJECTRA_PREFLIGHT_NONCE})+'\n'); process.exit(0); }
   catch(error) { fs.writeSync(2,'INJECTRA_PREFLIGHT_ERROR:'+String(error)+'\n'); process.exit(1); }
   throw Error('Preflight must not continue into original entry');
 }
@@ -19,8 +19,6 @@ const instance = crypto.randomBytes(32).toString('hex');
 const pages = new Map();
 let session = null, closing = false, polling = false, reporting = false;
 const receipts = [], logs = [];
-let startup = { status: 'not_configured', revision: null, origin: 'user', stage: 'startup' };
-let exportProgram = null;
 const nonce = () => crypto.randomBytes(32).toString('hex');
 function mac(role, client, server) {
   return crypto.createHmac('sha256', Buffer.from(config.key, 'hex'))
@@ -53,11 +51,6 @@ function visiblePages() {
     id: String(p.wc.id), generation: p.generation, title: p.wc.getTitle().slice(0,4096), url: p.wc.getURL().slice(0,16384),
   }));
 }
-function matchesSelector(url) {
-  try { const u = new URL(url); const s = config.selector;
-    return s && (!s.path_suffix || u.pathname.endsWith(s.path_suffix)) && (!s.origin || u.origin === s.origin || (u.protocol + '//' + u.host) === s.origin);
-  } catch { return false; }
-}
 function track(wc) {
   if (pages.has(wc.id) || !['window','browserView','webview','offscreen'].includes(wc.getType())) return;
   const p = { wc, generation: nonce(), ready: false, exported: false }; pages.set(wc.id, p);
@@ -70,10 +63,6 @@ function track(wc) {
     catch { return; }
     if (wc.isDestroyed() || p.generation !== generation || !sameFrame(p)) return;
     p.ready = true;
-    if (config.mode === 'export' && !p.exported && exportProgram && matchesSelector(wc.getURL())) {
-      p.exported = true;
-      wc.executeJavaScript(exportProgram).catch(error => process.stderr.write('INJECTRA_EXPORT_ERROR:' + String(error) + '\n'));
-    }
     flush().catch(() => {});
   }
   wc.on('did-start-navigation', (_event, url, inPlace, mainFrame) => {
@@ -96,7 +85,7 @@ async function flush() {
   if (!session || reporting || closing) return;
   reporting = true; const current = session;
   const sentReceipts = receipts.splice(0,64), sentLogs = logs.splice(0,100);
-  try { await request('/bridge/report', { pages: visiblePages(), receipts: sentReceipts, logs: sentLogs, startup }, current); }
+  try { await request('/bridge/report', { pages: visiblePages(), receipts: sentReceipts, logs: sentLogs }, current); }
   catch (e) {
     // Receipt retry is allowed; command execution is never replayed.
     if (session === current) { receipts.unshift(...sentReceipts); logs.unshift(...sentLogs); }
@@ -137,7 +126,7 @@ async function connect() {
   session = registered.session; receipts.length=0;logs.length=0; await flush();
 }
 async function poll() {
-  if (polling || closing || config.mode !== 'development') return;
+  if (polling || closing) return;
   polling = true;
   try { if (!session) await connect(); const result = await request('/bridge/poll'); if (result.command) await execute(result.command); }
   catch(error) { session=null; /* reconnect creates a fresh session; never replay commands */ }
@@ -146,30 +135,7 @@ async function poll() {
 app.on('web-contents-created', (_event,wc) => track(wc));
 app.whenReady().then(() => {for(const wc of webContents.getAllWebContents())track(wc);});
 app.on('will-quit', () => {closing=true;if(session)request('/bridge/disconnect',{},session).catch(()=>{});});
-try {
-  if (config.version !== VERSION) throw Error('Unsupported Injectra bootstrap version');
-  let current;
-  if (config.mode === 'export') {
-    current = JSON.parse(fs.readFileSync(path.join(__dirname,'export/current.json'),'utf8'));
-    exportProgram = fs.readFileSync(path.join(__dirname,'export/program.js'),'utf8');
-  } else {
-    current = JSON.parse(fs.readFileSync(path.join(config.stage_root,'current.json'),'utf8'));
-  }
-  startup.revision = current.revision;
-  if (current.startup) {
-    const base = config.mode === 'export' ? path.join(__dirname,'export/workspace') : path.join(config.stage_root,current.revision,'workspace');
-    const filename = path.resolve(base,current.startup);
-    if (!filename.startsWith(path.resolve(base)+path.sep)) throw Error('Startup path escapes staged workspace');
-    const bytes = fs.readFileSync(filename);
-    if (crypto.createHash('sha256').update(bytes).digest('hex') !== current.startup_hash) throw Error('Staged startup digest mismatch');
-    require(filename);
-    startup.status = 'executed'; startup.source = 'injectra://' + config.workspace + '/' + current.revision + '/' + current.startup;
-  }
-} catch(error) {
-  startup.status='failed';startup.error=String(error);startup.stack=String(error.stack||'');
-  process.stderr.write('INJECTRA_STARTUP:' + JSON.stringify(startup) + '\n');
-  app.exit(1);
-  throw error;
-}
-if (config.mode === 'development') { setImmediate(poll); const heartbeat=setInterval(()=>flush().catch(()=>{session=null;}),1000);heartbeat.unref(); }
+if (config.version !== VERSION) throw Error('Unsupported Injectra bootstrap version');
+setImmediate(poll);
+const heartbeat=setInterval(()=>flush().catch(()=>{session=null;}),1000);heartbeat.unref();
 module.exports = Object.freeze({ version:VERSION, artifact:config.artifact });
