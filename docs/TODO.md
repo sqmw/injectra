@@ -4,41 +4,22 @@
 
 ## 当前执行
 
-<a id="t-043"></a>
-### T-043 · Windows 全应用注入复验
-
-[恢复上下文 r1](tasks/T-043-context.md) · [逐应用证据](validation/windows-apps.md)。
+<a id="t-044"></a>
+### T-044 · Windows 未通过入口泛化评估
 
 ```tracking-task
 {
-  "id": "T-043",
-  "name": "Windows 全应用注入复验",
+  "id": "T-044",
+  "name": "Windows 未通过入口泛化评估",
   "version": "v1",
   "mode": "lightweight",
-  "status": "in_progress",
-  "goal": "对照Mac已尝试的全部应用，在Windows逐款复验接入、共享Web注入合同及适用的后续路线；FlowUs、Manus跳过。",
-  "scope": "Windows已安装应用盘点、runtime/CDP及后续Gadget/pre-runtime/Gecko候选；Mac编写工具，远端构建/运行，独立测试实例，既有用户进程保留；控制端与目标平台分别标明。",
-  "acceptance": "Mac应用清单逐项有Windows结果/缺项，区分安装/入口/真实注入；支持页面覆盖JS/CSS/HTML、交互、更新、清理；其他路线条件/失败及剩余工作明确，不能只测CDP就宣称全部路线完成。",
-  "execution_ref": "TODO.md#t-043",
+  "status": "pending",
+  "goal": "根据T043九项页面缺口，评估CEF/版本化入口/签名与缓存等通用接入路线，形成可评审后续范围。",
+  "scope": "待规划的通用路线评估，不自动为每应用开发专用执行代码、不建设平台、不改系统安全策略；本轮仅登记剩余问题，不启动研发。",
+  "acceptance": "按宿主与格式解释证据、明确可复用策略和验证条件；任何实施范围变化先由用户确定。",
+  "execution_ref": "",
   "acceptance_evidence": [],
-  "unplanned_reason": "用户明确要求Windows重走Mac全部应用注入流程。"
-}
-```
-
-```tracking-execution
-{
-  "id": "T-043/E-001",
-  "name": "Windows清单对账与首轮runtime实测",
-  "task_id": "T-043",
-  "task_version": "v1",
-  "status": "running",
-  "authorization": "2026-11-12用户要求Windows把Mac已尝试App全部尝试；FlowUs和Manus跳过。用户后续明确允许结束核验过的本轮残留测试进程，原初会话保留。",
-  "scope": "Windows已安装应用盘点、runtime/CDP及后续Gadget/pre-runtime/Gecko候选；Mac编写工具，远端构建/运行，独立测试实例，既有用户进程保留；控制端与目标平台分别标明。",
-  "steps": [],
-  "evidence": [
-    "已按全局当前事实通过公钥SSH连接DESKTOP-F4B6E6C；安装清单32新增/6已有核对，D:\\language\\rust\\code\\Injectra尚不存在；首轮明确使用Mac控制端经SSH转发测试Windows目标，不等同Windows CLI构建。"
-  ],
-  "stop_reason": ""
+  "unplanned_reason": "T043全清单测试完成，但9项尚无页面成功，需要保留后续跟进入口。"
 }
 ```
 
@@ -111,6 +92,33 @@
 上下文r6：Parent/main，single-writer，续接d210ec9。用户已解锁，菜单/偏好设置及新run yudc69f4完成，普通首页已恢复；钥匙串提示状态与快速退出根因仍未知。当前缺口是可执行的目标侧入口，任务保持受阻，不计注入成功。证据见[启动条件复核](compatibility/adrive-startup.md)；仅有新的入口或诊断证据时继续，不调用未确认服务、修改保护或重放Unknown。
 
 ## 最近完成的验证
+
+<a id="t-043"></a>
+### T-043 · Windows 全应用注入复验
+
+[恢复上下文 r1](tasks/T-043-context.md) · [逐应用证据](validation/windows-apps.md)。
+
+```tracking-task
+{
+  "id": "T-043",
+  "name": "Windows 全应用注入复验",
+  "version": "v1",
+  "mode": "lightweight",
+  "status": "done",
+  "goal": "对照Mac已尝试的全部应用，在Windows逐款复验接入、共享Web注入合同及适用的后续路线；FlowUs、Manus跳过。",
+  "scope": "Windows已安装应用盘点、runtime/CDP及后续Gadget/pre-runtime/Gecko候选；Mac编写工具，远端构建/运行，独立测试实例，既有用户进程保留；控制端与目标平台分别标明。",
+  "acceptance": "Mac应用清单逐项有Windows结果/缺项，区分安装/入口/真实注入；支持页面覆盖JS/CSS/HTML、交互、更新、清理；其他路线条件/失败及剩余工作明确，不能只测CDP就宣称全部路线完成。",
+  "execution_ref": "archive/T-043.md#t-043",
+  "acceptance_evidence": [
+    "38安装项全清单尝试完成，29页面正向、9本轮未取得页面；2用户跳过、4原Mac静态候选另列。完整方法、限制及raw run在validation/windows-apps.md。",
+    "Windows原生CLI编译及选定合同单测/doc tests通过；Gecko/Hook/pre-runtime相互区分，不外推全平台全App兼容。安装与入口错误纠正，旧run和源应用保留。"
+  ],
+  "unplanned_reason": "用户明确要求Windows重走Mac全部应用注入流程。"
+}
+```
+
+[关闭执行与证据](archive/T-043.md#t-043)。
+
 
 <a id="t-042"></a>
 ### T-042 · 嵌套归档与不透明入口接入
