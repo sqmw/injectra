@@ -96,3 +96,5 @@ plan为显式外部JSON数组（name/exe/version/可选args），不在产品核
 本检查点review：Parent检查回环地址、源文件保留、hash基线、PE记录匹配及协议/Hook非页面结果的隔离。共享ASAR代码提取后make check和Mac目录/ASAR/嵌套三类回归通过；PE32/PE64序列化与错基线拒绝通过。Windows副本工具仍是实验，需实机确认后才能计入兼容性。
 
 Windows探测还发现@electron/asar 3.4.1的嵌套入口API需要原生路径分隔符；已在共享入口/归档层归一化并增加多层目录用例，避免把真实存在的.vite/build入口误报为缺失。Mac四项入口合同与make check通过，Windows复验继续。
+
+部分Windows包带有虚拟size条目或原本已缺失的unpacked可选文件；完整流重建不能假造这些内容。测试副本工具新增[保留原数据段的增量ASAR写入](../../tests/windows/append-asar.mjs)，只更新声明条目，其他元数据及原字节保留；[独立格式测试](../../tests/windows/append-asar.test.mjs)覆盖虚拟条目、缺失外置文件和原packed数据不变。该路径尚待Windows真实App复验，不回填先前失败。

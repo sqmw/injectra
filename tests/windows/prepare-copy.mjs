@@ -7,12 +7,12 @@ import {parseArgs} from 'node:util';
 import {createHash} from 'node:crypto';
 import {createRequire} from 'node:module';
 import {inspectMain,delegateSource} from '../../crates/preparation/helper/entry.mjs';
-import {rebuild} from '../../crates/preparation/helper/archive.mjs';
+import {appendRewrite} from './append-asar.mjs';
 import {updateIntegrity} from './pe-integrity.mjs';
 const {values}=parseArgs({options:{exe:{type:'string'},output:{type:'string'},config:{type:'string'},package:{type:'string'}}});
 if(process.platform!=='win32')throw Error('Windows proof only');
 const tools=createRequire(path.join(process.env.INJECTRA_WIN_TEST_TOOLS,'package.json'));
-const asar=tools('@electron/asar'),acorn=tools('acorn'),pe=await import(pathToFileURL(tools.resolve('resedit')).href);
+const pickle=tools('chromium-pickle-js'),asar=tools('@electron/asar'),acorn=tools('acorn'),pe=await import(pathToFileURL(tools.resolve('resedit')).href);
 const sourceExe=fs.realpathSync(values.exe),source=path.dirname(sourceExe),destination=path.resolve(values.output);
 if(fs.existsSync(destination)||destination.toLowerCase().startsWith(source.toLowerCase()+path.sep))throw Error('New destination outside source required');
 const hash=b=>createHash('sha256').update(b).digest('hex');
@@ -46,7 +46,7 @@ if(entry.strategy==='main-delegate'){
 let nativeChanges=[];
 if(layout==='asar') {
  const archive=path.join(destination,packageRelative),old=hash(asar.getRawHeader(archive).headerString),temp=destination+'.rebuilt.asar';
- const next=await rebuild(asar,archive,temp,replacements);await fsp.copyFile(temp,archive);
+ const next=await appendRewrite({asar,pickle,source:archive,destination:temp,replacements});await fsp.copyFile(temp,archive);
  if(fs.existsSync(temp+'.unpacked'))await fsp.cp(temp+'.unpacked',archive+'.unpacked',{recursive:true});
  const component=path.dirname(path.dirname(archive));
  for(const name of fs.readdirSync(component).filter(n=>/\.(exe|dll)$/i.test(n))) {
