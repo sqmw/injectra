@@ -5,6 +5,7 @@
 | 关键词 | 权威文档 |
 | --- | --- |
 | 产品定位、runtime/pre-runtime、责任边界、需求来源、非目标 | [需求](requirements.md) |
+| 当前通用化方向、免重打包、外置增量、真实App反馈 | [dev模式边界](architecture/dev-mode.md) |
 | 架构分层、执行域契约、目标身份、能力与错误 | [架构](architecture/boundaries.md) |
 | 模块、测试、符号检索 | [代码地图](architecture/code-map.md) |
 | 构建、使用、Bundle、运行数据、恢复 | [开发说明](dev.md) |
@@ -17,6 +18,8 @@
 | MVP验收、版本与源码映射 | [交付记录](releases.md) |
 
 `make doc-check`检查本地链接、显式锚点和文档可达性；任务结构通过全局project-tracking-check单独校验。历史从任务关闭索引进入，不默认加载。
+
+当前以[T-040@v2](TODO.md#t-040)为范围真相；工作台/内置编辑器退出范围。v1局部实现见[旧方案入口](implementation/platform-v1.md)，不作为继续开发指令。
 
 当前Mac实施：[macOS多引擎交付](macos-delivery.md)。
 

@@ -4,7 +4,7 @@
 
 ## 已交付与实机结果
 
-主题归独立[web-ui-plugins插件库](../../../../../JavaScript/code/web-ui-plugins/plugins/qq-pastel-themes/README.md)，manifest为plugins/qq-pastel-themes/bundle/manifest.json，id为qq.pastel-themes。Injectra没有保存插件或Bundle副本，只负责生成并在运行中加载外部程序。
+主题归独立web-ui-plugins插件库（库内说明：`plugins/qq-pastel-themes/README.md`），manifest为plugins/qq-pastel-themes/bundle/manifest.json，id为qq.pastel-themes。Injectra没有保存插件或Bundle副本，只负责生成并在运行中加载外部程序。
 
 QQ6.9.86共享数据副本的主页面app://./renderer/index.html实测：
 

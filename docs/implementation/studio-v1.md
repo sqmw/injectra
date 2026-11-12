@@ -1,5 +1,8 @@
 # Studio local service contract
 
+> 状态校准（2026-11-12）：此页记录T-040@v1的Studio服务与工作流，不是当前交付要求。用户已将目标收敛到[通用注入核心与dev模式](../architecture/dev-mode.md)。 工作台与完整工作区不再推进；现有实现保留，尚未完成v1整体验收。 本页技术事实保留，不据此继续旧范围开发。
+
+
 Part of [T-040](platform-v1.md); Parent owns overall delivery and task status.
 
 The service keeps existing WebBackend objects on dedicated OS threads, rather than adding Send or async requirements to the core/Web domain. CDP, Electron Gadget and WKWebView targets receive a per-document nonce; execution checks that nonce in the same page evaluation as the payload. Opaque Studio IDs include connection identity and document generation. Bootstrap uses its own native target generation and revision receipts. A saved source revision is never a global “applied” flag.

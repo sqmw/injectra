@@ -1,5 +1,8 @@
 # 代码地图
 
+当前方向见[dev模式](dev-mode.md)。代码存在、当前需求和完成验收是三件事；下列v1留存模块不作为继续开发工作台的指令。
+
+
 先读本页，按关键词进入对应模块；不要批量读取整个源码树。
 
 | 能力 | 源码入口与职责 | 上下游边界 | 测试与专题 |
@@ -53,3 +56,14 @@ Objective-C分派Hook专项：[受控启动测试](../../scripts/objc-hook-smoke
 批次资源验证：[QQ/腾讯视频/Claude配方与控制](../../scripts/resource-patch-smoke.mjs)、[Electron41+摘要更新](../../tests/resource-patch/integrity-digest.py)及[格式测试](../../tests/resource-patch/integrity-digest.test.mjs)；[顺序实测、共享容器限制和当前失败](../compatibility/three-app-resource-patch.md)。仍是测试工具，不增加正式适配器或复制共享runtime。
 
 QQ外部主题预览：[开发加载器](../../scripts/qq-theme-preview.mjs)复用资源准备和共享程序生成器，接受外部已编译程序；[共享数据授权、实机粉/紫/原样与预览边界](../compatibility/qq-pastel-preview.md)。配色、选择器与Bundle只在独立插件库。
+
+## T-040 v1留存代码（未完成整体交付）
+
+| 现存模块 | 导航与状态 |
+| --- | --- |
+| workspace | [来源/快照合同](../implementation/workspace-v1.md)、[源码](../../crates/workspace/src/lib.rs)；完整工作区不在v2范围，必要来源能力仅作复用候选 |
+| Bootstrap | [协议](../implementation/bootstrap-protocol.md)、[源码](../../crates/bootstrap/src/lib.rs)；有局部协议测试，尚不能称通用dev已实机验收 |
+| Studio服务 | [留存合同](../implementation/studio-v1.md)、[源码](../../crates/studio/src/lib.rs)；工作台装配停止推进，代码保留 |
+| Studio前端 | [留存说明](../implementation/studio-ui.md)；只记录曾实现的界面，不是当前入口或依赖 |
+
+后续只按[当前任务定义](../TODO.md#t-040)收敛通用准备与dev更新链路；本轮不删除、回退或重命名这些源码模块。

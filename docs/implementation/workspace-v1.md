@@ -1,5 +1,8 @@
 # External increment workspace contract
 
+> 状态校准（2026-11-12）：此页记录T-040@v1的完整工作区/快照模型，不是当前交付要求。用户已将目标收敛到[通用注入核心与dev模式](../architecture/dev-mode.md)。 工作台与完整工作区不再推进；现有实现保留，尚未完成v1整体验收。 本页技术事实保留，不据此继续旧范围开发。
+
+
 Part of [T-040](../TODO.md#t-040); Parent owns Task/Execution status. This library supplies source/snapshot and execution-state contracts, not target preparation or a live backend.
 
 ## Public API

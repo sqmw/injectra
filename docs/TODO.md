@@ -5,42 +5,28 @@
 ## 当前执行
 
 <a id="t-040"></a>
-### T-040 · 通用注入与增量开发平台 v1
+### T-040 · 通用注入核心与 pre-runtime dev 模式
 
 ```tracking-task
 {
   "id": "T-040",
-  "name": "通用注入与增量开发平台 v1",
-  "version": "v1",
+  "name": "通用注入核心与 pre-runtime dev 模式",
+  "version": "v2",
   "mode": "lightweight",
-  "status": "in_progress",
-  "goal": "交付通用入口准备、统一页面会话与本地Web工作台，实现增量代码免反复打包的真实App开发及独立导出。",
-  "scope": "macOS arm64 Electron CJS目录/ASAR准备；外置页面增量及同步startup.cjs；来源区分、认证、目标世代、编辑执行与导出。保留现有CLI/后端及core/native边界。",
-  "acceptance": "用户批准计划的七项验收均完成：跨应用复用、免重包、入口语义、逐目标正确性、来源、离线导出、全量回归与两真实App验证。",
-  "execution_ref": "TODO.md#t-040",
+  "status": "pending",
+  "goal": "将入口准备和运行期增量加载按协议、宿主、资源格式复用；一次准备dev入口后，在现有编辑器修改外置增量，在目标App真实页面查看效果。",
+  "scope": "通用注入核心、必要的dev loader/更新通道和轻量来源信息；页面增量在线执行，初始化改动允许必要的重载或开发实例重启而不反复打包。不建设工作台、内置编辑器、文件管理器或完整工作区系统；本轮仅文档校准，不恢复功能实现或回退已有代码。",
+  "acceptance": "同类目标复用接入实现而非品牌分支；普通增量修改不重打包；在真实App核验效果；能识别增量文件、版本及执行结果；保留Web/native隔离和Unknown不重放。具体实施拆分以后续执行记录为准。",
+  "execution_ref": "archive/T-040.md#t-040",
   "acceptance_evidence": [],
-  "unplanned_reason": "用户明确要求实施已确认的通用平台v1计划。"
+  "unplanned_reason": "用户纠正查看平台含义：先注入少量dev代码，在原App看实时更新，先更新文档。",
+  "previous_versions": [
+    "v1"
+  ]
 }
 ```
 
-```tracking-execution
-{
-  "id": "T-040/E-001",
-  "name": "平台实现与验收",
-  "task_id": "T-040",
-  "task_version": "v1",
-  "status": "running",
-  "authorization": "2026-11-12用户PLEASE IMPLEMENT THIS PLAN，完整批准通用注入与增量开发平台v1。",
-  "scope": "macOS arm64 Electron CJS目录/ASAR准备；外置页面增量及同步startup.cjs；来源区分、认证、目标世代、编辑执行与导出。保留现有CLI/后端及core/native边界。",
-  "steps": [],
-  "evidence": [
-    "基线4cf736e，工作区干净；保留现有QQ预览窗口，不操作用户进程。"
-  ],
-  "stop_reason": ""
-}
-```
-
-[实施接口与恢复上下文](implementation/platform-v1.md)
+[当前范围](architecture/dev-mode.md) · [v1历史与退役执行](archive/T-040.md#t-040)。v2待启动，本轮仅由T-041校准文档。
 
 <a id="t-034"></a>
 ### T-034 · 阿里云盘 pre-runtime 入口核查
@@ -110,6 +96,28 @@
 上下文r6：Parent/main，single-writer，续接d210ec9。用户已解锁，菜单/偏好设置及新run yudc69f4完成，普通首页已恢复；钥匙串提示状态与快速退出根因仍未知。当前缺口是可执行的目标侧入口，任务保持受阻，不计注入成功。证据见[启动条件复核](compatibility/adrive-startup.md)；仅有新的入口或诊断证据时继续，不调用未确认服务、修改保护或重放Unknown。
 
 ## 最近完成的验证
+
+<a id="t-041"></a>
+### T-041 · 通用注入 dev 模式文档校准
+
+```tracking-task
+{
+  "id": "T-041",
+  "name": "通用注入 dev 模式文档校准",
+  "version": "v1",
+  "mode": "lightweight",
+  "status": "done",
+  "goal": "将文档和任务导航统一到用户澄清的通用注入核心与轻量dev模式，消除工作台仍在推进的误导。",
+  "scope": "仅更新项目文档、任务/决策及当前工作树的只读同步；保留旧方案与代码事实，不删除/回退代码，不恢复实现，不操作应用进程。",
+  "acceptance": "README/项目约束/需求/架构/开发/代码地图/实施专题/任务索引一致；T040版本迁移有历史映射；文档与任务校验、只读review通过。",
+  "execution_ref": "archive/T-041.md#t-041",
+  "acceptance_evidence": [
+    "当前范围、入口导航与旧版实现状态已统一；T-040 v1定义/证据保留，v2待启动；未修改源码或应用。",
+    "只读review发现的早期runtime措辞及旧Parent执行指令已修正；main与server文档检查、tracking-check、diff-check通过。"
+  ],
+  "unplanned_reason": "用户明确要求先更新之前的相关文档。"
+}
+```
 
 <a id="t-039"></a>
 ### T-039 · QQ粉紫主题资源补丁预览

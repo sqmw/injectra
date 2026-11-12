@@ -1,6 +1,9 @@
 # T-040 · Studio前端
 
-[总体接口与归属](platform-v1.md)。本子任务只实现本地Web工作台，实际效果在目标App中展示。后端/CLI与整体验收由Parent集成，前端测试不能替代真实App兼容性或完整浏览器视觉验收。
+> 状态校准（2026-11-12）：此页记录T-040@v1的工作台前端，不是当前交付要求。用户已将目标收敛到[通用注入核心与dev模式](../architecture/dev-mode.md)。 工作台与完整工作区不再推进；现有实现保留，尚未完成v1整体验收。 本页技术事实保留，不据此继续旧范围开发。
+
+
+[总体接口与归属](platform-v1.md)。旧版子任务实现本地Web工作台，实际效果在目标App中展示。当时后端/CLI与整体验收计划由Parent集成；该计划已停止，前端测试不能替代真实App兼容性或完整浏览器视觉验收。
 
 ## 入口与构建
 
@@ -12,7 +15,7 @@ node studio-ui/scripts/build.mjs
 node studio-ui/scripts/check.mjs
 ```
 
-建议Parent添加setup-studio-ui/build-studio-ui/check-studio-ui三个Make入口，分别调用上述命令。依赖通过package-lock锁定并安装到缓存根studio-ui/tools，生成产物默认在缓存根studio-ui/dist。缓存根继承INJECTRA_CACHE_DIR/XDG_CACHE_HOME约定；INJECTRA_STUDIO_ASSETS可指定其他构建输出目录。源码目录不生成node_modules或dist。
+旧方案曾建议添加setup-studio-ui/build-studio-ui/check-studio-ui三个Make入口，分别调用上述命令；这不是当前待办。依赖通过package-lock锁定并安装到缓存根studio-ui/tools，生成产物默认在缓存根studio-ui/dist。缓存根继承INJECTRA_CACHE_DIR/XDG_CACHE_HOME约定；INJECTRA_STUDIO_ASSETS可指定其他构建输出目录。源码目录不生成node_modules或dist。
 
 产物固定为index.html、app.js、app.css。Rust服务可从该目录读取或嵌入，URL必须分别映射为/、/app.js、/app.css；生产运行不需要Node。当前编译产物不带source map，不在Git中保存。
 
@@ -32,4 +35,4 @@ node studio-ui/scripts/check.mjs
 
 check命令运行严格TypeScript检查、真实CodeMirror构建及18项测试：native fetch接收者、启动诊断与凭据遮盖、认证凭据范围、WS首帧/认证顺序、目标世代失效、Unknown精确确认与不重放、queued不提前确认、保存时编辑竞争、只读来源、草稿冲突、新文件创建、导出目标范围及启动快照/页面执行分离。main入口已有beforeunload未保存草稿保护；跨文件保留的草稿同样触发保护。
 
-DOM交互测试使用JSDOM和受控编辑器替身，验证工作台流程；不伪称真实CodeMirror排版或目标App执行已验收。Parent需在集成服务后补真实浏览器视觉和端到端检查。当前无原App进程操作、没有新增插件或业务载荷。
+DOM交互测试使用JSDOM和受控编辑器替身，验证工作台流程；不伪称真实CodeMirror排版或目标App执行已验收。旧版尚缺真实浏览器视觉和端到端验收；保留此证据缺口，不继续旧工作台验收计划。当前无原App进程操作、没有新增插件或业务载荷。

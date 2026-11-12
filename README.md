@@ -1,10 +1,12 @@
 # Injectra
 
-面向桌面 Web UI 的**代码注入工具／核心**：在不修改目标应用源码的情况下，向其 Web 运行环境注入用户提供的 JS、HTML、CSS。长期考虑 runtime / pre-runtime 两类注入时机，**当前仅实现 runtime 注入**。
+面向桌面 Web UI 的**通用代码注入工具／核心**：向明确目标加载用户增量JS/HTML/CSS。已有runtime后端及pre-runtime实验；当前方向是[通用注入核心与轻量dev模式](docs/architecture/dev-mode.md)，通用dev尚未整体验收。
+
+dev目标：首次准备小型入口，现有编辑器改外置增量，真实App看更新；初始化修改可重载/重启，普通修改不反复打包。**不开发工作台、内置编辑器或完整工作区系统。** 既有相关代码仅为旧方案留存实现，不是当前交付要求。
 
 长期架构已建立执行域隔离：通用核心、Web／原生契约、可复用应用用例及平台／宿主职责分离。原生内存读写执行域仍仅有契约测试；已实现的Frida桥接用于Web页面执行，不等同于交付通用进程内存接口，见[架构](docs/architecture/boundaries.md)。
 
-首个核心版本为 **Rust CLI + macOS Electron/CDP**：连接已运行且显式开放本地调试端口的目标，选定单个页面并执行注入，报告结果、失败或结果未知。Injectra负责接入与注入能力；使用者负责脚本内容、选择器、组件适配及渲染覆盖问题。管理平台和Agent属于后续演进方向，见[产品边界](docs/requirements.md)。
+首个核心版本为 **Rust CLI + macOS Electron/CDP**：连接已运行且显式开放本地调试端口的目标，选定单个页面并执行注入，报告结果、失败或结果未知。Injectra负责接入与注入能力；使用者负责脚本内容、选择器、组件适配及渲染覆盖问题。管理平台和Agent不在当前范围，见[产品边界](docs/requirements.md)。
 
 当前Mac扩展已在本工作树实现[可选Gadget后端](docs/frida-backends.md)，抖音真实页面及独立Electron36通过；CEF/NW.js独立宿主也已通过；WebKit后端、独立宿主与真实Tauri应用已通过。详细进展见[Mac交付](docs/macos-delivery.md)。
 

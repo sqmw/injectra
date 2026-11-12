@@ -1,5 +1,8 @@
 # Bootstrap bridge contract
 
+> 状态校准（2026-11-12）：此页记录T-040@v1的Bootstrap通信实现，不是当前交付要求。用户已将目标收敛到[通用注入核心与dev模式](../architecture/dev-mode.md)。 其中通道/身份/逐目标确认可作为复用候选；当前与Studio的装配事实不等于v2已完成解耦或通用实机验收。 本页技术事实保留，不据此继续旧范围开发。
+
+
 Part of [T-040 platform implementation](platform-v1.md). This module is not an application-brand adapter and does not certify arbitrary apps.
 
 `injectra-bootstrap` exposes `Broker`, `BootstrapBackend`, and `router(Arc<Broker>) -> axum::Router`. Register an artifact ID and its 256-bit hex key before accepting a connection. The Studio keeps these keys server-side; they must not appear in browser state or logs.
