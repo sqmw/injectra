@@ -18,7 +18,7 @@ pub(crate) fn validate_path(path: &str) -> Result<()> {
     if Path::new(path)
         .components()
         .any(|c| !matches!(c, Component::Normal(_)))
-        || path.split('/').any(|p| p.is_empty() || p.starts_with('.'))
+        || path.split('/').any(|p| p.is_empty())
     {
         return Err(invalid(
             "workspace path must be relative without dot components",
@@ -29,6 +29,9 @@ pub(crate) fn validate_path(path: &str) -> Result<()> {
 
 pub(crate) fn user_path(path: &str) -> Result<()> {
     validate_path(path)?;
+    if path.split('/').any(|part| part.starts_with('.')) {
+        return Err(invalid("hidden paths are not user increments"));
+    }
     if !matches!(
         Path::new(path).extension().and_then(|s| s.to_str()),
         Some("js" | "cjs" | "mjs" | "css" | "html" | "json")

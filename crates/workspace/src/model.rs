@@ -45,6 +45,7 @@ pub struct SourceMapping {
     pub source_url: String,
     /// 1-based line in the generated execution unit where user JS starts.
     pub generated_start_line: usize,
+    pub generated_end_line: usize,
     pub source_start_line: usize,
 }
 
@@ -69,6 +70,12 @@ pub(crate) struct Manifest {
 
 impl Manifest {
     pub fn parse(bytes: &[u8]) -> injectra_core::Result<Self> {
+        Self::parse_with_mode(bytes, true)
+    }
+    pub fn parse_import(bytes: &[u8]) -> injectra_core::Result<Self> {
+        Self::parse_with_mode(bytes, false)
+    }
+    fn parse_with_mode(bytes: &[u8], strict: bool) -> injectra_core::Result<Self> {
         let value: Self =
             serde_json::from_slice(bytes).map_err(|e| crate::invalid(e.to_string()))?;
         if value.version != 1 {
@@ -92,7 +99,10 @@ impl Manifest {
         }
         let mut seen = std::collections::HashSet::new();
         for path in assets {
-            crate::filesystem::validate_path(path)?;
+            if !strict {
+                continue;
+            }
+            crate::filesystem::user_path(path)?;
             if path == "manifest.json"
                 || path == "startup.cjs"
                 || path.starts_with('.')

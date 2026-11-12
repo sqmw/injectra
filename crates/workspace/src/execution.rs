@@ -91,6 +91,19 @@ impl ExecutionLedger {
         self.records.push(record.clone());
         Ok(record)
     }
+    /// Call immediately before dispatch. Unknown is conservative until a target reply.
+    pub fn mark_submitted(&mut self, request_id: &str, target: &ExecutionTarget) -> Result<()> {
+        if self.active.get(target).map(String::as_str) != Some(request_id) {
+            return Err(invalid("stale or mismatched submission"));
+        }
+        let record = self
+            .records
+            .iter_mut()
+            .find(|record| record.request_id == request_id)
+            .ok_or_else(|| invalid("unknown request"))?;
+        record.certainty = ExecutionCertainty::Unknown;
+        Ok(())
+    }
     pub fn complete(
         &mut self,
         request_id: &str,

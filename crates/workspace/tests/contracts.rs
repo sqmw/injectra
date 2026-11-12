@@ -31,7 +31,14 @@ fn revisions_capture_content_and_preserve_startup_dependencies() {
     assert_eq!(
         map.source
             .lines()
-            .nth(map.mappings[0].generated_start_line - 1)
+            .nth(
+                map.mappings
+                    .iter()
+                    .find(|m| m.origin == SourceOrigin::User)
+                    .unwrap()
+                    .generated_start_line
+                    - 1
+            )
             .unwrap(),
         "console.log('first');"
     );
@@ -49,7 +56,7 @@ fn imports_copy_sources_and_readonly_metadata_is_not_user_editable() {
     .unwrap();
     let w =
         Workspace::import_manifest(&temp.path().join("work"), &src.join("bundle.json")).unwrap();
-    w.save("main.js", "changed()").unwrap();
+    w.save("page.js", "changed()").unwrap();
     assert_eq!(
         fs::read_to_string(src.join("main.js")).unwrap(),
         "original()"
@@ -58,7 +65,7 @@ fn imports_copy_sources_and_readonly_metadata_is_not_user_editable() {
         w.files()
             .unwrap()
             .iter()
-            .find(|f| f.path == "main.js")
+            .find(|f| f.path == "page.js")
             .unwrap()
             .imported_from
             .is_some()
@@ -216,4 +223,84 @@ fn unknown_is_not_replayed_or_reported_as_applied() {
     ledger.acknowledge_unknown(&t, &r.request_id).unwrap();
     assert_eq!(ledger.records().len(), 1);
     assert!(ledger.begin(t, "v2").is_ok());
+}
+
+#[test]
+fn imported_page_named_startup_is_not_executed_as_main_increment() {
+    let temp = TempDir::new().unwrap();
+    let source = temp.path().join("import");
+    fs::create_dir(&source).unwrap();
+    fs::write(source.join("startup.cjs"), "pageOnly()").unwrap();
+    fs::write(
+        source.join("manifest.json"),
+        r#"{"version":1,"id":"legacy","js":"./startup.cjs"}"#,
+    )
+    .unwrap();
+    let w = Workspace::import_manifest(&temp.path().join("work"), &source.join("manifest.json"))
+        .unwrap();
+    let snap = w.snapshot(&temp.path().join("cache")).unwrap();
+    assert_eq!(snap.bundle().unwrap().js, "pageOnly()");
+    assert!(snap.startup.is_none());
+    assert_eq!(
+        w.files()
+            .unwrap()
+            .iter()
+            .find(|f| f.path == "page.js")
+            .unwrap()
+            .stage,
+        SourceStage::Page
+    );
+}
+#[test]
+fn source_mappings_distinguish_runtime_and_user_ranges() {
+    let (temp, w) = create();
+    w.save("page.js", "one();\ntwo();").unwrap();
+    let p = w
+        .snapshot(&temp.path().join("cache"))
+        .unwrap()
+        .mapped_program()
+        .unwrap();
+    let user = p
+        .mappings
+        .iter()
+        .find(|m| m.origin == SourceOrigin::User)
+        .unwrap();
+    assert_eq!(user.generated_end_line - user.generated_start_line, 1);
+    assert_eq!(
+        p.source.lines().nth(user.generated_start_line - 1),
+        Some("one();")
+    );
+    assert_eq!(
+        p.source.lines().nth(user.generated_end_line - 1),
+        Some("two();")
+    );
+    for pair in p.mappings.windows(2) {
+        assert_eq!(pair[0].generated_end_line + 1, pair[1].generated_start_line);
+    }
+}
+#[cfg(unix)]
+#[test]
+fn poisoned_cache_links_and_source_nested_cache_are_rejected() {
+    use std::os::unix::fs::symlink;
+    let (temp, w) = create();
+    let cache = temp.path().join("cache");
+    let outside = temp.path().join("outside");
+    fs::create_dir(&cache).unwrap();
+    fs::create_dir(&outside).unwrap();
+    symlink(&outside, cache.join("workspaces")).unwrap();
+    assert!(w.snapshot(&cache).is_err());
+    assert!(fs::read_dir(&outside).unwrap().next().is_none());
+    let link = temp.path().join("source-link");
+    symlink(w.root(), &link).unwrap();
+    assert!(w.snapshot(&link.join("new-cache")).is_err());
+    assert!(!w.root().join("new-cache").exists());
+}
+#[test]
+fn dispatched_attempt_is_unknown_until_confirmed() {
+    let mut ledger = ExecutionLedger::default();
+    let t = target("dispatch");
+    let r = ledger.begin(t.clone(), "v1").unwrap();
+    ledger.mark_submitted(&r.request_id, &t).unwrap();
+    assert_eq!(ledger.records()[0].certainty, ExecutionCertainty::Unknown);
+    assert_eq!(ledger.records()[0].status, ExecutionStatus::Running);
 }

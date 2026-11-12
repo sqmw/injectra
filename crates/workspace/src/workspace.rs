@@ -87,31 +87,62 @@ impl Workspace {
             .unwrap_or_else(|| Path::new("."))
             .canonicalize()?;
         let source = Root::open(&parent)?;
-        let manifest = Manifest::parse(&source.read(name)?)?;
+        let manifest_bytes = source.read(name)?;
+        let mut manifest = Manifest::parse_import(&manifest_bytes)?;
         let mut assets = Vec::new();
         let mut total = 0;
-        for path in [&manifest.js, &manifest.css, &manifest.html]
-            .into_iter()
-            .flatten()
-        {
-            let bytes = source.read(path)?;
-            total += bytes.len();
-            if total > MAX_WORKSPACE_BYTES {
-                return Err(invalid("import exceeds workspace limit"));
+        for (asset, destination) in [
+            (&mut manifest.js, "page.js"),
+            (&mut manifest.css, "page.css"),
+            (&mut manifest.html, "page.html"),
+        ] {
+            if let Some(original) = asset.as_ref() {
+                let mut components = Vec::new();
+                for component in Path::new(original).components() {
+                    match component {
+                        std::path::Component::CurDir => (),
+                        std::path::Component::Normal(part) => components.push(
+                            part.to_str()
+                                .ok_or_else(|| invalid("non-UTF8 import path"))?,
+                        ),
+                        _ => {
+                            return Err(invalid(
+                                "import asset must remain within its manifest directory",
+                            ));
+                        }
+                    }
+                }
+                let path = components.join("/");
+                let bytes = source.read(&path)?;
+                total += bytes.len();
+                if total > MAX_WORKSPACE_BYTES {
+                    return Err(invalid("import exceeds workspace limit"));
+                }
+                assets.push((destination.to_owned(), path, bytes));
+                *asset = Some(destination.into());
             }
-            assets.push((path.clone(), bytes));
         }
-        // Validate before creating anything, and never hardlink imported assets.
+        // Manifest v1 page assets may be named startup.cjs or use ./ prefixes.
+        // Normalize copied files without confusing them with the main-process increment.
+        Manifest::parse(&json(&manifest)?)?;
         let root = Self::empty(root)?;
         let dest = Root::open(&root)?;
         let mut imports = BTreeMap::new();
-        for (path, bytes) in assets {
-            dest.write(&path, &bytes, true)?;
+        imports.insert(
+            "manifest.json".into(),
+            SourceReference {
+                origin: SourceOrigin::User,
+                path: parent.join(name).to_string_lossy().into_owned(),
+                hash: content_hash(&manifest_bytes),
+            },
+        );
+        for (destination, path, bytes) in assets {
+            dest.write(&destination, &bytes, true)?;
             imports.insert(
-                path.clone(),
+                destination,
                 SourceReference {
                     origin: SourceOrigin::User,
-                    path: parent.join(&path).to_string_lossy().into_owned(),
+                    path: parent.join(path).to_string_lossy().into_owned(),
                     hash: content_hash(&bytes),
                 },
             );

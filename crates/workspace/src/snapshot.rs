@@ -35,23 +35,63 @@ fn revision(id: &str, files: &[SourceFile]) -> Result<String> {
         &serde_json::to_vec(&(id, files)).map_err(|e| invalid(e.to_string()))?,
     ))
 }
+// Resolve existing ancestors before creating a requested cache directory.
+fn resolve_directory(path: &Path) -> Result<PathBuf> {
+    let mut out = PathBuf::new();
+    for component in std::path::absolute(path)?.components() {
+        match component {
+            std::path::Component::ParentDir => {
+                out.pop();
+            }
+            std::path::Component::CurDir => (),
+            other => {
+                out.push(other.as_os_str());
+                match fs::symlink_metadata(&out) {
+                    Ok(_) => {
+                        out = out.canonicalize()?;
+                    }
+                    Err(e) if e.kind() == std::io::ErrorKind::NotFound => (),
+                    Err(e) => return Err(e.into()),
+                }
+            }
+        }
+    }
+    Ok(out)
+}
 impl Snapshot {
     pub(crate) fn capture(workspace: &Workspace, cache: &Path) -> Result<Self> {
         let (_, files, data) = workspace.capture()?;
-        if std::path::absolute(cache)?.starts_with(workspace.root()) {
+        let cache = resolve_directory(cache)?;
+        if cache.starts_with(workspace.root()) {
             return Err(invalid("snapshot cache must be outside workspace"));
         }
-        fs::create_dir_all(cache)?;
-        let cache = cache.canonicalize()?;
+        fs::create_dir_all(&cache)?;
         if cache.starts_with(workspace.root()) {
             return Err(invalid("snapshot cache must be outside workspace"));
         }
         let revision = revision(workspace.id(), &files)?;
-        let parent = cache
-            .join("workspaces")
-            .join(workspace.id())
-            .join("revisions");
-        fs::create_dir_all(&parent)?;
+        let mut parent = cache;
+        for name in ["workspaces", workspace.id(), "revisions"] {
+            parent.push(name);
+            match fs::symlink_metadata(&parent) {
+                Ok(meta) if meta.is_dir() && !meta.file_type().is_symlink() => (),
+                Ok(_) => {
+                    return Err(invalid(
+                        "snapshot cache component is not an owned directory",
+                    ));
+                }
+                Err(error) if error.kind() == std::io::ErrorKind::NotFound => {
+                    let mut builder = fs::DirBuilder::new();
+                    #[cfg(unix)]
+                    {
+                        use std::os::unix::fs::DirBuilderExt;
+                        builder.mode(0o700);
+                    }
+                    builder.create(&parent)?;
+                }
+                Err(error) => return Err(error.into()),
+            }
+        }
         let target = parent.join(&revision);
         if target.exists() {
             let found = Self::load(&target)?;
@@ -246,20 +286,9 @@ impl Snapshot {
         let manifest = Manifest::parse(&files["manifest.json"])?;
         let bundle = self.bundle_from(&files)?;
         let mut source = injectra_web::apply(&bundle)?;
-        let path = manifest.js.unwrap_or_else(|| "manifest.json".into());
-        let encoded: String = path
-            .bytes()
-            .map(|b| {
-                if b.is_ascii_alphanumeric() || b"-._~/".contains(&b) {
-                    (b as char).to_string()
-                } else {
-                    format!("%{b:02X}")
-                }
-            })
-            .collect();
         let source_url = format!(
-            "injectra://{}/{}/{}",
-            self.workspace_id, self.revision, encoded
+            "injectra://{}/{}/generated/page-program.js",
+            self.workspace_id, self.revision
         );
         let marker = format!("\n{}\n}})", bundle.js);
         let offset = source
@@ -267,19 +296,45 @@ impl Snapshot {
             .ok_or_else(|| invalid("shared runtime source mapping shape changed"))?
             + 1;
         let start = source[..offset].bytes().filter(|b| *b == b'\n').count() + 1;
-        source.push_str(&format!("\n//# sourceURL={source_url}\n"));
-        Ok(GeneratedProgram {
-            source,
-            mappings: vec![SourceMapping {
+        let user_lines = if bundle.js.is_empty() {
+            0
+        } else {
+            bundle.js.bytes().filter(|b| *b == b'\n').count() + 1
+        };
+        let total = source.lines().count();
+        let mut mappings = vec![SourceMapping {
+            origin: SourceOrigin::Injectra,
+            path: "web/runtime.js".into(),
+            revision: self.revision.clone(),
+            source_url: source_url.clone(),
+            generated_start_line: 1,
+            generated_end_line: start - 1,
+            source_start_line: 1,
+        }];
+        if let Some(path) = manifest.js.filter(|_| user_lines > 0) {
+            mappings.push(SourceMapping {
                 origin: SourceOrigin::User,
                 path,
                 revision: self.revision.clone(),
-                source_url,
+                source_url: source_url.clone(),
                 generated_start_line: start,
+                generated_end_line: start + user_lines - 1,
                 source_start_line: 1,
-            }],
-        })
+            });
+        }
+        mappings.push(SourceMapping {
+            origin: SourceOrigin::Injectra,
+            path: "generated/page-wrapper.js".into(),
+            revision: self.revision.clone(),
+            source_url: source_url.clone(),
+            generated_start_line: start + user_lines,
+            generated_end_line: total,
+            source_start_line: 1,
+        });
+        source.push_str(&format!("\n//# sourceURL={source_url}\n"));
+        Ok(GeneratedProgram { source, mappings })
     }
+
     pub fn page_program(&self) -> Result<String> {
         Ok(self.mapped_program()?.source)
     }
