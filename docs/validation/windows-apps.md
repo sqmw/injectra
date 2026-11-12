@@ -65,6 +65,8 @@
 
 证据均为仓库外windows-validation-20261112下相对路径，不是仓库输入依赖；源码版本与控制/目标平台在各run中分开。原始run、工具失败、重试与截图超时均保留，不以最新网络失败抹掉旧成功。
 
+[九项Windows技术栈只读核查](windows-host-technology.md)：九款均有Web相关组件证据，六款Electron明确；CEF/混合UI不等于全主界面Web。
+
 ## 尚未取得页面的9项
 
 | 应用 | 已尝试/观察 | 本轮缺口 |
@@ -72,7 +74,7 @@
 | QQ | CDP、版本化资源根、目录主模块委托、Node预加载；原包fuse静态读取 | 改入口副本弹文件损坏；外置预加载标记未到达；不能据此判定QQ永久不支持 |
 | WorkBuddy | CDP、ASAR入口、PE摘要、委托/插入、保留虚拟/缺失外置条目的写入 | 副本未注册可执行页面；需进一步区分启动/缓存/宿主拦截 |
 | Figma | 更正实际版本化exe、FIGMA_TEST、CDP、ASAR委托 | 已启动外壳但未取得Bootstrap页面；编辑器/登录业务未测 |
-| 百度网盘 | CDP、Qt/WebView2进程环境候选、静态libcef识别 | Windows宿主为CEF路线，现有CJS准备不适用，尚缺页面桥 |
+| 百度网盘 | CDP、Qt/WebView2进程环境候选、静态libcef识别 | CEF＋WebView2加载器＋独立Electron浏览器模块并存，尚未绑定实际窗口/引擎 |
 | 优酷 | CDP、Qt/WebView2回环环境探测 | 未取得页面，不能用Mac已通过外推Windows |
 | 企业微信 | CDP、Qt/WebView2环境探测、安装结构核对 | 未取得页面，native/CEF宿主需进一步桥接 |
 | 抖音 | CDP、版本化资源定位、真实Win32 Hook | Hook仅证明进程内插桩，未建立页面执行通道 |

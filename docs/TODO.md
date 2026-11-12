@@ -13,16 +13,22 @@
   "name": "Windows 未通过入口泛化评估",
   "version": "v1",
   "mode": "lightweight",
-  "status": "pending",
+  "status": "in_progress",
   "goal": "根据T043九项页面缺口，评估CEF/版本化入口/签名与缓存等通用接入路线，形成可评审后续范围。",
   "scope": "待规划的通用路线评估，不自动为每应用开发专用执行代码、不建设平台、不改系统安全策略；本轮仅登记剩余问题，不启动研发。",
   "acceptance": "按宿主与格式解释证据、明确可复用策略和验证条件；任何实施范围变化先由用户确定。",
-  "execution_ref": "",
-  "acceptance_evidence": [],
+  "execution_ref": "archive/T-044-hosts.md#t-044",
+  "acceptance_evidence": [
+    "E001完成九款只读技术栈分类；实际窗口/引擎对应关系与后续入口路线仍待评估，Task不据此关闭。"
+  ],
   "unplanned_reason": "T043全清单测试完成，但9项尚无页面成功，需要保留后续跟进入口。"
 }
 ```
 
+
+
+
+[宿主核查](validation/windows-host-technology.md) · [本次执行](archive/T-044-hosts.md#t-044)。
 
 <a id="t-034"></a>
 ### T-034 · 阿里云盘 pre-runtime 入口核查
