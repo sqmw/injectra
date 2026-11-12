@@ -82,7 +82,7 @@ def main():
                 page=next((p for p in pages if p.get('url','').startswith(('file:','app:','chrome:','edge:'))),pages[0]);report['selected']=page['id']
                 verify_args=['scripts/verify-live.mjs','--no-screenshot','--port',str(port),'--target',page['id']]+(['--dom'] if args.dom else [])
                 if protocol!='cdp':
-                    verify_args=['scripts/windows-gecko-verify.mjs','--port',str(port),'--protocol',protocol]
+                    verify_args=['scripts/windows-gecko-verify.mjs','--port',str(port),'--protocol',protocol,'--owner',out]
                     report['route']='Gecko/'+protocol;report['product_backend']=False
                 executable=args.native_node
                 if protocol=='win32-hook':

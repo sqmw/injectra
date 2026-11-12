@@ -10,8 +10,10 @@ import {MarionetteClient} from '../tests/gecko/marionette-client.mjs';
 import {ThunderbirdContentHost} from '../tests/gecko/thunderbird-host.mjs';
 import {verifyRuntime} from '../tests/gecko/runtime-checks.mjs';
 import {root} from './test-env.mjs';
-const {values}=parseArgs({options:{port:{type:'string'},protocol:{type:'string'}}});
+const {values}=parseArgs({options:{port:{type:'string'},protocol:{type:'string'},owner:{type:'string'}}});
 assert.equal(process.platform,'win32');assert(['bidi','marionette'].includes(values.protocol));
+const owner=JSON.parse(await readFile(values.owner,'utf8'));
+const verifyOwner=session=>{assert.equal(session.capabilities['moz:processID'],owner.pid);assert.equal(resolve(session.capabilities['moz:profile']).toLowerCase(),resolve(owner.profile).toLowerCase());assert.equal(session.capabilities['moz:headless'],false);};
 const port=Number(values.port),runtime=await readFile(resolve(root,'web/runtime.js'),'utf8');
 const result={passed:false,platform:process.platform,protocol:values.protocol,productBackend:false,checks:[]};
 const check=async(name,action)=>{await action();result.checks.push(name);};
@@ -23,15 +25,16 @@ try {
  while(!client){try{client=values.protocol==='bidi'?await BidiClient.connect(`ws://127.0.0.1:${port}/session`,()=>{}):await MarionetteClient.connect(port,()=>{});}catch(error){if(Date.now()-start>40000)throw error;await new Promise(r=>setTimeout(r,500));}}
  let evaluate,other;
  if(values.protocol==='bidi') {
-  result.session=await client.command('session.new',{capabilities:{}},45000);
+  result.session=await client.command('session.new',{capabilities:{}},45000);verifyOwner(result.session);
   const a=await client.command('browsingContext.create',{type:'tab'}),b=await client.command('browsingContext.create',{type:'tab'});
   for(const [context,path]of [[a.context,'main'],[b.context,'other']])await client.command('browsingContext.navigate',{context,url:origin+'/'+path,wait:'complete'});
   evaluate=source=>client.evaluate({context:a.context},source);other=source=>client.evaluate({context:b.context},source);
   closeContent=async()=>{await client.command('browsingContext.close',{context:a.context});await client.command('browsingContext.close',{context:b.context});};
  } else {
-  result.session=await client.command('WebDriver:NewSession',{webSocketUrl:true},45000);
+  result.session=await client.command('WebDriver:NewSession',{webSocketUrl:true},45000);verifyOwner(result.session);
   await client.command('Marionette:SetContext',{value:'chrome'});
-  assert.equal(await client.evaluate("!!document.getElementById('tabmail')"),true);
+  const handles=await client.command('WebDriver:GetWindowHandles');let found=false;
+  for(const handle of handles){await client.command('WebDriver:SwitchToWindow',{handle});if(await client.evaluate("!!document.getElementById('tabmail')")){found=true;break;}}assert(found,'Owned Thunderbird main window not found');
   const host=new ThunderbirdContentHost(client,result.session.sessionId);
   await client.evaluate("(()=>{const t=document.getElementById('tabmail');t.openTab('contentTab',{url:"+JSON.stringify(origin+'/main')+"});t.openTab('contentTab',{url:"+JSON.stringify(origin+'/other')+"});return true;})()");
   let a,b;const deadline=Date.now()+30000;
