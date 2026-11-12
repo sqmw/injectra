@@ -41,3 +41,5 @@ Windows x64 V8 ABI实验：[agent](../../tests/windows/v8-windows.js)、[自有N
 受控Node Windows x64 V8验证已取得目标进程内marker（42、实际PID、win32），随后显式目标[附加器](../../tests/windows/v8-attach.py)核对exe/PID世代，调用同一agent。只派发引导加载，不终止现有App；派发成功仍不等于页面成功，后者独立用Bootstrap共享Web合同验收。
 
 Windows V8实验按MSVC ABI区分x64与ia32，32位先使用独立下载并核对官方SHA256的Node x86夹具验证，不对应用直接试错。真实Bootstrap验收增加目标世代连续稳定3秒的门槛，并记录选定目标的去查询参数URL；启动页重建拒绝仍保留旧run，后续显式连接属于新run，不重放Unknown。
+
+V8实验同时观察Windows I/O完成与消息泵入口，不假定所有Electron版本使用同一种泵。卸载回执记录命中、实际尝试和取消的排队数；只有卸载明确确认零尝试，才把尚未派发的请求判为NotExecuted，其他不确定结果继续Unknown且不自动重放。

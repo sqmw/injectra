@@ -18,7 +18,9 @@ try:
 except Exception as e:result['error']=str(e)
 finally:
  if script:
-  try:result['detach']=script.exports_sync.stop()
+  try:
+   result['detach']=script.exports_sync.stop()
+   if result['certainty']=='Unknown' and result['detach'].get('attempted')==0:result['certainty']='NotExecuted'
   except Exception as e:result['detach_error']=str(e)
  if session:
   try:session.detach()

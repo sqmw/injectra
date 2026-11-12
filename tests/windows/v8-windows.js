@@ -1,6 +1,5 @@
 // Windows MSVC V8 ABI experiment. Validate against an owned Node fixture first.
-let hook,closed=false,busy=false,queue=[];
-const retained=[];
+let hooks=[],closed=false,busy=false,queue=[],hits=0,attempted=0;
 rpc.exports={
  start(modulePath){
   if(Process.platform!=='windows'||!['ia32','x64'].includes(Process.arch))throw Error('Windows x86/x64 only');
@@ -15,11 +14,12 @@ rpc.exports={
   const string=fn(x64?'?NewFromUtf8@String@v8@@SA?AV?$MaybeLocal@VString@v8@@@2@PEAVIsolate@2@PEBDW4NewStringType@2@H@Z':'?NewFromUtf8@String@v8@@SA?AV?$MaybeLocal@VString@v8@@@2@PAVIsolate@2@PBDW4NewStringType@2@H@Z',['pointer','pointer','pointer','int','int']);
   const compile=fn(x64?'?Compile@Script@v8@@SA?AV?$MaybeLocal@VScript@v8@@@2@V?$Local@VContext@v8@@@2@V?$Local@VString@v8@@@2@PEAVScriptOrigin@2@@Z':'?Compile@Script@v8@@SA?AV?$MaybeLocal@VScript@v8@@@2@V?$Local@VContext@v8@@@2@V?$Local@VString@v8@@@2@PAVScriptOrigin@2@@Z',['pointer','pointer','pointer','pointer']);
   const run=fn(x64?'?Run@Script@v8@@QEAA?AV?$MaybeLocal@VValue@v8@@@2@V?$Local@VContext@v8@@@2@@Z':'?Run@Script@v8@@QAE?AV?$MaybeLocal@VValue@v8@@@2@V?$Local@VContext@v8@@@2@@Z',['pointer','pointer','pointer'],true);
-  hook=Interceptor.attach(Module.getGlobalExportByName('GetQueuedCompletionStatusEx'),{onLeave(){
+  const dispatch=()=>{
+   hits++;
    if(closed||busy||!queue.length)return;
    const isolate=current();if(isolate.isNull())return;
    busy=true;let handleScope=null;
-   const command=queue.shift();
+   const command=queue.shift();attempted++;
    try{
     handleScope=Memory.alloc(4096);scope(handleScope,isolate);
     const out=Memory.alloc(16);context(isolate,out);const ctx=out.readPointer();if(ctx.isNull())throw Error('No active context');
@@ -28,9 +28,15 @@ rpc.exports={
     out.writePointer(ptr(0));run(compiled,out,ctx);send({event:'v8-run',id:command.id,returned:!out.readPointer().isNull(),thread:Process.getCurrentThreadId()});
    }catch(error){send({event:'v8-error',id:command.id,message:String(error)});}
    finally{if(handleScope)unscope(handleScope);busy=false;}
-  }});
-  return {pid:Process.id,arch:Process.arch,module:m.path};
+  };
+  const addresses=new Set();
+  for(const name of ['GetQueuedCompletionStatusEx','GetQueuedCompletionStatus','PeekMessageW']){
+   const address=Module.findGlobalExportByName(name);if(!address||addresses.has(address.toString()))continue;
+   addresses.add(address.toString());hooks.push(Interceptor.attach(address,{onLeave:dispatch}));
+  }
+  if(!hooks.length)throw Error('No supported Windows event pump export');
+  return {pid:Process.id,arch:Process.arch,module:m.path,hooks:hooks.length};
  },
  execute(id,source){if(closed)throw Error('Closed');queue.push({id,source});return {queued:true};},
- stop(){closed=true;queue=[];hook?.detach();return {detached:true};}
+ stop(){closed=true;const canceled=queue.length;queue=[];for(const hook of hooks)hook.detach();return {detached:true,canceled,attempted,hits};}
 };
