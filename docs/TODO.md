@@ -4,48 +4,6 @@
 
 ## 当前执行
 
-<a id="t-040"></a>
-### T-040 · 通用注入核心与 pre-runtime dev 模式
-
-```tracking-task
-{
-  "id": "T-040",
-  "name": "通用注入核心与 pre-runtime dev 模式",
-  "version": "v3",
-  "mode": "lightweight",
-  "status": "in_progress",
-  "goal": "选择性撤回平台化代码，保留通用runtime并交付CLI prepare/dev页面增量闭环。",
-  "scope": "删除工作台、Studio、完整workspace及启动增量/导出；提取Bootstrap、最小来源及执行正确性；精简准备器，只改派生副本，保留历史和运行数据。",
-  "acceptance": "runtime合同回归；目录/ASAR准备、CLI动态更新、多目标/Unknown正确性；QQ/Claude优先实机验证并如实限定证据；无平台依赖。",
-  "execution_ref": "TODO.md#t-040",
-  "acceptance_evidence": [],
-  "unplanned_reason": "用户纠正查看平台含义：先注入少量dev代码，在原App看实时更新，先更新文档。",
-  "previous_versions": [
-    "v1",
-    "v2"
-  ]
-}
-```
-
-```tracking-execution
-{
-  "id": "T-040/E-002",
-  "name": "CLI 收敛与 dev 闭环",
-  "task_id": "T-040",
-  "task_version": "v3",
-  "status": "running",
-  "authorization": "2026-11-12用户明确PLEASE IMPLEMENT THIS PLAN，批准选择性删除平台化并打通CLI dev；页面增量、直接应用、无startup。",
-  "scope": "删除工作台、Studio、完整workspace及启动增量/导出；提取Bootstrap、最小来源及执行正确性；精简准备器，只改派生副本，保留历史和运行数据。",
-  "steps": [],
-  "evidence": [
-    "删除前main及4个platform工作树源码快照、HEAD、patch保存在仓库外recovery/t040-cli-20261112；不改其他工作树。已移除平台模块，提取application dev输入版本及Bootstrap请求绑定；cargo check通过。独立prepare/dev与最小未决记录已实现，make check、独立Electron、38项Frida测试、目录/ASAR两类dev夹具及Claude本地壳实机通过；QQ当前CJS入口Unsupported如实保留。"
-  ],
-  "stop_reason": ""
-}
-```
-
-[当前范围](architecture/dev-mode.md) · [v1历史与退役执行](archive/T-040.md#t-040)。v3按用户批准的CLI收敛计划实施；[v2定义](archive/T-040-v2.md)保留。
-
 <a id="t-034"></a>
 ### T-034 · 阿里云盘 pre-runtime 入口核查
 
@@ -114,6 +72,39 @@
 上下文r6：Parent/main，single-writer，续接d210ec9。用户已解锁，菜单/偏好设置及新run yudc69f4完成，普通首页已恢复；钥匙串提示状态与快速退出根因仍未知。当前缺口是可执行的目标侧入口，任务保持受阻，不计注入成功。证据见[启动条件复核](compatibility/adrive-startup.md)；仅有新的入口或诊断证据时继续，不调用未确认服务、修改保护或重放Unknown。
 
 ## 最近完成的验证
+
+<a id="t-040"></a>
+### T-040 · 通用注入核心与 pre-runtime dev 模式
+
+```tracking-task
+{
+  "id": "T-040",
+  "name": "通用注入核心与 pre-runtime dev 模式",
+  "version": "v3",
+  "mode": "lightweight",
+  "status": "done",
+  "goal": "选择性撤回平台化代码，保留通用runtime并交付CLI prepare/dev页面增量闭环。",
+  "scope": "删除工作台、Studio、完整workspace及启动增量/导出；提取Bootstrap、最小来源及执行正确性；精简准备器，只改派生副本，保留历史和运行数据。",
+  "acceptance": "runtime合同回归；目录/ASAR准备、CLI动态更新、多目标/Unknown正确性；QQ/Claude优先实机验证并如实限定证据；无平台依赖。",
+  "execution_ref": "archive/T-040-cli.md#t-040-e-002",
+  "acceptance_evidence": [
+    "CLI平台删减与prepare/dev闭环完成，代码提交a403982、323db43；源代码与历史WIP有仓库外恢复快照。",
+    "make check、Electron、双布局dev、多窗口/错误/Unknown合同、core/native独立构建及Frida回归通过。Claude本地页面实机通过，QQ Unsupported及console限制如实记录。"
+  ],
+  "unplanned_reason": "用户纠正查看平台含义：先注入少量dev代码，在原App看实时更新，先更新文档。",
+  "previous_versions": [
+    "v1",
+    "v2"
+  ]
+}
+```
+
+
+
+[当前范围](architecture/dev-mode.md) · [v1历史与退役执行](archive/T-040.md#t-040)。v3已按用户批准的CLI收敛计划完成；[v2定义](archive/T-040-v2.md)保留。
+
+[CLI收敛执行与证据](archive/T-040-cli.md#t-040-e-002)。
+
 
 <a id="t-041"></a>
 ### T-041 · 通用注入 dev 模式文档校准

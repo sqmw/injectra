@@ -18,7 +18,7 @@ QQ与Claude使用同一准备器；数据模式分别遵循已有QQ shared授权
 | Claude4.23118.1 | 通过 | 同一prepare/dev，isolated派生副本，app.asar的.vite/build/index.pre.js；真实本地壳页面两版HTML/CSS/JS断言及清理回执Executed；Ctrl-C不退出App；未登录/验证远端聊天 |
 | QQ6.9.86 | Unsupported | 主入口application.asar/app_launcher/index.js不是当前可直接读取的明文CJS文件；通用准备器在副本修改前拒绝，未新增品牌绕路；旧QQ主题实验不被本结果覆盖 |
 
-Claude控制台事件未收到，页面内DOM/CSS断言和执行回执通过；不把可选日志缺失写成日志验收成功。原用户实例没有被终止；仅测试新副本的精确PID在验证后经路径核对退出。
+Claude控制台事件未收到，页面内DOM/CSS断言和执行回执通过；不把可选日志缺失写成日志验收成功。首次Claude尝试等待console事件而超时（PID88127），随后新请求/PID88561改用页内断言与执行回执通过；未把前次日志等待失败改成成功。原用户实例没有被终止；仅测试新副本的精确PID在验证后经路径核对退出。
 
 仓库外证据：runs/preparation-fixtures-iNzd88/下两类acceptance.json；runs/t040-cli-real/claude/e791b34e-911b-48a5-a345-6796f0f80f5b/acceptance.json。早期资源封印读取、摘要空slot及日志事件名调试失败由对应派生目录/日志保留，不回填为成功。原包未修改；关键资源摘要校验不等于整包逐字节核对。
 
