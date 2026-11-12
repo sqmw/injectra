@@ -30,3 +30,5 @@ state投影包含workspace{id,root,revision}、files[{path,origin,stage,hash}]�
 以用户批准的七项标准为整体验收：目录/ASAR夹具及至少两真实App；外部载荷修改不改变准备产物；原入口身份与启动语义；多目标/旧回执/断线；三类来源；开发服务关闭后导出独立运行；make check、独立Electron与新协议/UI测试。
 
 现有QQ共享数据授权保留，其他应用由工作区配置明确选择。原用户会话不得自动结束。32独立方案阈值不变；本轮静态注册。插件仍归独立插件库，仓库只保留最小夹具。原历史实测与tag不改写。
+
+工作区模型接口与边界：[workspace v1](workspace-v1.md)。

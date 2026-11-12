@@ -10,6 +10,7 @@ const packages = new Map(JSON.parse(command.stdout).packages.map(p => [p.name, p
 const allowed = {
   "injectra-core": [],
   "injectra-web": ["injectra-core"],
+  "injectra-workspace": ["injectra-core", "injectra-web"],
   "injectra-native": ["injectra-core"],
   "injectra-application": ["injectra-core", "injectra-web"],
   "injectra-cdp": ["injectra-core", "injectra-web"],
