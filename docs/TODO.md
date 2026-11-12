@@ -19,7 +19,8 @@
   "acceptance": "九款均按实际进程/引擎/入口完成新验证；页面成功须覆盖注入、更新和清理；无法通过保留原始证据及缺口，通用工具完成相应回归。",
   "execution_ref": "TODO.md#t-044",
   "acceptance_evidence": [
-    "E001完成九款只读技术栈分类；实际窗口/引擎对应关系与后续入口路线仍待评估，Task不据此关闭。"
+    "E001完成只读Windows宿主分类，旧v1定义与run保留。",
+    "E002按Windows实际入口新增QQ、WorkBuddy、Figma、抖音、Cocos Creator五款页面通过，累计34/38；其余4款的启动/原生窗口/CEF入口缺口见validation/windows-retries.md，Task继续保留。"
   ],
   "unplanned_reason": "T043全清单测试完成，但9项尚无页面成功，需要保留后续跟进入口。",
   "previous_versions": [
@@ -31,7 +32,9 @@
 
 
 
-[宿主核查](validation/windows-host-technology.md) · [本次执行](archive/T-044-hosts.md#t-044)。
+[宿主核查](validation/windows-host-technology.md) · [v1执行与定义](archive/T-044-hosts.md#t-044) · [v2复验报告](validation/windows-retries.md)。
+
+恢复上下文 r2：本窗口为Parent，权威写入在本地main；起始a586804且无未提交改动。T-044@v2本轮E-002为九项复验，不等于九项全部兼容。剩余4项从复验报告及仓库外原始run恢复；不重复旧成功、不转为品牌适配、不改原安装/安全策略，不自动登录。Windows验证checkout按Git接收源码；其他旧平台工作树未接收或改写。
 
 ## E-002 · Windows 通用入口复验
 
@@ -41,11 +44,16 @@
   "name": "九款 Windows 通用入口复验",
   "task_id": "T-044",
   "task_version": "v2",
-  "status": "running",
+  "status": "succeeded",
   "authorization": "2026-11-13用户明确要求继续九款，按Windows实际引擎/入口且不得每App独立适配；既有授权允许仅结束核验过的本轮测试进程。",
   "scope": "复用协议、宿主和资源格式策略；允许自有派生副本与已确认测试进程操作，不新增品牌执行分支、不改原安装和系统安全策略、不终止原有用户实例。",
   "steps": [],
-  "evidence": [],
+  "evidence": [
+    "完成九项Windows新尝试；共享x64 V8/Bootstrap取得QQ主页面、WorkBuddy页面和Figma登录页证据；同一ASAR引导抖音通过，Cocos正确空项目配置走现有CLI/CDP通过。",
+    "其余4项未计页面成功：优酷Widevine404（包内CDM配置仍失败）；企业微信原生登录/百度原生欢迎且本轮未加载CEF；网易云新进程在关闭前已退出、退出码时间未知。原始失败与Unknown不改写/不自动重放。",
+    "make check、独立Electron及7项Windows格式测试通过；Win x64/ia32 Node ABI夹具通过；后端/共享runtime未按品牌复制，代码检索未发现测试实现中的应用名分支。报告validation/windows-retries.md。",
+    "按既有授权核对PID、exe及创建世代结束4个已确认测试进程；挂起的自有CEF测试控制进程另按精确启动记录收尾，原有QQ/WorkBuddy/Figma实例保留。Git拆分提交6c3b09c至本条所在提交；运行数据与密钥位于仓库外。"
+  ],
   "stop_reason": ""
 }
 ```
