@@ -35,3 +35,5 @@ state投影包含workspace{id,root,revision}、files[{path,origin,stage,hash}]�
 
 工作区模型接口与边界：[workspace v1](workspace-v1.md)。
 Bootstrap API and protocol: [bootstrap-protocol](bootstrap-protocol.md).
+
+Studio service and security contract: [studio-v1](studio-v1.md).
