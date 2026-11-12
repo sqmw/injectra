@@ -25,7 +25,7 @@ def main():
     child = None
     try:
         child = device.spawn([args.exe, '--remote-debugging-address=127.0.0.1',
-                              '--remote-debugging-port=' + str(args.port)])
+                              '--remote-debugging-port=' + str(args.port)], cwd=str(pathlib.Path(args.exe).parent))
         owner = dict(identity(child), pid=child)
         # Exact process generation, reusable by the existing cleanup reconciler.
         (args.output / 'launch.json').write_text(json.dumps(owner))

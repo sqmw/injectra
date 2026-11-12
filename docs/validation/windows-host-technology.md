@@ -35,3 +35,5 @@ E-002按Windows实际入口复验。实验副本复制器新增[包内链接复�
 CEF启动实验：[启动器](../../tests/windows/cef-spawn.py)、[初始化探针](../../tests/windows/cef-init.js)。仅在明确的CEF 86/91/107版本、目标架构及完整settings尺寸同时匹配时，替换本次cef_initialize参数为临时副本并设置调试端口，不修改原settings、安装文件或沙箱选项；未知版本/尺寸拒绝。布局依据CEF官方分支[4240](https://github.com/chromiumembedded/cef/blob/4240/include/internal/cef_types.h)、[4472](https://github.com/chromiumembedded/cef/blob/4472/include/internal/cef_types.h)、[5304](https://github.com/chromiumembedded/cef/blob/5304/include/internal/cef_types.h)。这是实机入口探索工具，不是正式后端或页面成功证明。
 
 包内Junction先读取显式目标再规范化，规避Windows libuv对尾部分隔符Junction的UNKNOWN；目标仍须canonical化且限制在源包。实验prepare-copy的`--exclude <相对路径>`仅配置明确的运行数据/锁目录，并写入proof清单，不能排除应用package；不因EBUSY静默跳过未知文件。
+
+Windows x64 V8 ABI实验：[agent](../../tests/windows/v8-x64.js)、[自有Node隔离验证](../../tests/windows/v8-fixture.py)。只选择明确引擎模块和完整MSVC导出符号，在目标I/O线程尝试受控执行；必须先通过自有进程验证，不能将Mac ABI或符号存在当作执行证明。32位目标不进入此实验，尚不是正式WebBackend。
