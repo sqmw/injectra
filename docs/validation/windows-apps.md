@@ -72,3 +72,13 @@ python -B scripts/windows-cdp-smoke.py --host "$WIN_HOST" --user "$WIN_USER" --s
 plan为显式外部JSON数组（name/exe/version/可选args），不在产品核心中按品牌分支。测试不修改安装目录、系统调试配置、现有同步目录或全局环境变量。当前仅是runtime首轮工具，不能将其当成Windows pre-runtime准备器。
 
 工具复核：已用Windows Chrome验证完整HTML合同及--dom/--no-screenshot组合；交互启动、停止标记和桌面会话收尾均有独立run。早期双反斜杠路径和Session0收尾问题已修正，旧自有实例通过交互任务按PID/启动时间/路径核对请求关闭；不强制结束用户进程。源码工具的Python仅标准库，Mac先完成语法、真实对照与make check。
+
+## Windows本机构建与后续验证
+
+已通过Git在仓库外建立source-69ddebc独立验证checkout，HEAD与Mac提交69ddebc一致，不覆盖Syncthing目录。Windows用现有Rust1.96.1/x86_64 MSVC、两路构建完成injectra.exe，Node24.18.0执行页面验证。native-runs将Windows CLI/测试客户端与Mac SSH编排区分；原生CDP实测已有成功，不再把Mac控制端结果当作唯一证据。
+
+后续工具新增--native-root/--native-node/--native-target-dir以在Windows直接执行页面验证；[远程诊断传输](../../scripts/windows_remote.py)只承载测试命令，复用SSH连接，参数与运行数据在仓库外。--native-python仅用于明确标记为测试探针的[Win32 Hook](../../scripts/windows-frida-hook.py)/[agent](../../tests/windows/dispatch-hook.js)，通过owner记录核对PID/创建时间/路径；Hook成功不计为页面注入通过。
+
+[Windows Gecko测试客户端](../../scripts/windows-gecko-verify.mjs)复用原BiDi、Marionette和Thunderbird宿主合同，尚待Windows实测；不注册正式CLI后端。窗口启动参数、临时user.js和子进程环境均由显式外部plan提供，不修改用户全局配置。新测试客户端在Mac完成语法及共享合同检查后经Git部署到Windows验证。
+
+2026-11-12用户补充授权：允许结束经PID、启动时间和路径核验的本轮残留测试进程，初始会话不动。已据初始running快照排除原进程，强制清理证据单独保存在force-owned-*.json；此前只请求正常退出的记录不改写。

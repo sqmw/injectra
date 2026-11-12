@@ -30,7 +30,7 @@
   "task_id": "T-043",
   "task_version": "v1",
   "status": "running",
-  "authorization": "2026-11-12用户要求Windows把Mac已尝试App全部尝试；FlowUs和Manus跳过。",
+  "authorization": "2026-11-12用户要求Windows把Mac已尝试App全部尝试；FlowUs和Manus跳过。用户后续明确允许结束核验过的本轮残留测试进程，原初会话保留。",
   "scope": "Windows已安装应用盘点、runtime/CDP及后续Gadget/pre-runtime/Gecko候选；Mac编写工具，远端构建/运行，独立测试实例，既有用户进程保留；控制端与目标平台分别标明。",
   "steps": [],
   "evidence": [
