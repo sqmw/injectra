@@ -3,6 +3,11 @@ import type { ApiFailure, StudioEvent } from './types';
 export class StudioError extends Error {
   constructor(message: string, public readonly status: number, public readonly certainty?: string) { super(message); }
 }
+export function startupFailure(error: unknown, token: string): Error {
+  let message = error instanceof Error ? error.message : '无法连接本地工作台服务。';
+  if (token) for (const secret of new Set([token, encodeURIComponent(token)])) message = message.split(secret).join('[redacted]');
+  return error instanceof StudioError ? new StudioError(message, error.status, error.certainty) : new Error(message);
+}
 export function takeToken(location: Pick<Location, 'hash' | 'pathname' | 'search'>, history: Pick<History, 'replaceState'>): string {
   const token = new URLSearchParams(location.hash.replace(/^#/, '')).get('token') ?? '';
   if (location.hash) history.replaceState(null, '', location.pathname + location.search);
@@ -13,7 +18,8 @@ export class StudioApi {
   async request<T>(path: string, body?: unknown, method = body === undefined ? 'GET' : 'POST'): Promise<T> {
     const url = new URL(path, this.origin);
     if (url.origin !== this.origin || !url.pathname.startsWith('/api/')) throw new Error('Only same-origin Studio API requests are allowed');
-    const response = await this.fetcher(url.href, { method, credentials: 'same-origin', cache: 'no-store', headers: { Authorization: `Bearer ${this.token}`, ...(body === undefined ? {} : { 'Content-Type': 'application/json' }) }, ...(body === undefined ? {} : { body: JSON.stringify(body) }) });
+    // WebKit's native fetch requires its Window/global receiver, not this client.
+    const response = await this.fetcher.call(globalThis, url.href, { method, credentials: 'same-origin', cache: 'no-store', headers: { Authorization: `Bearer ${this.token}`, ...(body === undefined ? {} : { 'Content-Type': 'application/json' }) }, ...(body === undefined ? {} : { body: JSON.stringify(body) }) });
     const content = await response.text();
     let data: unknown;
     try { data = content ? JSON.parse(content) : {}; } catch { throw new StudioError('服务返回了无法识别的响应。', response.status); }

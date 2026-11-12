@@ -19,6 +19,7 @@ node studio-ui/scripts/check.mjs
 ## API与交互
 
 - HTTP使用Authorization Bearer；启动URL的#token=读取后立即从URL清除，凭据仅保留本页面内存。工作台内“刷新连接”复用凭据；完整浏览器刷新需重新打开CLI输出链接。凭据不写storage或日志，不放API/WS URL中。
+- fetch显式使用浏览器global接收者，避免WebKit把StudioApi实例当作native方法接收者；启动错误保留实际Error.message，并遮去原始/URL编码凭据，不再把所有异常压成通用连接失败。
 - WebSocket连接/api/events后先发送authenticate帧，收到authenticated后才接收state/run/log。断线不自动重连或执行；用户点击刷新连接恢复。
 - API文件path作为不透明标识原样回传；relative_path仅用于展示。GET文件返回content/origin/stage/hash。PUT携带expected_hash，409保留草稿且阻止覆盖；重新载入是显式操作，有未保存内容时确认放弃。保存期间的新编辑不会被响应覆盖。新增文件使用user:<相对路径>、空内容和expected_hash:null，创建冲突保留当前草稿；startup.cjs与辅助文件均可从工作台创建。
 - 保存与运行分开；默认显式运行已保存revision。可选保存时应用只对页面增量生效，startup保存始终显示等待重启。启动状态绑定整个快照，因此其他文件保存或删除启动入口也可能等待重启；界面说明“启动阶段仍使用上一快照，页面增量可单独更新”，不阻止页面运行。POST run/reload同时传目标generation；目标世代变化立即清空选择并暂停自动应用。
@@ -29,6 +30,6 @@ node studio-ui/scripts/check.mjs
 
 ## 验证边界
 
-check命令运行严格TypeScript检查、真实CodeMirror构建及16项测试：认证凭据范围、WS首帧/认证顺序、目标世代失效、Unknown精确确认与不重放、queued不提前确认、保存时编辑竞争、只读来源、草稿冲突、新文件创建、导出目标范围及启动快照/页面执行分离。main入口已有beforeunload未保存草稿保护；跨文件保留的草稿同样触发保护。
+check命令运行严格TypeScript检查、真实CodeMirror构建及18项测试：native fetch接收者、启动诊断与凭据遮盖、认证凭据范围、WS首帧/认证顺序、目标世代失效、Unknown精确确认与不重放、queued不提前确认、保存时编辑竞争、只读来源、草稿冲突、新文件创建、导出目标范围及启动快照/页面执行分离。main入口已有beforeunload未保存草稿保护；跨文件保留的草稿同样触发保护。
 
 DOM交互测试使用JSDOM和受控编辑器替身，验证工作台流程；不伪称真实CodeMirror排版或目标App执行已验收。Parent需在集成服务后补真实浏览器视觉和端到端检查。当前无原App进程操作、没有新增插件或业务载荷。

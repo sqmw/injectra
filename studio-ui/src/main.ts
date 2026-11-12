@@ -1,5 +1,5 @@
 import './style.css';
-import { StudioApi, StudioError, takeToken } from './api';
+import { StudioApi, startupFailure, takeToken } from './api';
 import { StudioApp } from './studio';
 
 const root = document.getElementById('studio')!;
@@ -11,6 +11,6 @@ if (!token) {
   page.append(title, text); root.append(page);
 } else {
   const app = new StudioApp(root, new StudioApi(token, window.location.origin));
-  app.start().catch(error => app.reportError(error instanceof StudioError ? error : new Error('无法连接本地工作台服务。')));
+  app.start().catch(error => app.reportError(startupFailure(error, token)));
   window.addEventListener('beforeunload', event => { if (app.hasDirtyDrafts()) { event.preventDefault(); event.returnValue = ''; } });
 }

@@ -1,7 +1,25 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { load } from './load.mjs';
-const { StudioApi, takeToken, StudioError } = await load('api');
+const { StudioApi, takeToken, StudioError, startupFailure } = await load('api');
+test('fetch is invoked with the global receiver required by native browser APIs', async () => {
+  let invoked = false;
+  const nativeLikeFetch = async function (url) {
+    assert.equal(this, globalThis, 'Illegal invocation: receiver must be the browser global');
+    invoked = true;
+    assert.equal(url, 'http://127.0.0.1:1234/api/state');
+    return new Response('{"ok":true}', { status: 200 });
+  };
+  const api = new StudioApi('fixture-token', 'http://127.0.0.1:1234', nativeLikeFetch);
+  assert.deepEqual(await api.request('/api/state'), { ok: true }); assert.equal(invoked, true);
+});
+test('startup failure keeps the actual diagnostic message while redacting credentials', () => {
+  assert.equal(startupFailure(new TypeError('Illegal invocation'), 'fixture-token').message, 'Illegal invocation');
+  const token = 'fixture+/secret';
+  const failure = startupFailure(new StudioError(`Rejected ${token} and ${encodeURIComponent(token)}`, 401, 'NotExecuted'), token);
+  assert.equal(failure.message, 'Rejected [redacted] and [redacted]');
+  assert.equal(failure.status, 401); assert.equal(failure.certainty, 'NotExecuted');
+});
 test('fragment credentials are cleared and used only in same-origin headers', async () => {
   const histories = [];
   assert.equal(takeToken({ hash: '#token=private-token', pathname: '/', search: '?workspace=id' }, { replaceState: (...args) => histories.push(args) }), 'private-token');
