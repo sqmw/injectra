@@ -33,7 +33,7 @@ def main():
                 with socket.socket() as listener:listener.bind(('127.0.0.1',port))
             report['port']=port
             profile=root+'\\profile';out=root+'\\launch.json'
-            flags=[f'--remote-debugging-port={port}','--remote-debugging-address=127.0.0.1',f'--user-data-dir="{profile}"','--no-first-run','--no-default-browser-check']+spec.get('args',[])
+            flags=[f'--remote-debugging-port={port}','--remote-debugging-address=127.0.0.1',f'--user-data-dir="{profile}"','--no-first-run','--no-default-browser-check']+[value.format(port=port,profile=profile)for value in spec.get('args',[])]
             if spec.get('launch_args'):flags=[v.format(port=port,profile=profile)for v in spec['launch_args']]
             protocol=spec.get('protocol','cdp')
             preferences=dict(spec.get('preferences',{}))
@@ -48,7 +48,7 @@ def main():
                 env+='$env:'+key+'='+quoted(value.format(port=port,profile=profile))+';'
             launch=(preset+env+"$p=Start-Process -FilePath "+quoted(spec['exe'])+" -RedirectStandardOutput "+quoted(root+'\\app.stdout')+" -RedirectStandardError "+quoted(root+'\\app.stderr')+" -WorkingDirectory "+quoted(str(pathlib.PureWindowsPath(spec['exe']).parent))+" -ArgumentList @("+','.join(quoted(v) for v in flags)+") -PassThru;"+
                     "$stamp=0;try{$stamp=$p.StartTime.ToUniversalTime().Ticks}catch{};[IO.File]::WriteAllText("+quoted(out)+",(@{pid=$p.Id;started=$stamp;exe="+quoted(spec['exe'])+";profile="+quoted(profile)+"}|ConvertTo-Json -Compress));"+
-                    "for($i=0;$i -lt 180;$i++){$p.Refresh();if($p.HasExited){break};if(Test-Path "+quoted(root+'\\stop')+"){break};Start-Sleep -Seconds 1};$p.Refresh();$exited=$p.HasExited;$exitCode=$null;$exitTicks=$null;if($exited){$exitCode=$p.ExitCode;$exitTicks=$p.ExitTime.ToUniversalTime().Ticks};$closed=$false;if(!$exited){$closed=$p.CloseMainWindow()};[IO.File]::WriteAllText("+quoted(root+'\\cleanup.json')+",(@{closed_requested=$closed;exited_before_cleanup=$exited;exit_code=$exitCode;exit_ticks=$exitTicks}|ConvertTo-Json -Compress))")
+                    "for($i=0;$i -lt 180;$i++){$p.Refresh();if($p.HasExited){break};if(Test-Path "+quoted(root+'\\stop')+"){break};Start-Sleep -Seconds 1};$p.Refresh();$exited=$p.HasExited;$exitCode=$null;$exitTicks=$null;if($exited){try{$exitCode=$p.ExitCode;if($p.ExitTime){$exitTicks=$p.ExitTime.ToUniversalTime().Ticks}}catch{}};$closed=$false;if(!$exited){$closed=$p.CloseMainWindow()};[IO.File]::WriteAllText("+quoted(root+'\\cleanup.json')+",(@{closed_requested=$closed;exited_before_cleanup=$exited;exit_code=$exitCode;exit_ticks=$exitTicks}|ConvertTo-Json -Compress))")
             launch="try{"+launch+"}catch{[IO.File]::WriteAllText("+quoted(root+'\\launch-error.txt')+",[string]$_.Exception.Message)}"
             encoded='-NoProfile -NonInteractive -EncodedCommand '+base64.b64encode(('Invoke-Expression ([IO.File]::ReadAllText('+quoted(root+'\\launch-code.txt')+'))').encode('utf-16le')).decode()
             create=("New-Item -ItemType Directory -Force "+quoted(root)+"|Out-Null;[IO.File]::WriteAllText("+quoted(root+'\\launch-code.txt')+","+quoted(launch)+");"+

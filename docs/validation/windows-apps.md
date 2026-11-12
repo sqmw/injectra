@@ -2,6 +2,10 @@
 
 [T-043](../TODO.md#t-043)，2026-11-12开始，11-13续测。**安装列表38款均已实际尝试：29款取得页面正向证据，9款本轮未完成页面注入。** FlowUs、Manus跳过。Mac原候选中的Deskreen/OBS/EasyConnect/Clash原主要是静态枚举或未启动候选，额外单列同级核查，不冒充UI成功。
 
+## 后续复验
+
+[T-044@v2复验](windows-retries.md)新增QQ、WorkBuddy、Figma、抖音、Cocos Creator五款页面成功，累计34/38，尚余4款。下文29/9及逐run是T-043首轮历史口径，原证据不回填。
+
 ## 结果口径
 
 | 类别 | 数量/结果 | 范围 |
