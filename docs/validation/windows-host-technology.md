@@ -27,3 +27,7 @@ Electron组优先统一实际资源根、主模块加载方式、缓存/完整�
 ## 证据
 
 仓库外windows-validation-20261112/nine-host-technology-20261113.json记录组件路径/版本；nine-host-package-fuse-20261113.json记录包name/main和fuse标识。扫描未运行应用源码、解码不透明入口或读取用户文档/聊天数据。源代码及已安装资源均未修改。
+
+## v2 复验工具边界
+
+E-002按Windows实际入口复验。实验副本复制器新增[包内链接复制](../../tests/windows/copy-tree.mjs)：先验证链接最终目标位于源包内且属于复制范围，再重建指向派生副本的链接；外部目标、循环与既有目的目录明确拒绝。不得保留回指原安装的Junction。`make test-windows-format`覆盖链接隔离、外部拒绝、PE摘要和ASAR保留；格式测试不代表Cocos等实机通过。

@@ -11,17 +11,20 @@
 {
   "id": "T-044",
   "name": "Windows 未通过入口泛化评估",
-  "version": "v1",
+  "version": "v2",
   "mode": "lightweight",
   "status": "in_progress",
-  "goal": "根据T043九项页面缺口，评估CEF/版本化入口/签名与缓存等通用接入路线，形成可评审后续范围。",
-  "scope": "待规划的通用路线评估，不自动为每应用开发专用执行代码、不建设平台、不改系统安全策略；本轮仅登记剩余问题，不启动研发。",
-  "acceptance": "按宿主与格式解释证据、明确可复用策略和验证条件；任何实施范围变化先由用户确定。",
-  "execution_ref": "archive/T-044-hosts.md#t-044",
+  "goal": "按Windows实际引擎与入口继续九款未通过项的通用注入验证，取得页面执行证据或可复现入口缺口。",
+  "scope": "复用协议、宿主和资源格式策略；允许自有派生副本与已确认测试进程操作，不新增品牌执行分支、不改原安装和系统安全策略、不终止原有用户实例。",
+  "acceptance": "九款均按实际进程/引擎/入口完成新验证；页面成功须覆盖注入、更新和清理；无法通过保留原始证据及缺口，通用工具完成相应回归。",
+  "execution_ref": "TODO.md#t-044",
   "acceptance_evidence": [
     "E001完成九款只读技术栈分类；实际窗口/引擎对应关系与后续入口路线仍待评估，Task不据此关闭。"
   ],
-  "unplanned_reason": "T043全清单测试完成，但9项尚无页面成功，需要保留后续跟进入口。"
+  "unplanned_reason": "T043全清单测试完成，但9项尚无页面成功，需要保留后续跟进入口。",
+  "previous_versions": [
+    "v1"
+  ]
 }
 ```
 
@@ -29,6 +32,23 @@
 
 
 [宿主核查](validation/windows-host-technology.md) · [本次执行](archive/T-044-hosts.md#t-044)。
+
+## E-002 · Windows 通用入口复验
+
+```tracking-execution
+{
+  "id": "T-044/E-002",
+  "name": "九款 Windows 通用入口复验",
+  "task_id": "T-044",
+  "task_version": "v2",
+  "status": "running",
+  "authorization": "2026-11-13用户明确要求继续九款，按Windows实际引擎/入口且不得每App独立适配；既有授权允许仅结束核验过的本轮测试进程。",
+  "scope": "复用协议、宿主和资源格式策略；允许自有派生副本与已确认测试进程操作，不新增品牌执行分支、不改原安装和系统安全策略、不终止原有用户实例。",
+  "steps": [],
+  "evidence": [],
+  "stop_reason": ""
+}
+```
 
 <a id="t-034"></a>
 ### T-034 · 阿里云盘 pre-runtime 入口核查

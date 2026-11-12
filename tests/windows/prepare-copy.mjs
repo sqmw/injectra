@@ -9,6 +9,7 @@ import {createRequire} from 'node:module';
 import {inspectMain,delegateSource} from '../../crates/preparation/helper/entry.mjs';
 import {appendRewrite} from './append-asar.mjs';
 import {updateIntegrity} from './pe-integrity.mjs';
+import {copyTree} from './copy-tree.mjs';
 const {values}=parseArgs({options:{exe:{type:'string'},output:{type:'string'},config:{type:'string'},package:{type:'string'},strategy:{type:'string'}}});
 if(process.platform!=='win32')throw Error('Windows proof only');
 const tools=createRequire(path.join(process.env.INJECTRA_WIN_TEST_TOOLS,'package.json'));
@@ -26,12 +27,12 @@ const pkg=JSON.parse(packageBytes.toString('utf8').replace(/^\uFEFF/,''));if(pkg
 const sourceHash={exe:hash(fs.readFileSync(sourceExe)),package:hash(packageBytes)};
 if(layout==='asar')sourceHash.archive=hash(fs.readFileSync(base));
 else if(entry.archive)sourceHash.archive=hash(fs.readFileSync(entry.archive));
-await fsp.cp(source,destination,{recursive:true,dereference:false,filter:input=>{
+const copiedLinks=await copyTree(source,destination,input=>{
  const relative=path.relative(source,input),top=relative.split(path.sep)[0];
  if(['Files','User Data','userdata','Crashpad','Cache','logs'].includes(top)&&!packageRelative.startsWith(top+'/'))return false;
  if(relative.endsWith('.log'))return false;
- if(fs.lstatSync(input).isSymbolicLink())throw Error('Unsupported: reparse source requires separate validation');return true;
-}});
+ return true;
+});
 const repo=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'../..');
 const replacements=new Map([['.injectra/config.json',fs.readFileSync(values.config)]]);
 for(const name of ['bootstrap.cjs','evaluation.cjs'])replacements.set('.injectra/'+name,fs.readFileSync(path.join(repo,'crates/bootstrap/helper',name)));
@@ -62,5 +63,5 @@ if(hash(fs.readFileSync(sourceExe))!==sourceHash.exe)throw Error('Original execu
 const recheck=layout==='asar'?asar.extractFile(base,'package.json'):fs.readFileSync(path.join(base,'package.json'));
 if(hash(recheck)!==sourceHash.package)throw Error('Original package changed');
 const originalArchive=layout==='asar'?base:entry.archive;if(originalArchive&&hash(fs.readFileSync(originalArchive))!==sourceHash.archive)throw Error('Original archive baseline changed');
-const result={source,app:destination,exe:path.join(destination,path.basename(sourceExe)),package:packageRelative,originalMain:entry.main,sourceHash,strategy:entry.strategy,nativeChanges,productBackend:false};
+const result={source,app:destination,exe:path.join(destination,path.basename(sourceExe)),package:packageRelative,originalMain:entry.main,sourceHash,strategy:entry.strategy,nativeChanges,copiedLinks,productBackend:false};
 await fsp.writeFile(destination+'.proof.json',JSON.stringify(result,null,2));console.log(JSON.stringify(result));
