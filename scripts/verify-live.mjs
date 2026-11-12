@@ -8,7 +8,7 @@ import { resolve } from "node:path";
 import { parseArgs } from "node:util";
 import { binary, cache } from "./test-env.mjs";
 
-const { values } = parseArgs({ options: { port: { type: "string" }, target: { type: "string" } } });
+const { values } = parseArgs({ options: { port: { type: "string" }, target: { type: "string" }, dom: { type: "boolean", default: false }, "no-screenshot": {type:"boolean",default:false} } });
 const port = Number(values.port);
 assert.ok(Number.isInteger(port) && port > 0 && port <= 65535 && values.target,
   "Usage: node scripts/verify-live.mjs --port PORT --target EXACT_PAGE_ID");
@@ -56,8 +56,15 @@ await writeFile(resolve(run, "manifest.json"), JSON.stringify({ version: 1, id, 
 await writeFile(resolve(run, "style.css"), `[data-injectra="${id}"] section {position:fixed;top:110px;right:28px;z-index:2147483647;background:#17233b;color:white;padding:20px;border-radius:14px;font:15px/1.5 system-ui;box-shadow:0 8px 28px #0004;width:240px} [data-injectra="${id}"] button {background:rgb(76, 85, 213);color:white;border:0;padding:8px 14px;border-radius:8px;cursor:pointer;font:inherit}`);
 await writeFile(resolve(run, "panel.html"), '<section aria-label="Injectra兼容性验证"><strong>Injectra · 实机验证</strong><p>CSS / HTML / JS 已挂载</p><button type="button">验证交互 · 0</button></section>');
 await writeFile(resolve(run, "behavior.js"), 'const root=context.root; const button=root.querySelector("button"); root.dataset.clicks="0"; const click=()=>{root.dataset.clicks=String(Number(root.dataset.clicks)+1);button.textContent="验证交互 · "+root.dataset.clicks;};context.onCleanup(()=>button.removeEventListener("click",click));button.addEventListener("click",click);');
+if (values.dom) {
+  await writeFile(resolve(run, "panel.html"), "");
+  await writeFile(resolve(run, "behavior.js"), `const root=document.createElement('div');root.dataset.injectra=${JSON.stringify(id)};
+const section=document.createElement('section'),heading=document.createElement('strong'),text=document.createElement('p'),button=document.createElement('button');
+heading.textContent='Injectra';text.textContent='JS DOM / CSS';button.type='button';button.textContent='Verify';section.append(heading,text,button);root.append(section);document.body.append(root);
+root.dataset.clicks='0';const click=()=>{root.dataset.clicks=String(Number(root.dataset.clicks)+1);};button.addEventListener('click',click);context.onCleanup(()=>{button.removeEventListener('click',click);root.remove();});`);
+}
 const pageUrl = new URL(page.url);
-const report = { id, platform: process.platform, route: `${pageUrl.protocol}//${pageUrl.host}`, checks: {}, cleaned: false };
+const report = { id, platform: process.platform, route: `${pageUrl.protocol}//${pageUrl.host}`, mode: values.dom ? "js-dom" : "html-string", checks: {}, cleaned: false };
 try {
   report.checks.before = await evaluate(inspect);
   assert.equal(report.checks.before.nodes, 0);
@@ -68,9 +75,11 @@ try {
   await evaluate(`document.querySelector(${selector} + ' button').click(); true`);
   report.checks.interaction = await evaluate(inspect);
   assert.equal(report.checks.interaction.clicks, "1");
+  if (!values["no-screenshot"]) {
   const clip = await evaluate(`(() => {const r=document.querySelector(${selector} + ' section').getBoundingClientRect();return {x:r.x,y:r.y,width:r.width,height:r.height,scale:1};})()`);
   const screenshot = await call("Page.captureScreenshot", { format: "png", clip });
   await writeFile(resolve(run, "injected-panel.png"), Buffer.from(screenshot.data, "base64"));
+  } else report.screenshot = "not-requested";
   report.checks.update = cli("apply", ["--bundle", resolve(run, "manifest.json")]);
   assert.equal(report.checks.update.status, "updated");
   report.checks.updated = await evaluate(inspect);

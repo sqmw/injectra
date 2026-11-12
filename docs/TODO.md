@@ -4,6 +4,43 @@
 
 ## 当前执行
 
+<a id="t-043"></a>
+### T-043 · Windows 全应用注入复验
+
+```tracking-task
+{
+  "id": "T-043",
+  "name": "Windows 全应用注入复验",
+  "version": "v1",
+  "mode": "lightweight",
+  "status": "in_progress",
+  "goal": "对照Mac已尝试的全部应用，在Windows逐款复验接入、共享Web注入合同及适用的后续路线；FlowUs、Manus跳过。",
+  "scope": "Windows已安装应用盘点、runtime/CDP及后续Gadget/pre-runtime/Gecko候选；Mac编写工具，远端构建/运行，独立测试实例，既有用户进程保留；控制端与目标平台分别标明。",
+  "acceptance": "Mac应用清单逐项有Windows结果/缺项，区分安装/入口/真实注入；支持页面覆盖JS/CSS/HTML、交互、更新、清理；其他路线条件/失败及剩余工作明确，不能只测CDP就宣称全部路线完成。",
+  "execution_ref": "TODO.md#t-043",
+  "acceptance_evidence": [],
+  "unplanned_reason": "用户明确要求Windows重走Mac全部应用注入流程。"
+}
+```
+
+```tracking-execution
+{
+  "id": "T-043/E-001",
+  "name": "Windows清单对账与首轮runtime实测",
+  "task_id": "T-043",
+  "task_version": "v1",
+  "status": "running",
+  "authorization": "2026-11-12用户要求Windows把Mac已尝试App全部尝试；FlowUs和Manus跳过。",
+  "scope": "Windows已安装应用盘点、runtime/CDP及后续Gadget/pre-runtime/Gecko候选；Mac编写工具，远端构建/运行，独立测试实例，既有用户进程保留；控制端与目标平台分别标明。",
+  "steps": [],
+  "evidence": [
+    "已按全局当前事实通过公钥SSH连接DESKTOP-F4B6E6C；安装清单32新增/6已有核对，D:\\language\\rust\\code\\Injectra尚不存在；首轮明确使用Mac控制端经SSH转发测试Windows目标，不等同Windows CLI构建。"
+  ],
+  "stop_reason": ""
+}
+```
+
+
 <a id="t-034"></a>
 ### T-034 · 阿里云盘 pre-runtime 入口核查
 
