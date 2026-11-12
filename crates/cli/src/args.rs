@@ -37,6 +37,64 @@ pub struct Endpoint {
 }
 #[derive(Subcommand)]
 pub enum Command {
+    /// Create a new external increment workspace.
+    Create {
+        #[arg(long)]
+        workspace: PathBuf,
+        #[arg(long)]
+        id: String,
+    },
+    /// Import a manifest into a new or empty external workspace.
+    Import {
+        #[arg(long)]
+        workspace: PathBuf,
+        #[arg(long)]
+        manifest: PathBuf,
+    },
+    /// Run the authenticated local workbench for an external workspace.
+    Studio {
+        #[arg(long)]
+        workspace: PathBuf,
+        #[arg(long)]
+        cache: Option<PathBuf>,
+        #[arg(long)]
+        assets: Option<PathBuf>,
+    },
+    /// Ask the running Studio to prepare an application copy.
+    Prepare {
+        #[arg(long)]
+        workspace: PathBuf,
+        #[arg(long)]
+        app: PathBuf,
+        #[arg(long,default_value="isolated",value_parser=["isolated","shared"])]
+        data_mode: String,
+        #[arg(long)]
+        cache: Option<PathBuf>,
+    },
+    /// Launch the current prepared development artifact through Studio.
+    Dev {
+        #[arg(long)]
+        workspace: PathBuf,
+        #[arg(long)]
+        cache: Option<PathBuf>,
+    },
+    /// Export the current verified increment snapshot through Studio.
+    Export {
+        #[arg(long)]
+        workspace: PathBuf,
+        #[arg(long)]
+        destination: PathBuf,
+        #[arg(long)]
+        target: Option<String>,
+        #[arg(long)]
+        generation: Option<String>,
+        #[arg(long)]
+        path_suffix: Option<String>,
+        #[arg(long)]
+        origin: Option<String>,
+        #[arg(long)]
+        cache: Option<PathBuf>,
+    },
     /// Discover main pages using the explicitly selected backend.
     Targets {
         #[command(flatten)]

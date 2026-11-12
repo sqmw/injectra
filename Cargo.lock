@@ -743,14 +743,18 @@ version = "0.1.0"
 dependencies = [
  "clap",
  "injectra-application",
+ "injectra-bootstrap",
  "injectra-cdp",
  "injectra-core",
  "injectra-electron-gadget",
  "injectra-hosts",
+ "injectra-studio",
  "injectra-web",
  "injectra-webkit",
+ "injectra-workspace",
  "serde",
  "serde_json",
+ "tokio",
 ]
 
 [[package]]

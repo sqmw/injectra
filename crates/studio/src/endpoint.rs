@@ -52,7 +52,7 @@ pub fn directory(cache: &Path, workspace: &Path) -> Result<PathBuf> {
     let key = format!("{:x}", Sha256::digest(root.to_string_lossy().as_bytes()));
     Ok(cache.join("studio").join(key))
 }
-fn private_dir(path: &Path) -> Result<()> {
+pub(crate) fn private_dir(path: &Path) -> Result<()> {
     match fs::symlink_metadata(path) {
         Ok(meta) => {
             if !meta.is_dir() || meta.file_type().is_symlink() {
