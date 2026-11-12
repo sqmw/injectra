@@ -34,3 +34,4 @@ state投影包含workspace{id,root,revision}、files[{path,origin,stage,hash}]�
 现有QQ共享数据授权保留，其他应用由工作区配置明确选择。原用户会话不得自动结束。32独立方案阈值不变；本轮静态注册。插件仍归独立插件库，仓库只保留最小夹具。原历史实测与tag不改写。
 
 工作区模型接口与边界：[workspace v1](workspace-v1.md)。
+Bootstrap API and protocol: [bootstrap-protocol](bootstrap-protocol.md).
