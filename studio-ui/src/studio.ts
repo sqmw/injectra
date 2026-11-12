@@ -1,7 +1,7 @@
 import type { StudioApi } from './api';
 import { StudioError } from './api';
 import { createEditor, type SourceEditor } from './editor';
-import { StudioModel, targetIdentity, canEdit, statusLabel, acknowledgeSave, isUnknown, type Draft } from './model';
+import { StudioModel, targetIdentity, canEdit, statusLabel, acknowledgeSave, isUnknown, isInFlight, type Draft } from './model';
 import type { StudioState, FileContent, SourceFile, Run, StudioEvent } from './types';
 
 function element<K extends keyof HTMLElementTagNameMap>(tag: K, className = '', text = ''): HTMLElementTagNameMap[K] {
@@ -25,7 +25,10 @@ export class StudioApp {
   private workspaceLabel = element('span', 'workspace-name', '正在连接…');
   private connectionLabel = element('span', 'connection-state', '连接中');
   private notice = element('div', 'notice');
+  private automaticNotice = element('p', 'automatic-notice');
   private files = element('nav', 'file-tree');
+  private newFilePath = element('input');
+  private createFileButton = button('新增增量文件', () => { void this.createFile(); });
   private fileTitle = element('strong', '', '选择一个增量文件');
   private fileBadge = element('span', 'badge', '只读');
   private fileStatus = element('span', 'muted', '');
@@ -39,6 +42,7 @@ export class StudioApp {
   private endpoint = element('input');
   private endpointLabel: HTMLLabelElement;
   private targetDetails = element('p', 'target-details');
+  private exportScope = element('p', 'target-details');
   private startup = element('div', 'startup-card');
   private artifact = element('pre', 'artifact');
   private resultList = element('div', 'results-list');
@@ -52,10 +56,16 @@ export class StudioApp {
   private devButton = button('启动开发实例', () => { void this.operation('/api/dev', {}); });
   private reloadButton = button('重载页面', () => { const target = this.model.target(); if (!target) return; this.model.pauseAuto('页面重载后请重新选择目标并手动运行。'); this.model.select(null); this.render(); void this.operation('/api/reload', { target: target.id, generation: target.generation }); });
   private restartButton = button('重启开发实例', () => { this.model.pauseAuto('开发实例重启后请重新选择页面。'); this.model.select(null); this.render(); void this.operation('/api/restart', {}); });
-  private exportButton = button('导出固定版本', () => { if (!this.destination.value.trim()) return this.notify('请填写导出目录。', true); void this.operation('/api/export', { destination: this.destination.value.trim() }); });
+  private exportButton = button('导出固定版本', () => {
+    const target = this.model.target();
+    if (!target) return this.notify('请先选择要导出的页面范围。', true);
+    if (!this.destination.value.trim()) return this.notify('请填写导出目录。', true);
+    void this.operation('/api/export', { destination: this.destination.value.trim(), target: target.id, generation: target.generation });
+  });
 
   constructor(private readonly root: HTMLElement, private readonly api: StudioApi, editorFactory: typeof createEditor = createEditor) {
     this.notice.setAttribute('role', 'status'); this.notice.setAttribute('aria-live', 'polite'); this.notice.hidden = true;
+    this.automaticNotice.setAttribute('role', 'status'); this.automaticNotice.hidden = true;
     this.auto.type = 'checkbox'; this.auto.addEventListener('change', () => { if (this.auto.checked && !this.model.autoPausedReason) this.model.enableAuto(); else this.model.autoApply = false; this.render(); });
     this.target.setAttribute('aria-label', '目标页面'); this.target.addEventListener('change', () => { this.model.select(this.target.value || null); this.render(); });
     this.backend.setAttribute('aria-label', '连接方式');
@@ -63,21 +73,22 @@ export class StudioApp {
     this.backend.addEventListener('change', () => this.renderEndpoint());
     this.endpoint.placeholder = '9222'; this.endpoint.value = '9222'; this.endpointLabel = field('回环端口', this.endpoint);
     this.appPath.placeholder = '/Applications/Example.app'; this.destination.placeholder = '选择一个新的输出目录'; this.importPath.placeholder = '现有 manifest.json 路径';
+    this.newFilePath.placeholder = 'startup.cjs 或 helpers/setup.cjs';
     this.dataMode.append(option('', '选择数据模式'), option('shared', '沿用原应用数据'), option('isolated', '使用独立数据目录'));
     const header = element('header', 'topbar');
     const brand = element('div', 'brand'); brand.append(element('span', 'brand-icon', '↗'), element('strong', '', 'Injectra'), element('span', 'studio-word', 'STUDIO'));
     header.append(brand, this.workspaceLabel, this.connectionLabel, button('刷新连接', () => { void this.refreshConnection(); }, 'quiet'));
-    const sidebar = element('aside', 'sources'); sidebar.append(element('h2', '', '代码来源'), element('p', 'section-note', '增量可编辑，基线与引导保持只读。'), this.files);
+    const sidebar = element('aside', 'sources'); sidebar.append(element('h2', '', '代码来源'), element('p', 'section-note', '增量可编辑，基线与引导保持只读。'), this.files, field('新增文件（相对工作目录）', this.newFilePath), this.createFileButton);
     const editorColumn = element('section', 'editor-column');
     const fileHeader = element('div', 'file-header'); fileHeader.append(this.fileTitle, this.fileBadge, this.fileStatus);
     const editorHost = element('div', 'code-editor'); editorHost.setAttribute('aria-label', '增量代码编辑器');
     const toolbar = element('div', 'editor-toolbar'); const autoLabel = element('label', 'check-label'); autoLabel.append(this.auto, document.createTextNode('保存时应用'));
     toolbar.append(this.revisionLabel, autoLabel, this.rereadButton, this.saveButton, this.runButton);
     const emptyHint = element('p', 'preview-hint', '效果显示在真实 App 窗口中。Ctrl / ⌘ + S 保存，Ctrl / ⌘ + Enter 运行已保存版本。');
-    editorColumn.append(fileHeader, editorHost, toolbar, emptyHint);
+    editorColumn.append(fileHeader, editorHost, toolbar, this.automaticNotice, emptyHint);
     this.editor = editorFactory(editorHost, content => this.edit(content), () => { void this.save(); }, () => { void this.run(); });
     const right = element('aside', 'target-panel'); right.append(element('h2', '', '运行目标'), field('连接方式', this.backend), this.endpointLabel, button('连接 / 发现页面', () => { void this.connect(); }), field('目标页面', this.target), this.targetDetails, this.reloadButton, this.startup);
-    const deployment = element('details', 'deployment'); deployment.append(element('summary', '', '准备与导出'), field('原应用路径', this.appPath), field('数据模式', this.dataMode), this.prepareButton, this.devButton, this.restartButton, this.artifact, field('导出目录', this.destination), this.exportButton, field('导入现有增量', this.importPath), this.importButton); right.append(deployment);
+    const deployment = element('details', 'deployment'); deployment.append(element('summary', '', '准备与导出'), field('原应用路径', this.appPath), field('数据模式', this.dataMode), this.prepareButton, this.devButton, this.restartButton, this.artifact, this.exportScope, field('导出目录', this.destination), this.exportButton, field('导入现有增量', this.importPath), this.importButton); right.append(deployment);
     const body = element('main', 'workbench'); body.append(sidebar, editorColumn, right);
     const results = element('section', 'results'); const resultHeader = element('div', 'results-header'); resultHeader.append(element('h2', '', '执行记录'), element('span', 'muted', '保存与执行分别确认 · 结果未知时不自动重试'));
     results.append(resultHeader, this.resultList, this.logList);
@@ -97,7 +108,7 @@ export class StudioApp {
   private accept(state: StudioState): void {
     const invalidated = this.model.accept(state).targetInvalidated;
     for (const [path, draft] of this.drafts) { const file = state.files.find(file => file.path === path); if (!file || draft.baseHash !== file.hash) draft.conflict = true; }
-    if (this.manualRequest) { const run = state.runs.find(run => run.request_id === this.manualRequest); if (run && !['pending', 'running'].includes(run.status.toLowerCase())) { if (!isUnknown(run)) this.model.autoPausedReason = ''; this.manualRequest = null; } }
+    if (this.manualRequest) { const run = state.runs.find(run => run.request_id === this.manualRequest); if (run && !isInFlight(run.status)) { const target = this.model.target(); if (!isUnknown(run) && target?.id === run.target && (run.generation === undefined || run.generation === target.generation)) this.model.autoPausedReason = ''; this.manualRequest = null; } }
     if (invalidated) this.notify(this.model.autoPausedReason, true);
     this.render();
   }
@@ -130,6 +141,22 @@ export class StudioApp {
     this.busy = true; this.render(); this.notify('正在处理…');
     try { const result = await this.api.request<unknown>(path, body); await this.refresh(); this.notify(path === '/api/export' ? `导出完成：${format(result)}` : '操作完成。'); }
     catch (error) { this.reportError(error); }
+    finally { this.busy = false; this.render(); }
+  }
+  private async createFile(): Promise<void> {
+    if (this.busy || !this.model.state) return;
+    const relative = this.newFilePath.value.trim();
+    if (!relative || /[\\:\u0000]/.test(relative) || relative.startsWith('/') || relative.split('/').some(part => !part || part === '.' || part === '..')) return this.notify('请输入工作目录内的相对文件路径，例如 startup.cjs。', true);
+    const path = 'user:' + relative;
+    if (this.model.state.files.some(file => file.origin === 'user' && (file.path === path || file.path === relative || file.relative_path === relative))) return this.notify('该增量文件已经存在，请从文件树打开。', true);
+    this.busy = true; this.render();
+    try {
+      await this.api.request('/api/files', { path, content: '', expected_hash: null }, 'PUT');
+      await this.refresh();
+      const file = this.model.state?.files.find(file => file.origin === 'user' && (file.path === path || file.path === relative || file.relative_path === relative));
+      if (!file) throw Error('文件已提交，但服务尚未返回对应文件记录。请刷新连接。');
+      this.newFilePath.value = ''; await this.openFile(file); this.notify('增量文件已创建。内容保存与执行仍需分别确认。');
+    } catch (error) { this.reportError(error); }
     finally { this.busy = false; this.render(); }
   }
   private edit(content: string): void {
@@ -186,18 +213,27 @@ export class StudioApp {
   private async run(manual = true, revision = this.model.state?.workspace.revision): Promise<void> {
     const target = this.model.target();
     if (this.busy || !target || !revision || !target.capabilities.includes('web.page.evaluate') || this.targetRunning(target.id)) return;
-    if (!manual && this.model.autoPausedReason) return;
+    const unknown = this.latestUncertain();
+    if (!manual && (this.model.autoPausedReason || unknown)) return;
     this.busy = true; this.render();
-    try { const result = await this.api.request<Partial<Run>>('/api/run', { target: target.id, generation: target.generation, revision }); if (manual && result.request_id) this.manualRequest = result.request_id; await this.refresh(); this.notify('已提交已保存版本。请在执行记录中确认结果，并查看真实 App 窗口。'); }
+    try { const result = await this.api.request<Partial<Run>>('/api/run', { target: target.id, generation: target.generation, revision, ...(manual && unknown ? { acknowledge_unknown: unknown.request_id } : {}) }); if (manual && result.request_id) this.manualRequest = result.request_id; await this.refresh(); this.notify('已提交已保存版本。请在执行记录中确认结果，并查看真实 App 窗口。'); }
     catch (error) { this.reportError(error); }
     finally { this.busy = false; this.render(); }
   }
-  private targetRunning(id: string): boolean { return this.model.state?.runs.some(run => run.target === id && ['pending', 'running'].includes(run.status.toLowerCase())) ?? false; }
+  private latestUncertain(): Run | undefined {
+    const target = this.model.target();
+    if (!target) return undefined;
+    const last = this.model.state?.runs.filter(run => run.target === target.id && (run.generation === undefined || run.generation === target.generation)).at(-1);
+    return last && isUnknown(last) ? last : undefined;
+  }
+  private targetRunning(id: string): boolean { return this.model.state?.runs.some(run => run.target === id && isInFlight(run.status)) ?? false; }
   private renderToolbar(): void {
     const file = this.currentFile, draft = file && this.drafts.get(file.path), target = this.model.target();
     this.fileStatus.textContent = draft?.conflict ? '外部修改冲突 · 草稿保留' : draft?.dirty ? '未保存' : file ? '已保存' : '';
     this.saveButton.disabled = this.busy || !file || !canEdit(file) || !draft?.dirty || !!draft.conflict;
     this.rereadButton.disabled = this.busy || !file;
+    this.runButton.textContent = this.latestUncertain() ? '确认未知状态并运行' : '运行已保存版本';
+    this.runButton.title = this.latestUncertain() ? '前次代码可能已经执行。此操作确认指定未知记录，并创建新的执行请求，不代表回滚前次副作用。' : '执行当前已保存版本';
     this.runButton.disabled = this.busy || !target?.capabilities.includes('web.page.evaluate') || !this.model.state?.workspace.revision || !!target && this.targetRunning(target.id);
     this.auto.checked = this.model.autoApply; this.auto.disabled = this.busy || !target?.capabilities.includes('web.page.evaluate') || !!this.model.autoPausedReason;
     this.auto.title = this.model.autoPausedReason || '仅应用已保存的页面增量；启动代码需要重启。';
@@ -219,8 +255,16 @@ export class StudioApp {
     this.target.value = this.model.selectedTarget ?? '';
     const selected = this.model.target(); this.targetDetails.textContent = selected ? `${selected.url}\n页面世代 ${short(selected.generation)}` : '请选择目标页面。连接成功不代表代码已经执行。';
     this.reloadButton.disabled = this.busy || !selected?.capabilities.includes('web.page.reload'); this.reloadButton.title = selected?.capabilities.includes('web.page.reload') ? '' : '当前后端未声明页面重载能力';
-    this.startup.replaceChildren(element('strong', '', '启动增量'), element('p', '', state?.startup?.pending_restart ? '已保存 · 等待重启开发实例生效' : statusLabel(state?.startup?.status ?? '未配置')), element('small', 'muted', `已保存 ${short(state?.startup?.saved_revision)} / 已应用 ${short(state?.startup?.applied_revision)}`));
+    this.startup.replaceChildren(element('strong', '', '启动增量'), element('p', '', state?.startup?.pending_restart ? '启动阶段仍使用上一快照，等待重启生效；页面增量可单独更新。' : statusLabel(state?.startup?.status ?? '未配置')), element('small', 'muted', `已保存 ${short(state?.startup?.saved_revision)} / 已应用 ${short(state?.startup?.applied_revision)}`));
     for (const [control, capability] of [[this.prepareButton, 'prepare'], [this.devButton, 'dev'], [this.restartButton, 'restart'], [this.exportButton, 'export'], [this.importButton, 'workspace.import']] as const) { control.disabled = this.busy || !this.model.has(capability); control.title = this.model.has(capability) ? '' : '当前工作区暂不支持此操作'; }
+    this.createFileButton.disabled = this.busy || !state; this.newFilePath.disabled = this.busy || !state;
+    this.exportButton.disabled ||= !selected;
+    if (!selected) { this.exportScope.textContent = '导出范围：请先选择目标页面，不会默认导出到全部页面。'; this.exportButton.title = '需要明确选择页面范围'; }
+    else {
+      let source = selected.url, path = '';
+      try { const url = new URL(selected.url); source = url.origin === 'null' ? url.protocol + '//' + url.host : url.origin; path = url.pathname; } catch { /* Server verifies unsupported URL forms. */ }
+      this.exportScope.textContent = `导出页面来源：${source}\n当前路径：${path || selected.url}\n服务按此目标生成稳定选择器。`;
+    }
     this.artifact.textContent = state?.artifact ? format(state.artifact) : '尚未准备开发产物';
     this.resultList.replaceChildren();
     if (!state?.runs.length) this.resultList.append(element('p', 'empty-small', '尚无执行记录。保存文件后，选择目标并运行。'));
@@ -232,7 +276,8 @@ export class StudioApp {
       if (error && typeof error.path === 'string' && typeof error.line === 'number') { const file = state?.files.find(file => file.path === error.path); if (file) card.append(button(`定位 ${file.path}:${error.line}`, () => { void this.openFile(file).then(() => this.editor.focusLine(error.line as number)); }, 'quiet')); }
       this.resultList.append(card);
     }
-    if (this.model.autoPausedReason) this.notify(this.model.autoPausedReason, true);
+    this.automaticNotice.hidden = !this.model.autoPausedReason;
+    this.automaticNotice.textContent = this.model.autoPausedReason ? (this.latestUncertain() ? `前次代码可能已经执行。请先核对实际效果；“确认未知状态并运行”将确认请求 ${this.latestUncertain()!.request_id} 并新建一次执行。自动应用仍暂停。` : this.model.autoPausedReason) : '';
     this.renderToolbar();
   }
 }
