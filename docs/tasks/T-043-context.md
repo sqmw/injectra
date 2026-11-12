@@ -1,4 +1,4 @@
-# T-043恢复上下文 r1
+# T-043恢复上下文 r2
 
 [Task/Execution唯一状态](../TODO.md#t-043)。Parent/main唯一写入；当前chat工作树是旧platform-studio-server，尚未接收本轮Win检查点。目标仍为Windows全应用复验，不是建设平台或宣称全量支持。
 
@@ -31,3 +31,7 @@ SSH指纹/账号从全局current-truth读取。批量工具使用独立ControlMa
 ## 恢复动作
 
 先核对git status与缓存结果，收取在跑测试/构建输出；仅Parent改main。本轮权限和目标已充分，不重复问是否继续。补齐Firefox、正确入口路径及适用pre-runtime/Gadget路线后更新逐应用表，保留未完成/不适用/失败的精确阶段。Windows测试客户端不等于正式CLI后端。
+
+## 收口核对（2026-11-13）
+
+38安装项均已实际尝试，29页面正向（25原生CLI/CDP＋2Gecko测试客户端＋2Bootstrap实验），9未取得页面。Windows单测/doc-tests选定scope通过；Folo实际完整包部署已纠正。当前结果以validation/windows-apps.md为准；上文r1进展仅为恢复历史。原生函数Hook不计页面成功，正式Windows prepare/dev未交付。后续研发不由本轮测试结果自动授权。

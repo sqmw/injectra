@@ -46,7 +46,7 @@ def main():
             for key,value in spec.get('env',{}).items():
                 if not re.fullmatch('[A-Za-z_][A-Za-z0-9_]*',key):raise ValueError('Invalid environment variable name')
                 env+='$env:'+key+'='+quoted(value.format(port=port,profile=profile))+';'
-            launch=(preset+env+"$p=Start-Process -FilePath "+quoted(spec['exe'])+" -WorkingDirectory "+quoted(str(pathlib.PureWindowsPath(spec['exe']).parent))+" -ArgumentList @("+','.join(quoted(v) for v in flags)+") -PassThru;"+
+            launch=(preset+env+"$p=Start-Process -FilePath "+quoted(spec['exe'])+" -RedirectStandardOutput "+quoted(root+'\\app.stdout')+" -RedirectStandardError "+quoted(root+'\\app.stderr')+" -WorkingDirectory "+quoted(str(pathlib.PureWindowsPath(spec['exe']).parent))+" -ArgumentList @("+','.join(quoted(v) for v in flags)+") -PassThru;"+
                     "$stamp=0;try{$stamp=$p.StartTime.ToUniversalTime().Ticks}catch{};[IO.File]::WriteAllText("+quoted(out)+",(@{pid=$p.Id;started=$stamp;exe="+quoted(spec['exe'])+";profile="+quoted(profile)+"}|ConvertTo-Json -Compress));"+
                     "for($i=0;$i -lt 180;$i++){if(Test-Path "+quoted(root+'\\stop')+"){break};Start-Sleep -Seconds 1};$p.Refresh();$closed=$false;if(!$p.HasExited){$closed=$p.CloseMainWindow()};[IO.File]::WriteAllText("+quoted(root+'\\cleanup.json')+",(@{closed_requested=$closed}|ConvertTo-Json -Compress))")
             launch="try{"+launch+"}catch{[IO.File]::WriteAllText("+quoted(root+'\\launch-error.txt')+",[string]$_.Exception.Message)}"
