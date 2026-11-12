@@ -46,6 +46,7 @@ fn owned_remote_electron_page_contract() {
     let mut evidence = json!({"controller":"macos-rust-test","target":"windows","checks":[]});
     let attempt: Result<Value> = (|| {
         let start = Instant::now();
+        let mut stable: Option<(String, Instant)> = None;
         let target = loop {
             let targets = backend.targets()?;
             evidence["targets"] = json!(broker.targets());
@@ -56,13 +57,22 @@ fn owned_remote_electron_page_contract() {
                     .unwrap_or("")
                     .ends_with(config["suffix"].as_str().unwrap_or(""))
             }) {
-                break target;
+                let signature = format!("{:?}:{}", target.reference, target.url);
+                match &stable {
+                    Some((previous, since)) if previous == &signature => {
+                        if since.elapsed() >= Duration::from_secs(3) {
+                            break target;
+                        }
+                    }
+                    _ => stable = Some((signature, Instant::now())),
+                }
             }
             if start.elapsed() > Duration::from_secs(100) {
                 return Err(Error::from("Remote page connection deadline"));
             }
             thread::sleep(Duration::from_millis(150));
         };
+        evidence["selected"] = json!({"reference":format!("{:?}",target.reference),"url":target.url.split(['?','#']).next().unwrap_or(""),"title":target.title});
         let nonce = uuid::Uuid::new_v4().simple().to_string();
         let id = format!("injectra.remote.{nonce}");
         let counter = format!("__injectraRemoteCleaned{nonce}");
