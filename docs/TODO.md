@@ -20,7 +20,8 @@
   "execution_ref": "TODO.md#t-044",
   "acceptance_evidence": [
     "E001完成只读Windows宿主分类，旧v1定义与run保留。",
-    "E002按Windows实际入口新增QQ、WorkBuddy、Figma、抖音、Cocos Creator五款页面通过，累计34/38；其余4款的启动/原生窗口/CEF入口缺口见validation/windows-retries.md，Task继续保留。"
+    "E002按Windows实际入口新增QQ、WorkBuddy、Figma、抖音、Cocos Creator五款页面通过，累计34/38；其余4款的启动/原生窗口/CEF入口缺口见validation/windows-retries.md，Task继续保留。",
+    "E003网易云音乐3.1.38：用户正常退出后，标准CEF开关在新主进程开放回环CDP；现有Windows Rust CLI完成JS/CSS/HTML、交互、更新、清理，累计35/38，剩3项。"
   ],
   "unplanned_reason": "T043全清单测试完成，但9项尚无页面成功，需要保留后续跟进入口。",
   "previous_versions": [
@@ -34,7 +35,7 @@
 
 [宿主核查](validation/windows-host-technology.md) · [v1执行与定义](archive/T-044-hosts.md#t-044) · [v2复验报告](validation/windows-retries.md)。
 
-恢复上下文 r3：本窗口为Parent，权威写入在本地main；初次起始a586804；E003续接f96dfbb后的本地main。T-044@v2本轮E-002为九项复验，不等于九项全部兼容。剩余4项从复验报告及仓库外原始run恢复；不重复旧成功、不转为品牌适配、不改原安装/安全策略，不自动登录。E003当前确认网易云3.1.38已经运行并加载CEF91，无CDP监听；已请求正常退出重启的单独确认，现有实例不强停。Windows验证checkout按Git接收源码；其他旧平台工作树未接收或改写。
+恢复上下文 r3：本窗口为Parent，权威写入在本地main；初次起始a586804；E003续接f96dfbb后的本地main。T-044@v2本轮E-002为九项复验，不等于九项全部兼容。剩余4项从复验报告及仓库外原始run恢复；不重复旧成功、不转为品牌适配、不改原安装/安全策略，不自动登录。E003已获正常重启授权，用户手动退出后，标准CEF参数启动的新实例通过完整Windows CLI/CDP页面合同；累计35/38，剩余优酷/百度网盘/企业微信。当前原数据实例保持运行，证据见windows-retries的E003收口。Windows验证checkout按Git接收源码；其他旧平台工作树未接收或改写。
 
 ## E-002 · Windows 通用入口复验
 
@@ -66,17 +67,21 @@
   "name": "网易云音乐启动与页面入口复验",
   "task_id": "T-044",
   "task_version": "v2",
-  "status": "paused",
-  "authorization": "2026-11-13用户明确要求网易云音乐再次执行；沿用T044不改系统安全策略/不强停已有会话/不按品牌写执行分支边界。",
+  "status": "succeeded",
+  "authorization": "2026-11-13用户明确要求网易云音乐再次执行；沿用T044不改系统安全策略/不强停已有会话/不按品牌写执行分支边界。 用户随后明确允许正常退出并重启网易云；仅此App的正常重启获批，仍不强制结束现有用户会话。",
   "scope": "核对当前Windows网易云运行状态与实际启动入口，重试通用Web接入并验证页面执行；保留旧失败记录。",
   "steps": [],
   "evidence": [
     "当前安装3.1.38.205386；初次核查有原始基线内自动更新安装器47408/47756，未终止它们。后续安装器已不在运行，观测到新的活动主实例及GPU/renderer。",
     "正常Shell启动取得退出码0；活动主进程62312、renderer60828实际加载CEF91.2.2/Chromium91.0.4472.169，均存活；当前没有调试监听。只凭原先快速退出不能判为Web不支持。",
     "只读CEF上下文观察请求超时，未取得结果，未执行页面JS/HTML/CSS载荷；后续核查App/renderer仍存活，无自有观察控制进程。",
-    "原始新证据windows-validation-20261112/t044-cloud-retry-inventory-2602d7ab.json、t044-cloud-running-engine-1433212d.json、cloudmusic-e003/cloud-shell-launch-86536960b4.json等；旧run不覆盖。"
+    "原始新证据windows-validation-20261112/t044-cloud-retry-inventory-2602d7ab.json、t044-cloud-running-engine-1433212d.json、cloudmusic-e003/cloud-shell-launch-86536960b4.json等；旧run不覆盖。",
+    "用户批准正常退出重启；远程普通关闭只缩到托盘，未强制终止。用户随后明确回复已退出，确认旧主实例结束后才启动新实例。",
+    "以原数据和正确cwd经ShellExecute启动，仅添加标准CEF remote-debugging-port/address；主进程45412在127.0.0.1:58887提供真实orpheus://orpheus/pub/app.html页面，无需Frida或应用专用后端。",
+    "Windows本机Rust CLI完整html-string合同通过：applied、按钮0→1、updated且节点不重复、removed后节点0；cleaned=true。新证据cloudmusic-e003/result-final.json和t044-cloud-verify-native-5198300e.json。",
+    "App保持运行，回环地址已核对；原exe SHA256与接入前一致。没有修改产品源码、安装包、沙箱或系统安全策略；只同步文档并检查链接/任务/diff，旧失败run保留。"
   ],
-  "stop_reason": "已向用户请求正常退出并以通用CEF入口重启的单独确认；当前实例归属未证明为自有测试进程，等待答复，不强停。"
+  "stop_reason": ""
 }
 ```
 

@@ -14,7 +14,7 @@
 
 ## Windows复验（进行中）
 
-[首轮清单](../validation/windows-apps.md) · [九项复验](../validation/windows-retries.md)。当前累计34/38取得页面证据，尚余4款；包含Windows原生CLI/CDP、Gecko和实验Bootstrap/V8等不同口径，不表示34款均已拥有正式CLI后端。Windows目标与控制端平台分开记录。
+[首轮清单](../validation/windows-apps.md) · [九项复验](../validation/windows-retries.md)。当前累计35/38取得页面证据，尚余3款；包含Windows原生CLI/CDP、Gecko和实验Bootstrap/V8等不同口径，不表示34款均已拥有正式CLI后端。Windows目标与控制端平台分开记录。
 
 [Windows豆包双插件应用](doubao.md#windows-plugins)：本机CLI分别应用快捷窗口主题与论文插件；主题色值已核对，论文等待PDF，不外推PDF布局适配。
 

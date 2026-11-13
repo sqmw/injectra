@@ -4,7 +4,7 @@
 
 ## 后续复验
 
-[T-044@v2复验](windows-retries.md)新增QQ、WorkBuddy、Figma、抖音、Cocos Creator五款页面成功，累计34/38，尚余4款。下文29/9及逐run是T-043首轮历史口径，原证据不回填。
+[T-044@v2复验](windows-retries.md)先新增QQ、WorkBuddy、Figma、抖音、Cocos Creator五款，E003再补网易云音乐，累计35/38，尚余3款。下文29/9及逐run是T-043首轮历史口径，原证据不回填。
 
 ## 结果口径
 
