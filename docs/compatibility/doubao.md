@@ -52,3 +52,20 @@ make verify-live ARGS="--port PORT --target EXACT_PAGE_ID"
 结论仅覆盖上述版本和真实chat页面的独立面板注入；没有证明修改豆包原有控件、跨frame、导航恢复、所有窗口或全部Chromium应用兼容。未修改安装包、签名和账号数据，也未发送消息。
 
 review核对：原CLI执行路径、端口进程归属、唯一ID/局部选择器、截图隐私范围、异常清理及无调试参数恢复。保留失败日志，不把接入前置失败改写为核心Bug。任务与执行见[任务入口](../TODO.md#t-003)。
+
+
+<a id="windows-plugins"></a>
+## Windows 双插件应用（2026-11-13）
+
+[T-045](../TODO.md#t-045)，win-lenovo实际安装的豆包，定制Chromium147；不把内核版本当作豆包应用版本。用户明确允许正常退出并重启：关闭窗口仅隐藏托盘，随后调用豆包托盘“退出”菜单，确认旧进程结束，未强制结束。沿用原User Data重启，监听仅127.0.0.1，核对监听归属豆包。
+
+使用Windows本机Injectra Rust CLI，对外部插件库eeaca6a的原Bundle执行apply，没有改注入器或插件源码：
+
+| 插件 | 精确页面作用域 | 实测 |
+| --- | --- | --- |
+| doubao.quick-themes 0.1.1 | doubao-launcher/chat快捷窗口 | applied，API与自有控件存在，默认sakura；计算背景rgb(255,241,246)，文字rgb(74,36,53) |
+| doubao.paper-focus 0.3.0 | doubao-chat/chat主聊天页 | applied，API与自有控件存在；mode=waiting-for-pdf，未打开PDF，不据此宣称Windows阅读布局验证通过 |
+
+快捷窗口经当前Windows快捷操作打开。CDP发现报告doubao://，页面location规范化为chrome://；按精确目标与hostname分别选择，未把主题注入聊天/后台页。未读取聊天正文、账号凭据或发送消息；主题沿用自身已有配色偏好持久化。插件和App会话保留供用户使用；页面重建/刷新或App重启后需重新注入，不增加后台重注入服务。
+
+部署Bundle四文件SHA256匹配源库；运行数据位于仓库外doubao-windows/apply-53d21ba01182，包含deployment.json、verification-final.json及会话恢复信息。Windows缓存是发布产物，不是源码第二份维护入口。Review检查页面选择、双插件互不串页、调试回环地址、原数据模式及仅正常退出的授权边界。代码未改，无新增代码测试；通过实际CLI结果/状态/计算样式、文档与任务检查验收。
