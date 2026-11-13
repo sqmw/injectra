@@ -34,7 +34,7 @@
 
 [宿主核查](validation/windows-host-technology.md) · [v1执行与定义](archive/T-044-hosts.md#t-044) · [v2复验报告](validation/windows-retries.md)。
 
-恢复上下文 r2：本窗口为Parent，权威写入在本地main；起始a586804且无未提交改动。T-044@v2本轮E-002为九项复验，不等于九项全部兼容。剩余4项从复验报告及仓库外原始run恢复；不重复旧成功、不转为品牌适配、不改原安装/安全策略，不自动登录。Windows验证checkout按Git接收源码；其他旧平台工作树未接收或改写。
+恢复上下文 r3：本窗口为Parent，权威写入在本地main；初次起始a586804；E003续接f96dfbb后的本地main。T-044@v2本轮E-002为九项复验，不等于九项全部兼容。剩余4项从复验报告及仓库外原始run恢复；不重复旧成功、不转为品牌适配、不改原安装/安全策略，不自动登录。E003当前确认网易云3.1.38已经运行并加载CEF91，无CDP监听；已请求正常退出重启的单独确认，现有实例不强停。Windows验证checkout按Git接收源码；其他旧平台工作树未接收或改写。
 
 ## E-002 · Windows 通用入口复验
 
@@ -55,6 +55,28 @@
     "按既有授权核对PID、exe及创建世代结束4个已确认测试进程；挂起的自有CEF测试控制进程另按精确启动记录收尾，原有QQ/WorkBuddy/Figma实例保留。Git拆分提交6c3b09c至本条所在提交；运行数据与密钥位于仓库外。"
   ],
   "stop_reason": ""
+}
+```
+
+## E-003 · 网易云音乐复验
+
+```tracking-execution
+{
+  "id": "T-044/E-003",
+  "name": "网易云音乐启动与页面入口复验",
+  "task_id": "T-044",
+  "task_version": "v2",
+  "status": "paused",
+  "authorization": "2026-11-13用户明确要求网易云音乐再次执行；沿用T044不改系统安全策略/不强停已有会话/不按品牌写执行分支边界。",
+  "scope": "核对当前Windows网易云运行状态与实际启动入口，重试通用Web接入并验证页面执行；保留旧失败记录。",
+  "steps": [],
+  "evidence": [
+    "当前安装3.1.38.205386；初次核查有原始基线内自动更新安装器47408/47756，未终止它们。后续安装器已不在运行，观测到新的活动主实例及GPU/renderer。",
+    "正常Shell启动取得退出码0；活动主进程62312、renderer60828实际加载CEF91.2.2/Chromium91.0.4472.169，均存活；当前没有调试监听。只凭原先快速退出不能判为Web不支持。",
+    "只读CEF上下文观察请求超时，未取得结果，未执行页面JS/HTML/CSS载荷；后续核查App/renderer仍存活，无自有观察控制进程。",
+    "原始新证据windows-validation-20261112/t044-cloud-retry-inventory-2602d7ab.json、t044-cloud-running-engine-1433212d.json、cloudmusic-e003/cloud-shell-launch-86536960b4.json等；旧run不覆盖。"
+  ],
+  "stop_reason": "已向用户请求正常退出并以通用CEF入口重启的单独确认；当前实例归属未证明为自有测试进程，等待答复，不强停。"
 }
 ```
 
