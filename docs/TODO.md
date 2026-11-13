@@ -4,6 +4,42 @@
 
 ## 当前执行
 
+<a id="t-046"></a>
+### T-046 · 通用 CLI 与 Windows 验证里程碑发布
+
+```tracking-task
+{
+  "id": "T-046",
+  "name": "通用 CLI 与 Windows 验证里程碑发布",
+  "version": "v1",
+  "mode": "lightweight",
+  "status": "in_progress",
+  "goal": "为当前通用CLI与Windows验证进展创建可追溯注解式里程碑tag，并推送和核对远端。",
+  "scope": "新增milestone/generic-cli-windows-validation，发布覆盖CLI prepare/dev、Windows35/38及剩余3项边界；仅推送新tag，不移动旧tag、不改CLI版本、不创建安装包或GitHub Release。",
+  "acceptance": "注解tag指向含交付映射的本轮里程碑提交；远端tag对象与解引用SHA均与本地一致，已有tag保持不变。",
+  "execution_ref": "TODO.md#t-046",
+  "acceptance_evidence": [],
+  "unplanned_reason": "2026-11-13用户明确要求给当前通用CLI和Windows验证进展打里程碑tag并推远端。"
+}
+```
+
+上下文r1：Parent为本窗口，权威main；开始于134cf12，工作区干净。源能力/实测基线固定，发布仅增加映射及任务元数据；注解明确实验路线和剩余失败，不重新运行或改变真实App会话。
+
+```tracking-execution
+{
+  "id": "T-046/E-001",
+  "name": "创建并推送里程碑 tag",
+  "task_id": "T-046",
+  "task_version": "v1",
+  "status": "running",
+  "authorization": "2026-11-13用户明确要求给当前通用CLI与Windows验证进展打里程碑tag，推到远端。",
+  "scope": "新增milestone/generic-cli-windows-validation，发布覆盖CLI prepare/dev、Windows35/38及剩余3项边界；仅推送新tag，不移动旧tag、不改CLI版本、不创建安装包或GitHub Release。",
+  "steps": [],
+  "evidence": [],
+  "stop_reason": ""
+}
+```
+
 <a id="t-044"></a>
 ### T-044 · Windows 未通过入口泛化评估
 

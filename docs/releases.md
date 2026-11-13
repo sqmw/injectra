@@ -1,5 +1,14 @@
 # 版本与交付映射
 
+## milestone/generic-cli-windows-validation · 2026-11-13
+
+- 通用CLI与Windows验证里程碑，发布流程见[T-046](TODO.md#t-046)。能力/实测基线为134cf12；tag指向包含本节映射的里程碑提交，精确源码使用`git rev-parse 'milestone/generic-cli-windows-validation^{}'`定位。
+- CLI路线已收敛：runtime连接既有Web页面；pre-runtime为轻量prepare/dev、现有编辑器和真实App反馈。共享Web runtime及core/web/native边界保留；没有工作台、内置编辑器或完整工作区系统。
+- prepare/dev实测：目录/ASAR/嵌套ASAR夹具、macOS Apple Silicon上的QQ主页面与Claude本地壳；普通增量更新免重新准备App。见[CLI dev](validation/cli-dev.md)、[QQ修复与复验](validation/qq-cli-dev.md)。不外推Windows正式prepare/dev支持。
+- Windows累计35/38安装项取得页面注入证据，含现有原生Rust CLI/CDP、Gecko测试客户端、实验Bootstrap/V8等不同通道；3款仅JS DOM路线通过且HTML字符串限制仍保留。不表示35款均有正式CLI后端或所有业务页面通过。见[逐项历史](validation/windows-apps.md)、[当前复验与网易云通过](validation/windows-retries.md)。
+- 剩余3项：优酷启动依赖/Widevine404；百度网盘与企业微信当前原生欢迎/登录窗口下的Web入口仍未取得。保留旧失败与Unknown，不把接口/夹具当成兼容性证明。
+- 沿用已记录的make check、独立Electron、Windows格式/受控ABI及实机证据；本次仅发布元数据，重新检查映射、链接、任务身份和diff，不重启App或重写原run。CLI包版本仍为0.1.0；本里程碑为源码tag，不含安装包或GitHub Release。
+
 ## milestone/pre-runtime-web-injection · 2026-11-11
 
 - 用户认定的pre-runtime里程碑，本地annotated tag；精确指向`04a7013e2b3838db635850daf12edb810f064b36`。标记创建见[T-036](TODO.md#t-036)。
