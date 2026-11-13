@@ -4,6 +4,49 @@
 
 ## 当前执行
 
+<a id="t-045"></a>
+### T-045 · Windows 豆包双插件应用
+
+```tracking-task
+{
+  "id": "T-045",
+  "name": "Windows 豆包双插件应用",
+  "version": "v1",
+  "mode": "lightweight",
+  "status": "blocked",
+  "goal": "将独立插件库的豆包快捷窗口多主题及论文阅读悬浮聊天应用到win-lenovo豆包，保留可用效果。",
+  "scope": "使用现有外部Bundle和CLI，分别定位launcher/chat页面；不复制插件进入Injectra源码、不发消息/读聊天、不改安装包；需要退出已有用户实例时另确认。",
+  "acceptance": "两个Bundle在正确Windows页面完成注入并检查插件状态；论文未打开时明确区分等待PDF与实际阅读效果；目标会话保持可供用户查看。",
+  "execution_ref": "TODO.md#t-045",
+  "acceptance_evidence": [
+    "已定位doubao.quick-themes与doubao.paper-focus，来自外部插件库eeaca6a；四个发布文件已部署到Windows仓库外缓存并逐文件SHA256匹配。",
+    "当前用户豆包PID28020未提供可用CDP；尚未执行注入，等待正常退出并开启调试入口的明确授权，或用户选择独立实例。"
+  ],
+  "unplanned_reason": "用户在Windows复验后要求实际应用已有豆包两插件。"
+}
+```
+
+恢复上下文r1：Parent为本窗口，权威写入main；起始1198404，工作区干净。外部插件库按catalog定位豆包两个Bundle，Windows经既有连接检查后装配。
+
+```tracking-execution
+{
+  "id": "T-045/E-001",
+  "name": "win-lenovo 豆包双插件注入",
+  "task_id": "T-045",
+  "task_version": "v1",
+  "status": "paused",
+  "authorization": "2026-11-13用户要求把豆包已有两个插件注入win-lenovo；含传输/加载已有Bundle，不含退出当前用户会话。",
+  "scope": "使用现有外部Bundle和CLI，分别定位launcher/chat页面；不复制插件进入Injectra源码、不发消息/读聊天、不改安装包；需要退出已有用户实例时另确认。",
+  "steps": [],
+  "evidence": [
+    "Windows公钥连接可用；源项目映射目录不在Windows，本次仅部署插件发布Bundle到独立运行缓存，不手动覆盖源码同步目录。",
+    "独立插件库catalog确认两项：快捷窗口多主题0.1.1只作用launcher；论文阅读0.3.0安装在chat并等待PDF。四文件传输与SHA256核验通过；恢复材料doubao-windows/apply-53d21ba01182/deployment.json。",
+    "当前用户豆包PID28020始于2026-10-24；监听61132/51907不提供可用CDP元数据，DevToolsActivePort不存在，未退出原实例。已通过异步问题请求正常退出重启授权或独立实例选择。"
+  ],
+  "stop_reason": "等待用户选择正常退出并重启当前豆包，或保留当前会话另开实例；未收到授权，不执行依赖操作。"
+}
+```
+
 <a id="t-044"></a>
 ### T-044 · Windows 未通过入口泛化评估
 
