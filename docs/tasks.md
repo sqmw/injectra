@@ -4,8 +4,6 @@
 
 ## 当前任务
 
-[T-046 · 通用 CLI 与 Windows 验证里程碑发布 @v1](TODO.md#t-046)：创建新注解tag并核对远端。
-
 [T-044 · Windows 未通过入口泛化评估 @v2](TODO.md#t-044)：按Windows实际入口复验九项；[本轮证据](validation/windows-retries.md)。
 
 [T-034 · 阿里云盘 pre-runtime 入口核查 @v1](TODO.md#t-034)：原包不改动范围内的界面/CDP复核已记录，仍缺外部入口；测试副本资源补丁结果单列T-035，恢复条件见权威状态簿。
@@ -16,6 +14,7 @@
 
 | 任务 | 标准名称 | 定义版本 |
 | --- | --- | --- |
+| <a id="t-046"></a>[T-046](TODO.md#t-046) | 通用 CLI 与 Windows 验证里程碑发布 | v1 |
 | <a id="t-045"></a>[T-045](TODO.md#t-045) | Windows 豆包双插件应用 | v1 |
 | <a id="t-043"></a>[T-043](TODO.md#t-043) | Windows 全应用注入复验 | v1 |
 | <a id="t-042"></a>[T-042](TODO.md#t-042) | 嵌套归档与不透明入口接入 | v1 |

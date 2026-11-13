@@ -2,7 +2,7 @@
 
 ## milestone/generic-cli-windows-validation · 2026-11-13
 
-- 通用CLI与Windows验证里程碑，发布流程见[T-046](TODO.md#t-046)。能力/实测基线为134cf12；tag指向包含本节映射的里程碑提交，精确源码使用`git rev-parse 'milestone/generic-cli-windows-validation^{}'`定位。
+- 已创建并推送的注解式里程碑，见[T-046](TODO.md#t-046)。tag精确指向`aaa254a3ddc0d48ff61bc3109cd2b736b45eb36e`；能力/实测基线134cf12，里程碑提交仅新增映射/任务元数据。远端tag对象`b4e82e3955c1d947cf583f903fc1881221c8033e`及解引用提交已核对一致。
 - CLI路线已收敛：runtime连接既有Web页面；pre-runtime为轻量prepare/dev、现有编辑器和真实App反馈。共享Web runtime及core/web/native边界保留；没有工作台、内置编辑器或完整工作区系统。
 - prepare/dev实测：目录/ASAR/嵌套ASAR夹具、macOS Apple Silicon上的QQ主页面与Claude本地壳；普通增量更新免重新准备App。见[CLI dev](validation/cli-dev.md)、[QQ修复与复验](validation/qq-cli-dev.md)。不外推Windows正式prepare/dev支持。
 - Windows累计35/38安装项取得页面注入证据，含现有原生Rust CLI/CDP、Gecko测试客户端、实验Bootstrap/V8等不同通道；3款仅JS DOM路线通过且HTML字符串限制仍保留。不表示35款均有正式CLI后端或所有业务页面通过。见[逐项历史](validation/windows-apps.md)、[当前复验与网易云通过](validation/windows-retries.md)。
@@ -16,6 +16,8 @@
 - 已验证：阿里云盘6.9.3独立测试副本的真实本地登录壳页面执行共享runtime，随机标记、计算样式和按钮交互回执通过。
 - 条件：资源补丁与ASAR完整性重建、本地测试签名允许库加载、独立目录及测试钥匙串；fuses和Hardened Runtime保留。原普通窗口已恢复。
 - [实机证据与复现](compatibility/adrive-resource-patch.md)；不外推原包runtime兼容、登录后业务或正式pre-runtime后端。该tag不改变CLI版本号。
+
+下方阶段记录保留当时的合入/发布状态；其后已合入的源码由本次里程碑tag包含，当前验证范围以前述映射及对应实机记录为准。
 
 ## T-021/T-022 · Gecko验证成果（未发布）
 

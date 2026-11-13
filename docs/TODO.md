@@ -4,42 +4,6 @@
 
 ## 当前执行
 
-<a id="t-046"></a>
-### T-046 · 通用 CLI 与 Windows 验证里程碑发布
-
-```tracking-task
-{
-  "id": "T-046",
-  "name": "通用 CLI 与 Windows 验证里程碑发布",
-  "version": "v1",
-  "mode": "lightweight",
-  "status": "in_progress",
-  "goal": "为当前通用CLI与Windows验证进展创建可追溯注解式里程碑tag，并推送和核对远端。",
-  "scope": "新增milestone/generic-cli-windows-validation，发布覆盖CLI prepare/dev、Windows35/38及剩余3项边界；仅推送新tag，不移动旧tag、不改CLI版本、不创建安装包或GitHub Release。",
-  "acceptance": "注解tag指向含交付映射的本轮里程碑提交；远端tag对象与解引用SHA均与本地一致，已有tag保持不变。",
-  "execution_ref": "TODO.md#t-046",
-  "acceptance_evidence": [],
-  "unplanned_reason": "2026-11-13用户明确要求给当前通用CLI和Windows验证进展打里程碑tag并推远端。"
-}
-```
-
-上下文r1：Parent为本窗口，权威main；开始于134cf12，工作区干净。源能力/实测基线固定，发布仅增加映射及任务元数据；注解明确实验路线和剩余失败，不重新运行或改变真实App会话。
-
-```tracking-execution
-{
-  "id": "T-046/E-001",
-  "name": "创建并推送里程碑 tag",
-  "task_id": "T-046",
-  "task_version": "v1",
-  "status": "running",
-  "authorization": "2026-11-13用户明确要求给当前通用CLI与Windows验证进展打里程碑tag，推到远端。",
-  "scope": "新增milestone/generic-cli-windows-validation，发布覆盖CLI prepare/dev、Windows35/38及剩余3项边界；仅推送新tag，不移动旧tag、不改CLI版本、不创建安装包或GitHub Release。",
-  "steps": [],
-  "evidence": [],
-  "stop_reason": ""
-}
-```
-
 <a id="t-044"></a>
 ### T-044 · Windows 未通过入口泛化评估
 
@@ -189,6 +153,31 @@
 上下文r6：Parent/main，single-writer，续接d210ec9。用户已解锁，菜单/偏好设置及新run yudc69f4完成，普通首页已恢复；钥匙串提示状态与快速退出根因仍未知。当前缺口是可执行的目标侧入口，任务保持受阻，不计注入成功。证据见[启动条件复核](compatibility/adrive-startup.md)；仅有新的入口或诊断证据时继续，不调用未确认服务、修改保护或重放Unknown。
 
 ## 最近完成的验证
+
+<a id="t-046"></a>
+### T-046 · 通用 CLI 与 Windows 验证里程碑发布
+
+```tracking-task
+{
+  "id": "T-046",
+  "name": "通用 CLI 与 Windows 验证里程碑发布",
+  "version": "v1",
+  "mode": "lightweight",
+  "status": "done",
+  "goal": "为当前通用CLI与Windows验证进展创建可追溯注解式里程碑tag，并推送和核对远端。",
+  "scope": "新增milestone/generic-cli-windows-validation，发布覆盖CLI prepare/dev、Windows35/38及剩余3项边界；仅推送新tag，不移动旧tag、不改CLI版本、不创建安装包或GitHub Release。",
+  "acceptance": "注解tag指向含交付映射的本轮里程碑提交；远端tag对象与解引用SHA均与本地一致，已有tag保持不变。",
+  "execution_ref": "archive/T-046.md#t-046",
+  "acceptance_evidence": [
+    "注解tag milestone/generic-cli-windows-validation，对象b4e82e3955c1d947cf583f903fc1881221c8033e，精确指向aaa254a3ddc0d48ff61bc3109cd2b736b45eb36e；含当前CLI/Windows35/38边界与发布映射。",
+    "显式推送此tag成功；ls-remote回读注解对象和解引用SHA均与本地相同，原两个tag对象未改变。",
+    "Parent核对本地工作区干净、能力/证据基线134cf12、CLI/Windows正式与实验范围及剩余3项；本轮仅元数据变更，doc-check/tracking-check/diff-check通过。"
+  ],
+  "unplanned_reason": "2026-11-13用户明确要求给当前通用CLI和Windows验证进展打里程碑tag并推远端。"
+}
+```
+
+[执行与远端核对](archive/T-046.md#t-046)。
 
 <a id="t-045"></a>
 ### T-045 · Windows 豆包双插件应用
