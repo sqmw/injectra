@@ -7,7 +7,7 @@ function walk(directory) {
     ? walk(resolve(directory, entry.name)) : entry.name.endsWith(".md") ? [resolve(directory, entry.name)] : []);
 }
 const files = [resolve(root, "README.md"), resolve(root, "AGENTS.md"), ...walk(resolve(root, "docs")),
-  ...(existsSync(resolve(root, "references")) ? walk(resolve(root, "references")) : [])];
+  ...(existsSync(resolve(root, "references")) ? walk(resolve(root, "references")) : []) ];
 const graph = new Map();
 let count = 0;
 for (const file of files) {

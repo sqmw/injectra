@@ -25,7 +25,7 @@
 | 测试工具 | [setup-tests](../../scripts/setup-tests.mjs)、[锁文件](../../tests/package-lock.json)、[fixture](../../tests/electron/main.cjs) | 自有测试进程与profile | make test-electron；[验证](../validation.md) |
 | 真实应用验证 | [verify-live](../../scripts/verify-live.mjs)：精确目标上的CLI注入、断言、自有面板截图与清理 | 不管理用户进程，只接入显式端口/页面 | make verify-live；[豆包实测](../compatibility/doubao.md) |
 | 架构依赖门 | [check-architecture](../../scripts/check-architecture.mjs) | Cargo metadata验证执行域/具体后端方向，core/native独立 | make architecture-check；[契约](boundaries.md) |
-| 文档检查 | [check-docs](../../scripts/check-docs.mjs) | 相对链接/显式锚点/可达性 | make doc-check，不证明业务正确性 |
+| 文档检查 | [check-docs](../../scripts/check-docs.mjs) | 相对链接/显式锚点/可达性，含paper论文说明 | make doc-check，不证明业务正确性 |
 
 新增并列后端：共享[Frida通信](../../crates/frida/src/lib.rs)、[Electron Gadget](../../crates/electron-gadget/src/lib.rs)、[CLI装配](../../crates/cli/src/backend.rs)；[使用/边界](../frida-backends.md)。
 
