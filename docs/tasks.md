@@ -4,6 +4,8 @@
 
 ## 当前任务
 
+框选批注实时修改原型在独立项目[UI Annotation Lab / T-001@v1](../../ui-annotation-lab/docs/TODO.md#t-001)实施，来源为T-047规划；本仓库只提供既有库层能力，不承载新产品代码或重复任务状态。
+
 [T-044 · Windows 未通过入口泛化评估 @v2](TODO.md#t-044)：按Windows实际入口复验九项；[本轮证据](validation/windows-retries.md)。
 
 [T-034 · 阿里云盘 pre-runtime 入口核查 @v1](TODO.md#t-034)：原包不改动范围内的界面/CDP复核已记录，仍缺外部入口；测试副本资源补丁结果单列T-035，恢复条件见权威状态簿。
