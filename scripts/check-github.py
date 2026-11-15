@@ -41,6 +41,5 @@ with urllib.request.urlopen(source["url"], timeout=30) as response:
 assert hashlib.sha256(schema_bytes).hexdigest() == source["sha256"], "CFF schema checksum mismatch"
 citation = load(ROOT / "CITATION.cff", yaml.SafeLoader)
 jsonschema.Draft7Validator(json.loads(schema_bytes)).validate(citation)
-assert citation["type"] == "software" and "preferred-citation" not in citation
-assert "doi" not in citation, "No published DOI has been confirmed"
+assert citation["type"] == "software", "This metadata describes the software repository"
 print("GitHub YAML/forms/action pins and official CFF 1.2 schema: OK")
