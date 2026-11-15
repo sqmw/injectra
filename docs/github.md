@@ -31,3 +31,9 @@ uv run --python 3.13 --with-requirements .github/requirements-validation.txt scr
 [Linguist分类](../.gitattributes)将论文、研究图稿、文档和参考归档标为documentation，不改变文件字节或证据哈希。About说明和Topics与项目定位一致，研究入口指向仓库内论文目录。不建立虚构网站、论文作者/DOI、公开Release或Pages；不改变private可见性、现有许可/tag或协作者权限，也不新增强制人工审批门禁。
 
 论文翻译会话的未提交内容不属于本任务；本工作树按已提交稿源写研究导航，不将翻译中间态视为完成稿或纳入投稿就绪声明。论文统计口径差异仍由承接。
+
+## 本次验证状态（2026-11-16）
+
+本地make check、文档/任务/diff、GitHub YAML/CFF官方schema、actionlint 1.7.12及独立目录论文编译通过；GitHub GFM已实际渲染两种语言的标题、表格和Mermaid入口。远端工作流曾因job级runner上下文配置而在准备阶段失败，已改为step初始化并静态校验通过。随后GitHub报告账户级Actions启动限制，未创建测试job；[运行详情](https://github.com/sqmw/injectra/actions/runs/43750655874)可由获授权用户核对。云端未运行不能写成CI通过，也不能据此判定软件测试失败；待账户所有者处理后再实跑。
+
+远端已配置area:cli、area:backends、area:pre-runtime、area:paper和evidence标签，保留原有标签。协作权限、强制审批及计费设置未调整。
