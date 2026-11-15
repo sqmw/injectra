@@ -13,17 +13,21 @@
   "name": "GitHub 研究仓库展示与协作完善",
   "version": "v1",
   "mode": "lightweight",
-  "status": "in_progress",
+  "status": "blocked",
   "goal": "完善private GitHub仓库的双语介绍、协作入口、自动检查及研究材料导航，并核对远端。",
   "scope": "英文主README与完整中文README、About/Topics、贡献/支持/安全/行为规范、Issue/PR模板、软件引用及CI；保留private、现有许可和tag，不改论文主张/正文/作者、不承诺发表信息、不设置强制审批或公开发布。",
   "acceptance": "两种语言的能力/命令/数字和局限一致，引用不虚构论文信息，协作文件/YAML/CFF/文档检查通过，CI实际运行结果可核对；GitHub默认分支和About更新、private保持。",
   "execution_ref": "TODO.md#t-070",
-  "acceptance_evidence": [],
+  "acceptance_evidence": [
+    "双语项目介绍、About/11项Topics、论文导航、CFF软件引用、贡献/安全/支持/行为规范、Issue/PR模板、Linguist分类、5个领域标签、Dependabot与两套CI已发布默认main，仓库PRIVATE回读确认；GitHub社区文件完整度100%。",
+    "本地make check、GitHub YAML/CFF官方schema、actionlint 1.7.12、GitHub GFM双语渲染与独立目录make paper均通过；不改变论文科研主张或macOS汇总口径。",
+    "云端CI未产生测试作业：GitHub UI明确显示账户Actions启动限制（计费/额度），故不能标为CI通过。待账户所有者处理后重跑，Task保留阻塞；其余仓库配置已交付。"
+  ],
   "unplanned_reason": "2026-11-16用户要求审阅最新提交、准备论文并全面完善private GitHub；另确认引用信息准备中。"
 }
 ```
 
-上下文r1：本窗口Parent，codex/github-research-presentation权威维护T070；基线0cfd758，其他任务沿用已提交main快照，只读；T069属于主工作区，不在此复制其未提交状态。修改仓库入口和.github，论文正文/图稿及翻译由另一会话维护。
+上下文r2：本窗口Parent，codex/github-research-presentation权威维护T070；基线0cfd758，其他任务沿用已提交main快照，只读；T069属于主工作区，不在此复制其未提交状态。修改仓库入口和.github，论文正文/图稿及翻译由另一会话维护。
 
 ```tracking-execution
 {
@@ -31,15 +35,20 @@
   "name": "完善私有仓库的双语介绍、协作入口与自动检查",
   "task_id": "T-070",
   "task_version": "v1",
-  "status": "running",
+  "status": "paused",
   "authorization": "用户明确要求GitHub上所有相关入口完善，不仅README，保持private；署名与论文信息准备中。",
   "scope": "英文主README与完整中文README、About/Topics、贡献/支持/安全/行为规范、Issue/PR模板、软件引用及CI；保留private、现有许可和tag，不改论文主张/正文/作者、不承诺发表信息、不设置强制审批或公开发布。",
   "steps": [],
   "evidence": [
     "只读核对GitHub为PRIVATE且有admin权限；近期提交至0cfd758主要为论文写作、图表及文献构建。",
-    "主工作区存在T069 DeepL英文稿未提交改动；本任务在已附加worktree的codex/github-research-presentation分支独立写入，基线0cfd758，不提交/覆盖主工作区WIP。"
+    "主工作区存在T069 DeepL英文稿未提交改动；本任务在已附加worktree的codex/github-research-presentation分支独立写入，基线0cfd758，不提交/覆盖主工作区WIP。",
+    "主工作区T069未提交翻译/作者/构建改动保留；本分支基于0cfd758独立修改并非强制快进推送main，不提交对方WIP。",
+    "检查新增根Markdown与.github导航，修正2处跨私有相邻仓库链接为保留原定位信息的外部工件说明；没有放宽仓库内链接校验。",
+    "About/Topics/private通过API核对；GitHub GFM实际渲染两语标题/表格/Mermaid入口；CFF通过官方1.2 schema、工作流经actionlint校验。本地make check和独立cache make paper通过。",
+    "远端默认main eea322e已包含展示/协作/工作流；社区文件完整度100%，CFF和中文README均在默认分支；已有license/tag/权限不动。",
+    "初次job级runner上下文错误已修正。后续运行43750655874启动失败，浏览器仅只读查看到GitHub账户Actions计费/额度阻塞；未操作计费或支付，不伪报云端测试通过。"
   ],
-  "stop_reason": ""
+  "stop_reason": "仓库配置及默认分支发布完成；云端CI因账户Actions启动限制无法开始测试，等待账户所有者处理后继续验证。"
 }
 ```
 
