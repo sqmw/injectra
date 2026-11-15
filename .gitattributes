@@ -1,0 +1,4 @@
+# Keep research/documentation sources versioned without presenting them as runtime code.
+# No line-ending or content normalization is applied to evidence artifacts.
+docs/** linguist-documentation=true
+references/** linguist-documentation=true

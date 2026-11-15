@@ -4,6 +4,45 @@
 
 ## 当前执行
 
+<a id="t-070"></a>
+### T-070 · GitHub 研究仓库展示与协作完善
+
+```tracking-task
+{
+  "id": "T-070",
+  "name": "GitHub 研究仓库展示与协作完善",
+  "version": "v1",
+  "mode": "lightweight",
+  "status": "in_progress",
+  "goal": "完善private GitHub仓库的双语介绍、协作入口、自动检查及研究材料导航，并核对远端。",
+  "scope": "英文主README与完整中文README、About/Topics、贡献/支持/安全/行为规范、Issue/PR模板、软件引用及CI；保留private、现有许可和tag，不改论文主张/正文/作者、不承诺发表信息、不设置强制审批或公开发布。",
+  "acceptance": "两种语言的能力/命令/数字和局限一致，引用不虚构论文信息，协作文件/YAML/CFF/文档检查通过，CI实际运行结果可核对；GitHub默认分支和About更新、private保持。",
+  "execution_ref": "TODO.md#t-070",
+  "acceptance_evidence": [],
+  "unplanned_reason": "2026-11-16用户要求审阅最新提交、准备论文并全面完善private GitHub；另确认引用信息准备中。"
+}
+```
+
+上下文r1：本窗口Parent，codex/github-research-presentation权威维护T070；基线0cfd758，其他任务沿用已提交main快照，只读；T069属于主工作区，不在此复制其未提交状态。修改仓库入口和.github，论文正文/图稿及翻译由另一会话维护。
+
+```tracking-execution
+{
+  "id": "T-070/E-001",
+  "name": "完善私有仓库的双语介绍、协作入口与自动检查",
+  "task_id": "T-070",
+  "task_version": "v1",
+  "status": "running",
+  "authorization": "用户明确要求GitHub上所有相关入口完善，不仅README，保持private；署名与论文信息准备中。",
+  "scope": "英文主README与完整中文README、About/Topics、贡献/支持/安全/行为规范、Issue/PR模板、软件引用及CI；保留private、现有许可和tag，不改论文主张/正文/作者、不承诺发表信息、不设置强制审批或公开发布。",
+  "steps": [],
+  "evidence": [
+    "只读核对GitHub为PRIVATE且有admin权限；近期提交至0cfd758主要为论文写作、图表及文献构建。",
+    "主工作区存在T069 DeepL英文稿未提交改动；本任务在已附加worktree的codex/github-research-presentation分支独立写入，基线0cfd758，不提交/覆盖主工作区WIP。"
+  ],
+  "stop_reason": ""
+}
+```
+
 <a id="t-044"></a>
 ### T-044 · Windows 未通过入口泛化评估
 

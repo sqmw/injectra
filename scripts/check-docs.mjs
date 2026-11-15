@@ -6,7 +6,8 @@ function walk(directory) {
   return readdirSync(directory, { withFileTypes: true }).flatMap(entry => entry.isDirectory()
     ? walk(resolve(directory, entry.name)) : entry.name.endsWith(".md") ? [resolve(directory, entry.name)] : []);
 }
-const files = [resolve(root, "README.md"), resolve(root, "AGENTS.md"), ...walk(resolve(root, "docs")),
+const files = [...readdirSync(root, { withFileTypes:true }).filter(entry => entry.isFile() && entry.name.endsWith(".md")).map(entry => resolve(root, entry.name)), ...walk(resolve(root, "docs")),
+  ...(existsSync(resolve(root, ".github")) ? walk(resolve(root, ".github")) : []),
   ...(existsSync(resolve(root, "references")) ? walk(resolve(root, "references")) : []) ];
 const graph = new Map();
 let count = 0;

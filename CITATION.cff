@@ -1,0 +1,20 @@
+cff-version: 1.2.0
+type: software
+message: >-
+  Please cite the software repository and record the exact commit or milestone used.
+title: "Injectra: Reusable Injection Infrastructure for Web-Based Desktop Applications"
+authors:
+  - name: "Injectra contributors"
+repository-code: "https://github.com/sqmw/injectra"
+url: "https://github.com/sqmw/injectra"
+license: Apache-2.0
+abstract: >-
+  A Rust CLI and shared Web runtime for runtime injection and lightweight
+  pre-runtime development in accessible desktop Web UI contexts. Application
+  validation is version-, platform-, route-, and page-specific.
+keywords:
+  - desktop applications
+  - extensibility
+  - code injection
+  - Rust
+  - Web UI

@@ -1,58 +1,142 @@
 # Injectra
 
-面向桌面 Web UI 的**通用代码注入 CLI**：runtime连接已运行App执行JS/HTML/CSS；pre-runtime先准备少量dev引导，再使用现有编辑器修改外部增量，在真实App查看更新。
+**Retrofitting extensibility into Web-based desktop applications.**
+**为基于 Web 的桌面应用补充可复用的扩展能力。**
 
-独立`prepare/dev`已实现；目录/ASAR/嵌套ASAR Electron夹具、Claude本地壳及QQ主页面通过当前验收，详见[范围与证据](docs/validation/cli-dev.md)。工作台、Studio和完整workspace已选择性删除；原生独立边界及历史代码/实验保留。
+[English](README.md) · [简体中文](README.zh-CN.md) · [Documentation](docs/README.md) · [Validation matrix](docs/compatibility/current-matrix.md)
 
-长期架构已建立执行域隔离：通用核心、Web／原生契约、可复用应用用例及平台／宿主职责分离。原生内存读写执行域仍仅有契约测试；已实现的Frida桥接用于Web页面执行，不等同于交付通用进程内存接口，见[架构](docs/architecture/boundaries.md)。
+Injectra is a **Rust CLI and reusable injection infrastructure** for adding user-provided JavaScript, HTML, and CSS to accessible desktop Web UI contexts. It separates application access from enhancement logic, so payload authors can reuse discovery, target binding, execution, incremental iteration, and diagnostics instead of rebuilding an integration stack for every enhancement.
 
-首个核心版本为 **Rust CLI + macOS Electron/CDP**：连接已运行且显式开放本地调试端口的目标，选定单个页面并执行注入，报告结果、失败或结果未知。Injectra负责接入与注入能力；使用者负责脚本内容、选择器、组件适配及渲染覆盖问题。管理平台和Agent不在当前范围，见[产品边界](docs/requirements.md)。
+Use your existing editor and inspect the result **inside the real application**. Injectra provides the access and execution machinery; payload authors remain responsible for selectors, application-specific behavior, rerendering, and side effects.
 
-当前Mac扩展已在本工作树实现[可选Gadget后端](docs/frida-backends.md)，抖音真实页面及独立Electron36通过；CEF/NW.js独立宿主也已通过；WebKit后端、独立宿主与真实Tauri应用已通过。详细进展见[Mac交付](docs/macos-delivery.md)。
+## What Injectra provides
 
-**MVP 已于 2026-10-31 经用户亲自验证通过**，交付版本为 `v0.1.0-mvp`。版本范围与证据见[交付记录](docs/releases.md)。项目采用 [Apache-2.0 许可证](LICENSE)。
+| Capability | Purpose |
+| --- | --- |
+| Runtime injection | Discover an accessible running page, select its exact target, and execute an external Bundle. CDP is the default route; optional Electron Gadget and WKWebView backends have separate prerequisites. |
+| Lightweight pre-runtime development | Prepare a **derived application copy** with a small Bootstrap entry, then watch external page increments through `prepare` / `dev`. Editing a payload does not require preparing the application again. |
+| One shared Web runtime | Load JS/HTML/CSS, replace an existing Bundle with the same ID, and expose owned-node removal and registered cleanup callbacks across Web backends. |
+| Explicit execution feedback | Preserve target identity and distinguish `NotExecuted`, `Executed`, and `Unknown`. Uncertain results are not automatically replayed. |
+| Replaceable access mechanisms | Separate protocols, host layouts, platform operations, and execution domains; avoid application-brand branches in the shared runtime. |
 
-## 快速入口
+**Two timings, one execution path:** runtime connects to an already accessible application; pre-runtime prepares an entry before a development instance starts. Pre-runtime page updates then reuse the Web contracts and shared runtime.
 
-工具版本由 [mise.toml](mise.toml) 声明：Rust 1.93.0、Node 24.6.0。已有匹配工具可直接使用；Node用于开发验证和可选pre-runtime准备工具；编译后的runtime命令不依赖Node。Rust、测试与准备工具分别通过Cargo.lock及各package-lock.json锁定。
+## Architecture
+
+```mermaid
+flowchart TD
+    CLI["Rust CLI"] --> APP["Application use cases / dev loop"]
+    APP --> RT["Bundle + shared runtime program"]
+    RT --> WEB["WebBackend / WebSession"]
+    WEB --> CDP["CDP"]
+    WEB --> GADGET["Electron Gadget / V8 bridge"]
+    WEB --> WK["WKWebView bridge"]
+    WEB --> BOOT["Bootstrap channel"]
+    CLI --> PREP["prepare: host / resource format / platform"]
+    PREP --> COPY["Derived development app"]
+    COPY --> BOOT
+    CDP --> PAGE["Selected real application page"]
+    GADGET --> PAGE
+    WK --> PAGE
+    BOOT --> PAGE
+```
+
+The common `core` contains identity, capabilities, errors, and execution certainty without assuming a page, JavaScript, or JSON. The `web` domain owns page execution; the separate `native` domain defines process/address and memory-operation contracts. **General native process-memory access is not implemented.** Platform and host preparation remain outside the domain-independent core. See the [execution-domain boundaries](docs/architecture/boundaries.md) and [code map](docs/architecture/code-map.md).
+
+## Implementation and validation scope
+
+| Area | Current evidence and boundary |
+| --- | --- |
+| macOS | Apple Silicon only. CDP, Electron Gadget, and WKWebView have recorded fixture/application results under specific versions and access conditions. Intel Mac is outside the current scope. |
+| CLI `prepare` / `dev` | macOS Electron CommonJS directory, ASAR, and nested-ASAR fixtures; QQ main page and Claude local shell. Unsupported layouts are rejected; this is not a promise to handle every proprietary loader. |
+| Windows | **35 of 38 installed applications obtained page-injection evidence** in the recorded campaign. This combines native CLI/CDP, Gecko test clients, and experimental Bootstrap/V8 routes; it is not 35 formal Windows CLI backends or an unrestricted compatibility rate. Three results retain HTML-string limitations with JS/DOM alternatives. |
+| Windows gaps | Youku: startup/Widevine dependency failure. Baidu Netdisk and WeCom: Web entry not obtained in the observed native welcome/login state. FlowUs and Manus were skipped separately by user request. |
+| Gecko | Firefox/Thunderbird experiments use separate test clients and host APIs. They are not formal Gecko CLI backends. |
+| Linux and native memory | No real-application compatibility claim for Linux; native memory operations remain contract tests using owned buffers. |
+
+These are **version × platform × route × page × validation-contract** results. A DLL, an open port, successful attachment, or a test double is not proof of page execution. Different historical batches are not merged into one experiment. A manuscript-wide macOS aggregate is still being reconciled; no consolidated macOS success rate is asserted here.
+
+Start with the [current matrix](docs/compatibility/current-matrix.md), [Windows follow-up](docs/validation/windows-retries.md), [CLI dev acceptance](docs/validation/cli-dev.md), and.
+
+## Getting started
+
+Repository access is restricted to authorized collaborators. Tool versions are declared in [mise.toml](mise.toml): Rust **1.93.0** and Node **24.6.0**. Build the Rust CLI with Cargo and a native linker. Node is used for development checks and optional preparation tooling; the compiled CDP CLI does not require Node or Frida.
 
 ```sh
+git clone https://github.com/sqmw/injectra.git
+cd injectra
 make build
 make run ARGS="--help"
+```
+
+Build products default to `${XDG_CACHE_HOME:-$HOME/.cache}/injectra/cargo-target`. `INJECTRA_CACHE_DIR` changes the cache root; `CARGO_TARGET_DIR` can override the build directory. Keep runtime data outside the source tree.
+
+### Runtime: discover, select, apply
+
+The target application must already expose an authorized **loopback** debugging entry. Injectra does not automatically stop user processes or enable an entry on every host.
+
+```sh
 make run ARGS="targets --port 9222"
+# Inspect title/URL, then use the exact target ID and an external manifest.
+make run ARGS="apply --port 9222 --target PAGE_ID --bundle MANIFEST_PATH"
+make run ARGS="remove --port 9222 --target PAGE_ID --id BUNDLE_ID"
 ```
 
-插件统一位于独立插件库（独立 web-ui-plugins 仓库内 README.md）；本仓库不保存插件。将所选插件manifest的路径设为`BUNDLE_MANIFEST`，再运行下列命令。`targets` 需要目标应用已开放 `127.0.0.1:9222` 的页面调试入口。确认输出中的页面身份后，把下面的 `TARGET_ID` 替换为对应 ID：
+For paths with spaces, invoke the built executable directly with properly quoted arguments. A native Windows CDP build can use PowerShell:
+
+```powershell
+cargo build --workspace --locked --target-dir "$env:LOCALAPPDATA\Injectra\build"
+$Injectra = "$env:LOCALAPPDATA\Injectra\build\debug\injectra.exe"
+& $Injectra targets --port 9222
+& $Injectra apply --port 9222 --target '<PAGE_ID>' --bundle '<MANIFEST_PATH>'
+```
+
+CDP is not the same as the application framework: an Electron/CEF/custom Chromium host must actually expose a usable page endpoint. See [CLI usage](docs/dev.md), [optional Frida backends](docs/frida-backends.md), and [WKWebView conditions](docs/webkit-backend.md).
+
+### Pre-runtime: prepare once, edit external increments
+
+The following workflow currently targets supported **macOS Electron** layouts:
 
 ```sh
-make run ARGS="apply --port 9222 --target TARGET_ID --bundle $BUNDLE_MANIFEST"
-make run ARGS="remove --port 9222 --target TARGET_ID --id injectra.accent"
+make setup-preparation
+# Set these paths to your original app, a new derived-copy directory,
+# an external Bundle manifest, and the artifact_file returned by prepare.
+injectra prepare --app "$APP" --output "$DERIVED_DIR" --data-mode isolated
+injectra dev --artifact "$ARTIFACT_JSON" --bundle "$BUNDLE_MANIFEST"
 ```
 
-插件效果由插件库中的实现决定；再次 apply 替换同 ID 的已有内容；remove 删除拥有的节点并执行脚本登记的清理回调。CLI 成功输出 JSON，失败退出码为 1，参数错误为 2。
+Here `injectra` denotes the compiled executable. The original installation is retained. `dev` applies the current payload and watches its declared JS/HTML/CSS files; saving in your editor updates the selected real page. Multiple targets require an explicit choice. A page rebuild/closure stops the current update session. Ctrl-C stops the CLI connection without undoing arbitrary JS or automatically quitting the app. Shared data mode requires explicit acceptance for that application. See [dev-mode semantics](docs/architecture/dev-mode.md) and [full commands](docs/dev.md).
 
-pre-runtime使用：先`make setup-preparation`，然后运行`injectra prepare --app "$APP" --output "$DERIVED_DIR" --data-mode isolated`；将输出artifact_file传给`injectra dev --artifact "$ARTIFACT_JSON" --bundle "$BUNDLE_MANIFEST"`。详细参数、共享数据和未知结果处理见[CLI说明](docs/dev.md)。
+## External Bundles and ownership
 
-## 验证与源码导航
+A manifest v1 specifies a unique `id`, `version: 1`, and relative `js` / `html` / `css` resource paths, with at least one non-empty resource. JS is an async function body with optional `context.root` and `context.onCleanup(callback)` support. Paths, file sizes, versions, and IDs are checked before execution. Detailed rules are in the [Bundle contract](docs/dev.md).
+
+**Actual plugins and distributable examples live in the separate `web-ui-plugins` repository.** This repository contains the injector, access implementations, shared runtime, and minimal test fixtures; it does not vendor an application plugin catalog. Use an external manifest path rather than copying plugins into Injectra.
+
+
+## Development and checks
 
 ```sh
-make setup-tests   # 安装锁定的测试依赖到仓库外
-make check         # 格式、clippy、Rust/Web 测试、架构依赖、文档与差异检查
-make test-electron # 启动并退出独立 Electron fixture，验证真实注入链路
+make setup-tests       # locked test dependencies in the external cache
+make check             # Rust formatting/lint/tests, Web tests, architecture/docs
+make test-electron     # isolated Electron fixture, not a user application
+make setup-preparation
+make test-preparation  # explicit preparation/dev acceptance
 ```
 
-- [开发与使用](docs/dev.md)：启动规划、脚本约定、缓存及验证边界。
-- [需求与范围](docs/requirements.md)：已核对的分享需求和本轮 MVP 边界。
-- [架构](docs/architecture/boundaries.md) · [代码地图](docs/architecture/code-map.md)。
-- [应用平台与内核兼容性总表](docs/compatibility/current-matrix.md)：统一查看豆包、抖音等应用的版本、平台、内核、接入路线、结果与代码入口。
-- [验收证据](docs/validation.md) · [任务](docs/tasks.md) · [文档入口](docs/README.md)。
--：摘要与各章独立编辑，使用`make paper`在仓库外生成PDF。
-- [软件注入参考实现](references/README.md)：按软件归档源码/启动样例，共享桥接只保留一份；可独立检查和统计，不参与产品构建或发布。
+Real-application tests are **explicit opt-in operations**: they require an authorized entry and precise target. CI runs repository checks and controlled contracts; it does not log into, restart, or manipulate personal applications. Optional native backends have their own dependencies.
 
-## 当前限制
+## Boundaries
 
-页面操作仅连接显式回环端口或身份核对的会话，使用精确页面ID；apply/remove不自动启动或结束应用，不改应用包。Gadget受控启动是单独的显式命令。页面刷新或窗口重建后需由使用者重新选择目标并 apply；自动重注入、跨窗口恢复及应用控件适配不属当前交付。当前WebKit已在独立WKWebView和真实Tauri应用验证；macOS硬件范围仅Apple Silicon，Intel Mac不在支持或验证计划内；Windows/Linux尚无兼容性证明，详见[范围](docs/requirements.md)。
+- Payloads are trusted local code, not sandboxed extensions; they execute with the target page's available authority.
+- `remove` and registered cleanup cover owned resources, not arbitrary external or persistent side effects. A failed replacement does not automatically restore the previous Bundle.
+- `Unknown` is not success and is never automatically replayed. Page navigation/rebuilding requires rediscovery and, when appropriate, explicit reinjection.
+- Automatic navigation reinjection, a plugin marketplace, an embedded editor/workbench, arbitrary JS rollback, and application-business adapters are outside the current product scope.
 
-载荷是受信任的本地代码，具有目标页面允许的权限，并非沙箱。当前不提供任意JS撤销或一键回滚；已有remove与清理回调保留为受管理内容的辅助接口。更新是先移除旧内容再应用新内容，失败不会自动恢复旧版本。超时/断线表示执行结果不确定，不自动重试。
+## Contributing, support, and license
 
-默认缓存根为 `${XDG_CACHE_HOME:-$HOME/.cache}/injectra`，可用 `INJECTRA_CACHE_DIR` 覆盖。构建、测试依赖、fixture profile/日志放仓库外；仓库只保存注入器源码、锁文件及最小测试数据，不保存可交付插件包。没有大型数据集、模型权重或远端部署。
+Read [CONTRIBUTING.md](CONTRIBUTING.md), [SUPPORT.md](SUPPORT.md), [SECURITY.md](SECURITY.md), and the [Code of Conduct](CODE_OF_CONDUCT.md). Report reproducible engine/access failures separately from payload-specific UI behavior. Contributions to a reference enhancement belong in its own project.
+
+Licensed under [Apache-2.0](LICENSE). Third-party components retain their respective licenses.
+
+[GitHub repository configuration and checks / GitHub协作配置](docs/github.md)
