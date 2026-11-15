@@ -20,7 +20,6 @@ jobs:
     env:
       RUSTUP_TOOLCHAIN: 1.93.0
       CARGO_BUILD_JOBS: 2
-      INJECTRA_CACHE_DIR: ${{ runner.temp }}/injectra
       ELECTRON_SKIP_BINARY_DOWNLOAD: '1'
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -34,6 +33,8 @@ jobs:
       - name: Check Apple Silicon runner
         if: runner.os == 'macOS'
         run: test "$(uname -m)" = arm64
+      - name: Set external cache directory
+        run: echo "INJECTRA_CACHE_DIR=$RUNNER_TEMP/injectra" >> "$GITHUB_ENV"
       - run: make setup-tests
       - run: make check
   windows-contracts:
@@ -43,13 +44,14 @@ jobs:
     env:
       RUSTUP_TOOLCHAIN: 1.93.0
       CARGO_BUILD_JOBS: 2
-      CARGO_TARGET_DIR: ${{ runner.temp }}/injectra-cargo
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
       - name: Install declared Rust toolchain
         run: rustup toolchain install 1.93.0 --profile minimal
+      - name: Set external Cargo directory
+        run: '"CARGO_TARGET_DIR=$env:RUNNER_TEMP/injectra-cargo" >> $env:GITHUB_ENV'
       - name: Test portable domain and CDP contracts
         run: cargo test --locked -p injectra-core -p injectra-native -p injectra-web -p injectra-application -p injectra-cdp
   repository-metadata:

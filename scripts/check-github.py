@@ -24,6 +24,7 @@ for path in sorted((ROOT / ".github").rglob("*.yml")):
         assert "pull_request_target" not in document.get("on", {}), path
         for job in document["jobs"].values():
             assert "timeout-minutes" in job, path
+            assert all("runner." not in value for value in job.get("env", {}).values()), "runner context belongs in steps, not job env"
             for step in job["steps"]:
                 if "uses" in step:
                     assert re.fullmatch(r"[\w.-]+/[\w./-]+@[a-f0-9]{40}", step["uses"]), step
