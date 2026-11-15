@@ -46,7 +46,7 @@ make test-electron # 启动并退出独立 Electron fixture，验证真实注入
 - [架构](docs/architecture/boundaries.md) · [代码地图](docs/architecture/code-map.md)。
 - [应用平台与内核兼容性总表](docs/compatibility/current-matrix.md)：统一查看豆包、抖音等应用的版本、平台、内核、接入路线、结果与代码入口。
 - [验收证据](docs/validation.md) · [任务](docs/tasks.md) · [文档入口](docs/README.md)。
--：摘要与各章独立编辑，使用`make paper`在仓库外生成PDF。
+- LaTeX论文：使用`make paper`；使用`make paper-en`，均在仓库外输出PDF。
 - [软件注入参考实现](references/README.md)：按软件归档源码/启动样例，共享桥接只保留一份；可独立检查和统计，不参与产品构建或发布。
 
 ## 当前限制
