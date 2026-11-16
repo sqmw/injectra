@@ -4,7 +4,7 @@ What changes for a user, and why? Keep application payload behavior separate fro
 
 ## Scope / 影响范围
 
-Affected execution domain, backend, host/resource layout, CLI contract, documentation, or manuscript claims. State any new access requirements or unsupported cases.
+Affected execution domain, backend, host/resource layout, CLI contract, documentation, or validation claims. State any new access requirements or unsupported cases.
 
 ## Validation / 验证
 

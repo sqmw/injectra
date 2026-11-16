@@ -4,6 +4,41 @@
 
 ## 当前执行
 
+<a id="t-080"></a>
+### T-080 · GitHub论文残留入口清理与复核
+
+```tracking-task
+{
+  "id": "T-080",
+  "name": "GitHub论文残留入口清理与复核",
+  "version": "v1",
+  "mode": "lightweight",
+  "status": "in_progress",
+  "goal": "使代码仓库当前展示与论文已迁出状态一致，并给出远端论文残留的可核验边界。",
+  "scope": "清理GitHub About失效论文链接、当前项目文档中的过时论文入口及空置论文标签；核验远端分支/标签可达历史与已知稿件对象，保留软件验收和迁移历史，不重写Git历史、不删除Actions运行或改变private。",
+  "acceptance": "About不再指向paper，过时当前入口消除，全部远端分支/标签新克隆无稿件目录及已知稿件blob；服务器旧SHA与非Git元数据结果独立披露，修订正常推送并回读。",
+  "execution_ref": "TODO.md#t-080",
+  "acceptance_evidence": [],
+  "unplanned_reason": "2026-11-16用户要求确认GitHub无论文资料并清理截图所示历史残留。"
+}
+```
+
+```tracking-execution
+{
+  "id": "T-080/E-001",
+  "name": "清理仓库展示并审计远端残留",
+  "task_id": "T-080",
+  "task_version": "v1",
+  "status": "running",
+  "authorization": "2026-11-16用户明确要求核对GitHub论文残留并清理失效展示入口；保留既有private状态。",
+  "scope": "清理GitHub About失效论文链接、当前项目文档中的过时论文入口及空置论文标签；核验远端分支/标签可达历史与已知稿件对象，保留软件验收和迁移历史，不重写Git历史、不删除Actions运行或改变private。",
+  "steps": [],
+  "evidence": [],
+  "stop_reason": ""
+}
+```
+
+
 <a id="t-072"></a>
 ### T-072 · README 中英文状态段落全历史清理
 

@@ -54,9 +54,9 @@ The common `core` contains identity, capabilities, errors, and execution certain
 | Gecko | Firefox/Thunderbird experiments use separate test clients and host APIs. They are not formal Gecko CLI backends. |
 | Linux and native memory | No real-application compatibility claim for Linux; native memory operations remain contract tests using owned buffers. |
 
-These are **version × platform × route × page × validation-contract** results. A DLL, an open port, successful attachment, or a test double is not proof of page execution. Different historical batches are not merged into one experiment. A manuscript-wide macOS aggregate is still being reconciled; no consolidated macOS success rate is asserted here.
+These are **version × platform × route × page × validation-contract** results. A DLL, an open port, successful attachment, or a test double is not proof of page execution. Different historical batches are not merged into one experiment; this page does not assert a consolidated macOS success rate.
 
-Start with the [current matrix](docs/compatibility/current-matrix.md), [Windows follow-up](docs/validation/windows-retries.md), [CLI dev acceptance](docs/validation/cli-dev.md), and.
+Start with the [current matrix](docs/compatibility/current-matrix.md), [Windows follow-up](docs/validation/windows-retries.md), and [CLI dev acceptance](docs/validation/cli-dev.md).
 
 ## Getting started
 

@@ -1,0 +1,43 @@
+{
+  "task": "T-080@v1",
+  "recorded_on": "2026-11-16",
+  "scope": "current GitHub metadata and all advertised branch/tag histories; known retired SHA probes",
+  "repository": "sqmw/injectra",
+  "visibility": "private",
+  "homepage": "",
+  "removed_unused_label": "area:paper",
+  "history_audit": {
+    "remote_ref_count": 5,
+    "commits": 121,
+    "object_count": 1957,
+    "paper_path_hits": [],
+    "known_manuscript_blobs_over_100_bytes": 163,
+    "known_manuscript_blob_hits": []
+  },
+  "manuscript_directories_in_current_main": false,
+  "known_old_sha_authenticated_manuscript_access": true,
+  "old_sha_probe_count": 4,
+  "old_sha_file_access_successes": 2,
+  "old_sha_references_and_file_metadata_location": "external private audit artifacts only",
+  "github_artifacts": 0,
+  "releases": 0,
+  "pages": false,
+  "issues_and_pull_requests": 0,
+  "retained_historical_actions_runs": 24,
+  "historical_paper_workflow_names_may_remain": true,
+  "actions_logs_deleted": false,
+  "git_history_rewritten_in_this_execution": false,
+  "preserved_software_reading_plugin_evidence": true,
+  "limitations": [
+    "Fresh-clone graph/object audit does not cover server-retained unreachable objects.",
+    "Known retired SHA still exposes manuscript files to an authenticated repository owner; no claim of server-wide erasure.",
+    "Historical task/commit/workflow names can mention manuscript preparation; they are not manuscript source files.",
+    "Repository visibility was not changed; anonymous Edge request returned sign-in/404."
+  ],
+  "checks": [
+    "About homepage read back empty; repository private.",
+    "Unused paper label removed; all-issue count zero.",
+    "Documentation and PR template remnants repaired without editing runtime code."
+  ],
+  "raw_artifacts_under_user_cache": "injectra/t080-20261116-34ggh9ui"
+}

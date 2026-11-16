@@ -54,9 +54,9 @@ flowchart TD
 | Gecko | Firefox/Thunderbird 使用独立测试客户端与宿主 API，尚未成为正式 Gecko CLI 后端。 |
 | Linux 与原生内存 | 没有 Linux 真实应用兼容性声明；原生内存操作仅有自有缓冲区合同测试。 |
 
-验证单位是**版本 × 平台 × 路线 × 页面 × 验证合同**。存在 DLL、开放端口、附加成功或测试替身通过，都不等于页面执行成功。不同历史批次不合并成一次实验；论文中的 macOS 整体统计仍在对齐，本页不宣称一个统一的 macOS 成功率。
+验证单位是**版本 × 平台 × 路线 × 页面 × 验证合同**。存在 DLL、开放端口、附加成功或测试替身通过，都不等于页面执行成功。不同历史批次不合并成一次实验；本页不宣称一个统一的 macOS 成功率。
 
-证据入口：[当前矩阵](docs/compatibility/current-matrix.md)、[Windows 复验](docs/validation/windows-retries.md)、[CLI dev 验收](docs/validation/cli-dev.md)、。
+证据入口：[当前矩阵](docs/compatibility/current-matrix.md)、[Windows 复验](docs/validation/windows-retries.md)、[CLI dev 验收](docs/validation/cli-dev.md)。
 
 ## 快速开始
 
