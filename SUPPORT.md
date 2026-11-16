@@ -18,4 +18,3 @@ Remove session keys, tokens, cookies, authorization headers, private URLs, profi
 ## 中文
 
 先查看对应版本/路线的验证边界。问题报告写清 commit/tag、系统/架构、应用/引擎版本、后端、脱敏命令和实际回执；不要把“没有端口”“附加成功”和“页面执行成功”混为一谈。真实 App 测试不要擅自退出他人会话、登录或发送消息。个人会话、文档、账号数据和密钥不应作为复现附件。
-

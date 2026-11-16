@@ -21,6 +21,8 @@
 - 常规编辑与验证在本机仓库完成。缓存、日志、备份及运行数据的位置在落地时独立确定，默认放仓库外。
 - 冻结基线：无。架构候选与已确定边界分开记录，见[架构边界](docs/architecture/boundaries.md)。
 
+- 仓库文档只写可核验的功能、适用条件、实测结果和具体限制；未经用户明确要求，不添加项目成熟度、投稿资格或泛化免责声明式自评旁白，也不据仓库可见性添加README状态标签。
+
 ## 检查入口
 
 `make build`构建；`make setup-tests`准备仓库外测试依赖；`make check`运行格式、lint、Rust/Web测试与文档检查；`make test-electron`运行独立真实Electron验证；`make setup-preparation`安装可选准备工具，`make test-preparation`验收CLI dev。工具版本见mise.toml；禁止将测试通过外推为全部应用兼容。
