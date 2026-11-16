@@ -2,6 +2,7 @@
 
 归属[T-070](TODO.md#t-070)。仓库保持private；以下文件管理项目展示和协作，不改变运行时注入能力或论文科研主张。
 
+
 ## 项目与研究入口
 
 - [English README](../README.md) / [中文 README](../README.zh-CN.md)：用途、双路线、能力边界、命令、验证口径及研究导航。
