@@ -1,0 +1,20 @@
+name: Feature or research proposal / 功能与研究提案
+description: Describe a missing reusable capability or a traceable research improvement.
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem and intended outcome / 问题与目标
+    validations:
+      required: true
+  - type: textarea
+    id: boundary
+    attributes:
+      label: Scope and alternatives / 边界与替代方案
+      description: Identify shared access/execution work versus application-specific payload behavior.
+  - type: textarea
+    id: validation
+    attributes:
+      label: Validation and evidence / 验证与证据
+      description: State how success would be measured and what would remain unverified.

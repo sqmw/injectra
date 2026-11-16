@@ -4,7 +4,11 @@
 
 ## 当前任务
 
-框选批注实时修改原型在独立项目[UI Annotation Lab / T-001@v1](../../ui-annotation-lab/docs/TODO.md#t-001)实施，来源为T-047规划；本仓库只提供既有库层能力，不承载新产品代码或重复任务状态。
+[T-071 · Git 分叉成果整合 @v1](TODO.md#t-071)：整合英文论文与GitHub两路成果，保留提交并同步main。
+
+[T-070 · GitHub 研究仓库展示与协作完善 @v1](TODO.md#t-070)：已整合至main，仓库配置完成；云端Actions仍受账户级限制。
+
+框选批注实时修改原型在独立项目UI Annotation Lab / T-001@v1（外部项目定位符：`ui-annotation-lab/docs/TODO.md#t-001`）实施，来源为T-047规划；本仓库只提供既有库层能力，不承载新产品代码或重复任务状态。
 
 [T-044 · Windows 未通过入口泛化评估 @v2](TODO.md#t-044)：按Windows实际入口复验九项；[本轮证据](validation/windows-retries.md)。
 

@@ -74,3 +74,4 @@ QQ外部主题预览：[开发加载器](../../scripts/qq-theme-preview.mjs)复�
 Windows复验：[逐应用证据](../validation/windows-apps.md)、[交互启动/原生CLI编排](../../scripts/windows-cdp-smoke.py)、[共享ASAR格式](../../crates/preparation/helper/archive.mjs)。Windows Gecko/Hook/资源副本目前是测试工具，不额外宣称正式产品后端支持。
 
 Windows九项复验：[实机与剩余入口](../validation/windows-retries.md)。实验[MSVC V8](../../tests/windows/v8-windows.js)/[受控Node验证](../../tests/windows/v8-fixture.py)、[CEF初始化](../../tests/windows/cef-init.js)、[包内链接复制](../../tests/windows/copy-tree.mjs)分别独立；都不进入公共core或正式适配方案注册。
+

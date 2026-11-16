@@ -1,0 +1,31 @@
+name: Bug report / 缺陷报告
+description: A reproducible injector, backend, build, or documentation failure.
+labels: [bug]
+body:
+  - type: input
+    id: revision
+    attributes:
+      label: Injectra commit or tag / 版本
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment and route / 环境与路线
+      description: OS, architecture, target app/version/engine, and backend. Do not include credentials.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Minimal reproduction / 最小复现
+      description: Include sanitized commands and owned test content; avoid personal profiles or conversations.
+    validations:
+      required: true
+  - type: textarea
+    id: result
+    attributes:
+      label: Expected and observed behavior / 预期与实测
+      description: Include execution certainty and redacted error output when available.
+    validations:
+      required: true

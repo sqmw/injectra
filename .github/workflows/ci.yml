@@ -1,0 +1,70 @@
+name: Repository checks
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  core:
+    name: Core and Web (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, macos-15]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 25
+    env:
+      RUSTUP_TOOLCHAIN: 1.93.0
+      CARGO_BUILD_JOBS: 2
+      ELECTRON_SKIP_BINARY_DOWNLOAD: '1'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24.6.0
+      - name: Install declared Rust toolchain
+        run: rustup toolchain install 1.93.0 --profile minimal --component rustfmt --component clippy
+      - name: Check Apple Silicon runner
+        if: runner.os == 'macOS'
+        run: test "$(uname -m)" = arm64
+      - name: Set external cache directory
+        run: echo "INJECTRA_CACHE_DIR=$RUNNER_TEMP/injectra" >> "$GITHUB_ENV"
+      - run: make setup-tests
+      - run: make check
+  windows-contracts:
+    name: Windows execution contracts
+    runs-on: windows-2022
+    timeout-minutes: 25
+    env:
+      RUSTUP_TOOLCHAIN: 1.93.0
+      CARGO_BUILD_JOBS: 2
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Install declared Rust toolchain
+        run: rustup toolchain install 1.93.0 --profile minimal
+      - name: Set external Cargo directory
+        run: '"CARGO_TARGET_DIR=$env:RUNNER_TEMP/injectra-cargo" >> $env:GITHUB_ENV'
+      - name: Test portable domain and CDP contracts
+        run: cargo test --locked -p injectra-core -p injectra-native -p injectra-web -p injectra-application -p injectra-cdp
+  repository-metadata:
+    name: GitHub metadata and citation
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: '3.13'
+      - run: python -m venv "${{ runner.temp }}/metadata-venv"
+      - run: '"${{ runner.temp }}/metadata-venv/bin/python" -m pip install -r .github/requirements-validation.txt'
+      - run: '"${{ runner.temp }}/metadata-venv/bin/python" scripts/check-github.py'

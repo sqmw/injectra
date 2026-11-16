@@ -1,0 +1,3 @@
+# Optional GitHub metadata checks only; not a CLI/runtime dependency.
+PyYAML==6.0.2
+jsonschema==4.23.0
