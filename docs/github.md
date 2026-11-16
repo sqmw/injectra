@@ -1,6 +1,6 @@
 # GitHub 仓库与协作入口
 
-归属[T-070](TODO.md#t-070)。仓库保持private；以下文件管理项目展示和协作，不改变运行时注入能力或论文科研主张。
+归属[T-070](TODO.md#t-070)。可见性由用户自行控制；以下文件管理项目展示和协作，不改变运行时注入能力或论文科研主张。
 
 
 ## 项目与研究入口
@@ -38,3 +38,7 @@ T-070发布时未纳入翻译会话的未提交内容；T-071随后整合其已�
 本地make check、文档/任务/diff、GitHub YAML/CFF官方schema、actionlint 1.7.12及独立目录论文编译通过；GitHub GFM已实际渲染两种语言的标题、表格和Mermaid入口。远端工作流曾因job级runner上下文配置而在准备阶段失败，已改为step初始化并静态校验通过。随后GitHub报告账户级Actions启动限制，未创建测试job；[运行详情](https://github.com/sqmw/injectra/actions/runs/43750655874)可由获授权用户核对。云端未运行不能写成CI通过，也不能据此判定软件测试失败；待账户所有者处理后再实跑。
 
 远端已配置area:cli、area:backends、area:pre-runtime、area:paper和evidence标签，保留原有标签。协作权限、强制审批及计费设置未调整。
+
+## 私有研究资料边界
+
+论文原稿、图表、写作与投稿资料已迁往独立论文工作区，代码仓库不跟踪paper/paper-en。迁移与受控历史核验见[T-076](TODO.md#t-076)。原工作树的私有恢复历史不得重新推入此库。用户自行操作公开，本轮保留private；GitHub旧SHA对象仍存在，当前新克隆无稿件不等于服务端所有旧对象已删除。
