@@ -39,5 +39,21 @@
     "Unused paper label removed; all-issue count zero.",
     "Documentation and PR template remnants repaired without editing runtime code."
   ],
-  "raw_artifacts_under_user_cache": "injectra/t080-20261116-34ggh9ui"
+  "raw_artifacts_under_user_cache": "injectra/t080-20261116-34ggh9ui",
+  "published_cleanup_commit": "ae55ee60a3b6e596caf5e573abdac19076d3f3f8",
+  "published_main_tree_verified": true,
+  "published_current_files_match_local": [
+    ".github/pull_request_template.md",
+    "CONTRIBUTING.md",
+    "README.md",
+    "README.zh-CN.md",
+    "docs/github.md",
+    "docs/architecture/code-map.md"
+  ],
+  "validation": [
+    "make doc-check: 129 Markdown files and 1009 local links passed.",
+    "project-tracking-check passed.",
+    "git diff --check passed.",
+    "Runtime code untouched; no product regression run needed for this documentation-only change."
+  ]
 }

@@ -13,31 +13,17 @@
   "name": "GitHub论文残留入口清理与复核",
   "version": "v1",
   "mode": "lightweight",
-  "status": "in_progress",
+  "status": "done",
   "goal": "使代码仓库当前展示与论文已迁出状态一致，并给出远端论文残留的可核验边界。",
   "scope": "清理GitHub About失效论文链接、当前项目文档中的过时论文入口及空置论文标签；核验远端分支/标签可达历史与已知稿件对象，保留软件验收和迁移历史，不重写Git历史、不删除Actions运行或改变private。",
   "acceptance": "About不再指向paper，过时当前入口消除，全部远端分支/标签新克隆无稿件目录及已知稿件blob；服务器旧SHA与非Git元数据结果独立披露，修订正常推送并回读。",
-  "execution_ref": "TODO.md#t-080",
-  "acceptance_evidence": [],
+  "execution_ref": "archive/T-080.md#t-080",
+  "acceptance_evidence": ["About homepage清空并API回读，area:paper标签无关联Issue后移除，仓库private保持。", "远端全新镜像覆盖2分支/3标签、121个提交与1957个对象；paper/paper-en历史路径0，163个已知稿件blob（大于100字节）匹配0。", "旧SHA认证API核验4项中2项仍可读；当前展示及可达历史清理不等于服务器旧对象已删除。未删Actions日志、修改可见性或重写历史。", "README中英文、贡献指南、PR模板、代码地图和GitHub说明残留已修正；ae55ee6正常推送，GitHub主分支文件对象与本地逐项一致且无稿件目录。", "make doc-check通过129文件/1009链接，tracking及diff检查通过；只改文档/展示，无运行代码变更。复核见docs/validation/github-paper-residuals.json。"],
   "unplanned_reason": "2026-11-16用户要求确认GitHub无论文资料并清理截图所示历史残留。"
 }
 ```
 
-```tracking-execution
-{
-  "id": "T-080/E-001",
-  "name": "清理仓库展示并审计远端残留",
-  "task_id": "T-080",
-  "task_version": "v1",
-  "status": "running",
-  "authorization": "2026-11-16用户明确要求核对GitHub论文残留并清理失效展示入口；保留既有private状态。",
-  "scope": "清理GitHub About失效论文链接、当前项目文档中的过时论文入口及空置论文标签；核验远端分支/标签可达历史与已知稿件对象，保留软件验收和迁移历史，不重写Git历史、不删除Actions运行或改变private。",
-  "steps": [],
-  "evidence": [],
-  "stop_reason": ""
-}
-```
-
+[执行归档](archive/T-080.md#t-080)
 
 <a id="t-072"></a>
 ### T-072 · README 中英文状态段落全历史清理
