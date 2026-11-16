@@ -4,45 +4,6 @@
 
 ## 当前执行
 
-<a id="t-071"></a>
-### T-071 · Git 分叉成果整合
-
-```tracking-task
-{
-  "id": "T-071",
-  "name": "Git 分叉成果整合",
-  "version": "v1",
-  "mode": "lightweight",
-  "status": "in_progress",
-  "goal": "将英文论文和GitHub展示/CI两路已提交成果整合到统一main，并同步远端和当前工作树。",
-  "scope": "保留原提交与恢复分支，非破坏性合并共享README/导航/检查入口；不重写论文正文或历史、不重置/强推、不删除工作树或分支，保持GitHub private。",
-  "acceptance": "main包含两路原提交且与origin/main同步，工作区无冲突；中英文稿/作者与原证据保留，双语项目介绍和CI能力保留；文档/任务/元数据检查及双语构建通过。",
-  "execution_ref": "TODO.md#t-071",
-  "acceptance_evidence": [],
-  "unplanned_reason": "2026-11-16用户提供两agent分叉图并要求处理；本地main独有英文稿，远端独有5个GitHub完善提交。"
-}
-```
-
-上下文r1：本窗口在主工作区main负责整合，基线efe50c2与origin/main的92abfee已各自保留恢复分支。两个执行者的Task69/70原状态及证据合并保留；无未提交用户改动。
-
-```tracking-execution
-{
-  "id": "T-071/E-001",
-  "name": "合并论文与 GitHub 两路提交",
-  "task_id": "T-071",
-  "task_version": "v1",
-  "status": "running",
-  "authorization": "用户明确要求处理两agent并行工作导致的分支问题，采用保留历史的合并与同步。",
-  "scope": "保留原提交与恢复分支，非破坏性合并共享README/导航/检查入口；不重写论文正文或历史、不重置/强推、不删除工作树或分支，保持GitHub private。",
-  "steps": [],
-  "evidence": [
-    "本地main efe50c2、origin/main 92abfee，共同基线0cfd758；两个工作区均干净。只读merge-tree预演仅README冲突，其余共享文件自动合并。",
-    "已保留两条恢复分支及仓库外before.json；旧tag和原始成果不变。"
-  ],
-  "stop_reason": ""
-}
-```
-
 <a id="t-070"></a>
 ### T-070 · GitHub 研究仓库展示与协作完善
 
@@ -240,6 +201,32 @@
 上下文r6：Parent/main，single-writer，续接d210ec9。用户已解锁，菜单/偏好设置及新run yudc69f4完成，普通首页已恢复；钥匙串提示状态与快速退出根因仍未知。当前缺口是可执行的目标侧入口，任务保持受阻，不计注入成功。证据见[启动条件复核](compatibility/adrive-startup.md)；仅有新的入口或诊断证据时继续，不调用未确认服务、修改保护或重放Unknown。
 
 ## 最近完成的验证
+
+<a id="t-071"></a>
+### T-071 · Git 分叉成果整合
+
+```tracking-task
+{
+  "id": "T-071",
+  "name": "Git 分叉成果整合",
+  "version": "v1",
+  "mode": "lightweight",
+  "status": "done",
+  "goal": "将英文论文和GitHub展示/CI两路已提交成果整合到统一main，并同步远端和当前工作树。",
+  "scope": "保留原提交与恢复分支，非破坏性合并共享README/导航/检查入口；不重写论文正文或历史、不重置/强推、不删除工作树或分支，保持GitHub private。",
+  "acceptance": "main包含两路原提交且与origin/main同步，工作区无冲突；中英文稿/作者与原证据保留，双语项目介绍和CI能力保留；文档/任务/元数据检查及双语构建通过。",
+  "execution_ref": "archive/T-071.md#t-071",
+  "acceptance_evidence": [
+    "非破坏性合并提交c531566，父提交efe50c2与92abfee均保留为祖先；两个恢复分支保留，未reset/rebase/强推或删除分支。",
+    "main、origin/main及GitHub功能分支完成统一；本地与远端均无ahead/behind，GitHub仍PRIVATE。",
+    "75个论文/作者/图稿/构建文件Git对象哈希与英文稿提交一致，14个GitHub配置对象原样保留；README手动整合双语项目介绍与中英文稿导航，论文CI覆盖双语构建。",
+    "make check、文档/任务、GitHub YAML/CFF schema、actionlint和中英文make paper/paper-en均通过；仓库外branch-integration-20261116保存前状态和构建日志。"
+  ],
+  "unplanned_reason": "2026-11-16用户提供两agent分叉图并要求处理；本地main独有英文稿，远端独有5个GitHub完善提交。"
+}
+```
+
+[合并、恢复点与验证](archive/T-071.md#t-071)。
 
 <a id="t-046"></a>
 ### T-046 · 通用 CLI 与 Windows 验证里程碑发布

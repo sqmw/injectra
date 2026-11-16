@@ -4,8 +4,6 @@
 
 ## 当前任务
 
-[T-071 · Git 分叉成果整合 @v1](TODO.md#t-071)：整合英文论文与GitHub两路成果，保留提交并同步main。
-
 [T-070 · GitHub 研究仓库展示与协作完善 @v1](TODO.md#t-070)：已整合至main，仓库配置完成；云端Actions仍受账户级限制。
 
 框选批注实时修改原型在独立项目UI Annotation Lab / T-001@v1（外部项目定位符：`ui-annotation-lab/docs/TODO.md#t-001`）实施，来源为T-047规划；本仓库只提供既有库层能力，不承载新产品代码或重复任务状态。
@@ -20,6 +18,7 @@
 
 | 任务 | 标准名称 | 定义版本 |
 | --- | --- | --- |
+| <a id="t-071"></a>[T-071](TODO.md#t-071) | Git 分叉成果整合 | v1 |
 | <a id="t-046"></a>[T-046](TODO.md#t-046) | 通用 CLI 与 Windows 验证里程碑发布 | v1 |
 | <a id="t-045"></a>[T-045](TODO.md#t-045) | Windows 豆包双插件应用 | v1 |
 | <a id="t-043"></a>[T-043](TODO.md#t-043) | Windows 全应用注入复验 | v1 |
