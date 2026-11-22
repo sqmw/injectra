@@ -3,11 +3,19 @@
 **为基于 Web 的桌面应用补充可复用的扩展能力。**
 **Retrofitting extensibility into Web-based desktop applications.**
 
-[English](README.md) · [简体中文](README.zh-CN.md) · [文档入口](docs/README.md) · [验证矩阵](docs/compatibility/current-matrix.md)
+[English](README.md) · [简体中文](README.zh-CN.md) · [论文](https://arxiv.org/abs/2611.20713) · [文档入口](docs/README.md) · [验证矩阵](docs/compatibility/current-matrix.md)
 
 Injectra 是一套 **Rust CLI 与可复用代码注入基础设施**，将使用者提供的 JavaScript、HTML、CSS 送入可接入的桌面 Web UI 上下文。它把应用接入与增强逻辑分开：不同增强可以复用目标发现、目标绑定、代码执行、增量迭代和诊断反馈，减少重复搭建接入链路的工作。
 
 使用自己的编辑器修改代码，直接在**真实应用窗口**中查看效果。Injectra 负责接入与执行；载荷作者负责选择器、应用业务行为、重渲染覆盖与脚本副作用。
+
+## 论文与引用
+
+Qin Sun (2026). *Injectra: Retrofitting Extensibility into Web-Based Desktop Applications*. arXiv:2611.20713 [cs.SE].
+
+[arXiv 论文页](https://arxiv.org/abs/2611.20713) · [PDF 全文](https://arxiv.org/pdf/2611.20713) · [BibTeX](https://arxiv.org/bibtex/2611.20713) · [DOI](https://doi.org/10.48550/arXiv.2611.20713)
+
+点击仓库侧栏的 **Cite this repository** 即可复制论文引文。报告使用本软件得到的结果时，请同时注明实际使用的 Git 提交或标签。[引用元数据](CITATION.cff)
 
 ## 提供什么
 
@@ -60,7 +68,7 @@ flowchart TD
 
 ## 快速开始
 
-仓库仅向获授权的协作者开放。[mise.toml](mise.toml) 声明 Rust **1.93.0**、Node **24.6.0**；Rust CLI 构建还需要本机链接工具。Node 用于开发检查和可选准备工具；编译后的 CDP CLI 无需 Node 或 Frida。
+[mise.toml](mise.toml) 声明 Rust **1.93.0**、Node **24.6.0**；Rust CLI 构建还需要本机链接工具。Node 用于开发检查和可选准备工具；编译后的 CDP CLI 无需 Node 或 Frida。
 
 ```sh
 git clone https://github.com/sqmw/injectra.git

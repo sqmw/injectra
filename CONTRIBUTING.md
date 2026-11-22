@@ -1,6 +1,6 @@
 # Contributing / 贡献指南
 
-Injectra is a private research and development repository. Work against the current code and [evidence boundaries](docs/compatibility/current-matrix.md), and keep the [English](README.md) and [Chinese](README.zh-CN.md) introductions consistent.
+Work against the current code and [evidence boundaries](docs/compatibility/current-matrix.md), and keep the [English](README.md) and [Chinese](README.zh-CN.md) introductions consistent.
 
 ## Changes and validation
 

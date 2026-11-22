@@ -4,6 +4,29 @@
 
 ## 当前执行
 
+<a id="t-081"></a>
+### T-081 · GitHub 预印本引用与读者入口更新
+
+```tracking-task
+{
+  "id":"T-081","name":"GitHub 预印本引用与读者入口更新","version":"v1","mode":"lightweight","status":"in_progress",
+  "goal":"从代码仓库首页可阅读与引用 arXiv 已公开的 Injectra 论文。",
+  "scope":"双语 README、CITATION.cff、GitHub About 网站与说明、当前协作指引、文档导航和本地及远端核验。",
+  "acceptance":"论文元数据与 arXiv 匹配，软件引用保留；中英文读者入口、CFF 校验与 GitHub 默认分支及 About 回读通过。",
+  "execution_ref":"TODO.md#t-081","acceptance_evidence":[],
+  "unplanned_reason":"2026-11-22 用户提供 arXiv:2611.20713，要求更新 GitHub。"
+}
+```
+
+```tracking-execution
+{
+  "id":"T-081/E-001","name":"双语首页、引用与 About 发布核验","task_id":"T-081","task_version":"v1","status":"running",
+  "authorization":"2026-11-22 用户要求在论文公开后更新 GitHub。",
+  "scope":"main 单写，基线 cae7fb1、开工工作区干净。核对公开书目，更新读者入口并发布，回读验证。",
+  "steps":[],"evidence":[],"stop_reason":""
+}
+```
+
 <a id="t-080"></a>
 ### T-080 · GitHub论文残留入口清理与复核
 

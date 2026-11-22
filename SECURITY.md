@@ -8,9 +8,7 @@ Use loopback endpoints and authenticated, identity-checked sessions where suppor
 
 ## Reporting
 
-This repository is private. Authorized collaborators may open a **redacted private-repository issue** describing the affected commit/backend, preconditions, and a minimal reproduction with owned data. Do not attach live credentials, personal profiles, user documents, or working access to someone else's application. For material that should not be visible to all repository collaborators, contact the maintainer through an already established private channel first.
-
-Do not assume a public vulnerability-reporting portal, public advisory, or bug-bounty program exists. Coordinate disclosure with the maintainer before sharing a report outside the authorized group.
+Report suspected vulnerabilities to the maintainer through an established private channel. If you need contact details, open a public issue asking for a private reporting channel and keep the technical details for the private exchange. Include the affected commit, backend and observed impact in the private report. Remove credentials, personal profiles and user documents from attachments.
 
 ## Maintenance scope
 
@@ -18,4 +16,4 @@ The current development branch is the primary investigation target. Tags preserv
 
 ## 中文
 
-仅运行可信载荷，核对目标身份并限制本地调试入口；源码仓库不保存凭据或用户 profile。发现问题时提供脱敏复现及实际影响，敏感材料先通过已有私下渠道联系维护者。私有仓库 issue 对获授权协作者可见，不等同于只向某一位维护者保密。旧 tag 是可追溯快照，不代表全部版本都获长期维护。
+仅运行可信载荷，核对目标身份并限制本地调试入口。发现疑似漏洞时，请通过已有私下渠道联系维护者，在私下报告中提供受影响的提交、后端和实际影响。如果需要联系方式，可以在公开 Issue 中只询问私下报告渠道。发送附件前请移除凭据、个人配置及用户文档。

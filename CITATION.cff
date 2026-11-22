@@ -1,13 +1,24 @@
 cff-version: 1.2.0
 type: software
 message: >-
-  Please cite the software repository and record the exact commit or milestone used.
+  Please cite the Injectra paper. For work using the software, also record
+  the exact commit or tag used.
 title: "Injectra: Reusable Injection Infrastructure for Web-Based Desktop Applications"
 authors:
   - name: "Injectra contributors"
 repository-code: "https://github.com/sqmw/injectra"
 url: "https://github.com/sqmw/injectra"
 license: Apache-2.0
+preferred-citation:
+  type: article
+  title: "Injectra: Retrofitting Extensibility into Web-Based Desktop Applications"
+  authors:
+    - family-names: Sun
+      given-names: Qin
+  journal: arXiv
+  year: 2026
+  doi: "10.48550/arXiv.2611.20713"
+  url: "https://arxiv.org/abs/2611.20713"
 abstract: >-
   A Rust CLI and shared Web runtime for runtime injection and lightweight
   pre-runtime development in accessible desktop Web UI contexts. Application

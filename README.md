@@ -3,11 +3,19 @@
 **Retrofitting extensibility into Web-based desktop applications.**
 **为基于 Web 的桌面应用补充可复用的扩展能力。**
 
-[English](README.md) · [简体中文](README.zh-CN.md) · [Documentation](docs/README.md) · [Validation matrix](docs/compatibility/current-matrix.md)
+[English](README.md) · [简体中文](README.zh-CN.md) · [Paper](https://arxiv.org/abs/2611.20713) · [Documentation](docs/README.md) · [Validation matrix](docs/compatibility/current-matrix.md)
 
 Injectra is a **Rust CLI and reusable injection infrastructure** for adding user-provided JavaScript, HTML, and CSS to accessible desktop Web UI contexts. It separates application access from enhancement logic, so payload authors can reuse discovery, target binding, execution, incremental iteration, and diagnostics instead of rebuilding an integration stack for every enhancement.
 
 Use your existing editor and inspect the result **inside the real application**. Injectra provides the access and execution machinery; payload authors remain responsible for selectors, application-specific behavior, rerendering, and side effects.
+
+## Paper and citation
+
+Qin Sun (2026). *Injectra: Retrofitting Extensibility into Web-Based Desktop Applications*. arXiv:2611.20713 [cs.SE].
+
+[Read the paper on arXiv](https://arxiv.org/abs/2611.20713) · [PDF](https://arxiv.org/pdf/2611.20713) · [BibTeX](https://arxiv.org/bibtex/2611.20713) · [DOI](https://doi.org/10.48550/arXiv.2611.20713)
+
+Use **Cite this repository** to copy the paper citation. When reporting results obtained with the software, also record the Git commit or tag you used. [Citation metadata](CITATION.cff)
 
 ## What Injectra provides
 
@@ -60,7 +68,7 @@ Start with the [current matrix](docs/compatibility/current-matrix.md), [Windows 
 
 ## Getting started
 
-Repository access is restricted to authorized collaborators. Tool versions are declared in [mise.toml](mise.toml): Rust **1.93.0** and Node **24.6.0**. Build the Rust CLI with Cargo and a native linker. Node is used for development checks and optional preparation tooling; the compiled CDP CLI does not require Node or Frida.
+Tool versions are declared in [mise.toml](mise.toml): Rust **1.93.0** and Node **24.6.0**. Build the Rust CLI with Cargo and a native linker. Node is used for development checks and optional preparation tooling; the compiled CDP CLI does not require Node or Frida.
 
 ```sh
 git clone https://github.com/sqmw/injectra.git
