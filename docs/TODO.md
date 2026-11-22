@@ -4,29 +4,6 @@
 
 ## 当前执行
 
-<a id="t-081"></a>
-### T-081 · GitHub 预印本引用与读者入口更新
-
-```tracking-task
-{
-  "id":"T-081","name":"GitHub 预印本引用与读者入口更新","version":"v1","mode":"lightweight","status":"in_progress",
-  "goal":"从代码仓库首页可阅读与引用 arXiv 已公开的 Injectra 论文。",
-  "scope":"双语 README、CITATION.cff、GitHub About 网站与说明、当前协作指引、文档导航和本地及远端核验。",
-  "acceptance":"论文元数据与 arXiv 匹配，软件引用保留；中英文读者入口、CFF 校验与 GitHub 默认分支及 About 回读通过。",
-  "execution_ref":"TODO.md#t-081","acceptance_evidence":[],
-  "unplanned_reason":"2026-11-22 用户提供 arXiv:2611.20713，要求更新 GitHub。"
-}
-```
-
-```tracking-execution
-{
-  "id":"T-081/E-001","name":"双语首页、引用与 About 发布核验","task_id":"T-081","task_version":"v1","status":"running",
-  "authorization":"2026-11-22 用户要求在论文公开后更新 GitHub。",
-  "scope":"main 单写，基线 cae7fb1、开工工作区干净。核对公开书目，更新读者入口并发布，回读验证。",
-  "steps":[],"evidence":[],"stop_reason":""
-}
-```
-
 <a id="t-080"></a>
 ### T-080 · GitHub论文残留入口清理与复核
 
@@ -280,6 +257,30 @@
 上下文r6：Parent/main，single-writer，续接d210ec9。用户已解锁，菜单/偏好设置及新run yudc69f4完成，普通首页已恢复；钥匙串提示状态与快速退出根因仍未知。当前缺口是可执行的目标侧入口，任务保持受阻，不计注入成功。证据见[启动条件复核](compatibility/adrive-startup.md)；仅有新的入口或诊断证据时继续，不调用未确认服务、修改保护或重放Unknown。
 
 ## 最近完成的验证
+
+<a id="t-081"></a>
+### T-081 · GitHub 预印本引用与读者入口更新
+
+```tracking-task
+{
+  "id": "T-081",
+  "name": "GitHub 预印本引用与读者入口更新",
+  "version": "v1",
+  "mode": "lightweight",
+  "status": "done",
+  "goal": "从代码仓库首页可阅读与引用 arXiv 已公开的 Injectra 论文。",
+  "scope": "双语 README、CITATION.cff、GitHub About 网站与说明、当前协作指引、文档导航和本地及远端核验。",
+  "acceptance": "论文元数据与 arXiv 匹配，软件引用保留；中英文读者入口、CFF 校验与 GitHub 默认分支及 About 回读通过。",
+  "execution_ref": "archive/T-081.md#t-081",
+  "acceptance_evidence": [
+    "6fc022c 已推送至 main。GitHub 渲染的双语 README 均有论文页、PDF、BibTeX 与 DOI。GitHub About Website 已回读。",
+    "首选论文引文通过 CFF 1.2 schema。GitHub 页面显示 Cite this repository 按钮。"
+  ],
+  "unplanned_reason": "2026-11-22 用户提供 arXiv:2611.20713，要求更新 GitHub。"
+}
+```
+
+[执行记录](archive/T-081.md#t-081)
 
 <a id="t-076"></a>
 ### T-076 · 论文迁移与代码仓库历史净化
