@@ -10,6 +10,8 @@
 
 2026-11-12用户进一步澄清：查看平台是pre-runtime的dev加载模式——先注入少量dev代码，使用现有编辑器修改增量，在真实App直接看更新，避免反复打包。工作台、内置编辑器和完整工作区不在当前目标；[T-040已升级v3](TODO.md#t-040)，依据[D-012](DECISIONS.md#d-012)。当前定义见[dev模式](architecture/dev-mode.md)，旧方案与证据保留；用户随后批准CLI收敛与平台代码删减。
 
+2026-11-25用户确认[第二个里程碑 M-002](TODO.md#m-002)（见[D-015](DECISIONS.md#d-015)与[规划](plans/milestone-2-core-engine.md)）：Injectra 锚定为通用底层注入引擎／SDK 与一等公民 CLI，上层 Agent、MCP 封装、插件管理器与日常持久化运行层建在其外；按宿主控制层区分 runtime 与 pre-runtime 互补分工，重加壳/原生二进制补丁明确 Unsupported，`iframe`/`<webview>` 子帧暂缓，渐进沉淀正式核心代码。
+
 面向以JS、HTML、CSS渲染界面的桌面应用，提供代码注入能力：运行期直接连接执行；pre-runtime可在派生副本中准备引导入口，用户增量保持外置，长期覆盖Electron之外的Web宿主。Web界面是目标类别，不意味着任何应用都已可接入或已验证兼容。
 
 | 方向 | 当前边界 |

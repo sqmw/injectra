@@ -380,3 +380,33 @@ D-006参考归档边界补充：接入、桥接与验证工具可以保留，可
 ```
 
 补充D-013的准备器覆盖；保留旧Unsupported证据。[验证](validation/qq-cli-dev.md)。
+
+<a id="d-015"></a>
+## D-015 · 第二个里程碑核心引擎边界与渐进路线
+
+```tracking-decision
+{
+  "id": "D-015",
+  "date": "2026-11-25",
+  "status": "accepted",
+  "conclusion": "第二个里程碑（M-002）锁定Injectra为通用底层注入引擎/SDK与一等公民CLI，按“CLI机器契约→只读应用诊断与非CDP会话收敛→Web桌面架构调研与跨平台正式化→共享Runtime策略容错”四阶段渐进推进；runtime与pre-runtime按宿主控制层互补分工，重度加壳/原生二进制补丁明确Unsupported，iframe子帧与上层MCP/托管runner暂不纳入核心。",
+  "trigger": "2026-11-24/25用户核对通用能力缺口后明确以底层注入引擎/SDK和CLI为核心目标，拒绝补丁式推进并确认将四阶段路线作为第二个里程碑落文档。",
+  "context": "承接D-003/D-004/D-010/D-012/D-013/D-014及论文发布后基线36306eb；不推翻既有核心分层与已验证边界。",
+  "affects": [
+    "M-002里程碑范围与阶段顺序",
+    "CLI机器可读错误与只读观测契约",
+    "跨平台宿主诊断、准备器与非CDP会话收口",
+    "重加壳排除与iframe延后边界"
+  ],
+  "alternatives": [
+    "把MCP Server、插件管理器或日常自动重注入runner做进Injectra核心：偏离底层引擎定位，增加内核耦合",
+    "要求pre-runtime覆盖Tauri编译内嵌资源或重加壳二进制：引入脆弱补丁与对抗负担，违背通用核心原则",
+    "在M-002同时加入iframe/webview子帧与全平台重构：范围过大，违背渐进开发要求",
+    "继续以tests/和scripts/外部脚本拼装承担Windows与非CDP能力：无法形成可复用正式CLI底座"
+  ],
+  "commit": "本条所在提交",
+  "supersedes": []
+}
+```
+
+[M-002规划](plans/milestone-2-core-engine.md) · [M-002状态簿](TODO.md#m-002)。补充既有架构与产品边界，不覆盖历史交付或验证记录。

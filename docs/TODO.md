@@ -2,7 +2,138 @@
 
 当前权威来源为本地main。T-021/T-022原交付记录保留当时口径，后续接收状态以T-023为准；更早任务亦保留原验收事实。保留完整定义与证据，默认从[任务索引](tasks.md)按Task ID定向读取。
 
+## 里程碑
+
+<a id="m-002"></a>
+### M-002 · 通用底层注入引擎与 CLI 底座夯实
+
+```tracking-milestone
+{
+  "id": "M-002",
+  "name": "通用底层注入引擎与 CLI 底座夯实",
+  "status": "pending",
+  "goal": "将 Injectra 打磨为人类开发者与各类 LLM Agent 可直接复用的通用底层注入引擎／SDK 与一等公民 CLI，消除正式能力与外部实验脚本之间的断层。",
+  "scope": "按 D-015 四阶段渐进推进：CLI 机器契约与只读观测（T-083）、跨平台应用引擎诊断与非 CDP 会话收敛（T-084）、主流 Web 桌面架构调研与跨平台正式 crate 沉淀（T-085）、共享 Web Runtime 策略容错与依赖减重（T-086）。不纳入 iframe 子帧、重加壳/原生二进制补丁、内置 MCP Server、日常托管 runner 或图形工作台。",
+  "acceptance": "所有成员任务均完成或获准收口：CLI 进程边界完整保留结构化错误与确定性且提供只读状态/观测原语；只读应用诊断覆盖主流 Web 桌面架构且非 CDP 会话接入不再依赖手拼外部脚本；已验证的 Windows 通用能力与 Electron ESM 入口按正规分层迁入正式 workspace 并通过对应平台实测；明确记录不支持边界与遗留限制，无应用品牌补丁侵入核心。",
+  "acceptance_evidence": []
+}
+```
+
+[规划与架构边界](plans/milestone-2-core-engine.md) · [D-015](DECISIONS.md#d-015)。
+
 ## 当前执行
+
+<a id="t-083"></a>
+### T-083 · CLI 机器契约与只读观测原语
+
+```tracking-task
+{
+  "id": "T-083",
+  "name": "CLI 机器契约与只读观测原语",
+  "version": "v1",
+  "mode": "staged",
+  "status": "pending",
+  "priority": "P0",
+  "milestone": "M-002",
+  "goal": "使 Injectra CLI 在进程边界完整保留执行确定性语义，并补齐面向脚本与 AI Agent 的只读状态与观测命令。",
+  "scope": "扩展 CLI 错误输出与退出码，保留 core::Error 的 kind/phase/certainty 语义；新增 list 查询当前页面已注入受管 bundle，以及受控只读 eval 原语；保持既有成功 JSON 输出与 core/web/application 分层不变，不引入内置 MCP Server。",
+  "acceptance": "CLI 所有子命令在失败时提供机器可解析的结构化错误与可区分退出码（区分 NotExecuted/Executed/Unknown）；list 与只读 eval 在 Rust 契约测试及真实 Electron fixture 上通过验收；make check 全绿且既有 CLI 合同不破坏。",
+  "execution_ref": "",
+  "acceptance_evidence": []
+}
+```
+
+关联规划：[M-002 阶段 1](plans/milestone-2-core-engine.md) · [D-015](DECISIONS.md#d-015)。
+
+<a id="t-084"></a>
+### T-084 · 应用引擎只读诊断与非 CDP 会话收敛
+
+```tracking-task
+{
+  "id": "T-084",
+  "name": "应用引擎只读诊断与非 CDP 会话收敛",
+  "version": "v1",
+  "mode": "staged",
+  "status": "pending",
+  "priority": "P1",
+  "milestone": "M-002",
+  "goal": "降低调用方与 Agent 在接入前识别应用架构和准备非 CDP 会话的门槛，收敛外部脚本胶水。",
+  "scope": "按 platform-* 与 hosts 分层实现只读 inspect-app 及扩展 launch-plan，识别 Electron/NW.js/CEF/Tauri/WebView2 架构、适用路线与缺失前置条件；梳理 Gadget/WKWebView 会话建立与校验契约，收口对 scripts/ 手工串联的依赖；保持不自动强杀用户实例、不静默降级。",
+  "acceptance": "只读诊断命令对主流宿主夹具与已记录样本输出结构化架构/路线/前置清单，对未知或重加壳目标明确报 Unsupported；非 CDP 会话管理边界清晰并通过回归与受控实机验证。",
+  "execution_ref": "",
+  "acceptance_evidence": []
+}
+```
+
+关联规划：[M-002 阶段 2](plans/milestone-2-core-engine.md) · [D-015](DECISIONS.md#d-015)。
+
+<a id="t-085"></a>
+### T-085 · Web 桌面架构调研与跨平台核心正式化
+
+```tracking-task
+{
+  "id": "T-085",
+  "name": "Web 桌面架构调研与跨平台核心正式化",
+  "version": "v1",
+  "mode": "staged",
+  "status": "pending",
+  "priority": "P1",
+  "milestone": "M-002",
+  "goal": "以多架构调研基线指导 platform/hosts/preparation 跨平台重构，将已验证的 Windows 通用能力与 Electron ESM 准备沉淀为正式 crate 代码。",
+  "scope": "系统核验 macOS 与 Windows 下 Electron（CJS/ESM）、Tauri/WebView2、CEF、NW.js 的调试与资源控制层边界；重构 preparation 解耦 macOS 硬编码，按正规分层迁入 Windows 通用准备/Bootstrap/V8 等已验证核心能力，不以应用品牌补丁或二进制脱壳换取覆盖。",
+  "acceptance": "架构调研文档与核心 crate 抽象一致；Windows 正式 CLI 能力超越纯 CDP 并在 Windows 宿主完成对应实测验收；macOS 与 Windows 回归测试与架构边界检查全部通过。",
+  "execution_ref": "",
+  "acceptance_evidence": []
+}
+```
+
+关联规划：[M-002 阶段 3](plans/milestone-2-core-engine.md) · [D-015](DECISIONS.md#d-015)。
+
+<a id="t-086"></a>
+### T-086 · 共享 Web Runtime 策略容错与依赖减重
+
+```tracking-task
+{
+  "id": "T-086",
+  "name": "共享 Web Runtime 策略容错与依赖减重",
+  "version": "v1",
+  "mode": "lightweight",
+  "status": "pending",
+  "priority": "P2",
+  "milestone": "M-002",
+  "goal": "减少共享 Web Runtime 在 Trusted Types/严格 CSP 页面上的挂载摩擦，并评估准备器核心去重型外部运行时依赖。",
+  "scope": "在唯一 web/runtime.js 中设计显式、可控的安全 DOM 挂载模式并将策略拦截与脚本运行异常分离报告；评估并按收益用纯 Rust 替换部分 Node ASAR/解析依赖；保持既有 manifest v1 与单文件运行语义。",
+  "acceptance": "受限 Trusted Types 测试页面可通过声明式安全路径完成挂载、更新与清理且错误分类清晰；依赖减重方案给出明确收益/边界并在实施部分通过跨平台测试。",
+  "execution_ref": "",
+  "acceptance_evidence": []
+}
+```
+
+关联规划：[M-002 阶段 4](plans/milestone-2-core-engine.md) · [D-015](DECISIONS.md#d-015)。
+
+<a id="t-082"></a>
+### T-082 · 建立第二个里程碑与核心演进路线文档
+
+```tracking-task
+{
+  "id": "T-082",
+  "name": "建立第二个里程碑与核心演进路线文档",
+  "version": "v1",
+  "mode": "lightweight",
+  "status": "done",
+  "goal": "将用户确认的通用底层注入引擎与 CLI 底座四阶段路线登记为第二个里程碑（M-002），同步决策、任务与导航文档并提交。",
+  "scope": "仅更新规划、决策、任务、需求与导航 Markdown 文档并在本地 main 提交；不改动产品代码、不推送远端、不改写历史证据。",
+  "acceptance": "M-002 规划文档、D-015 决策、TODO 里程碑与四个 pending 成员任务、tasks/README/requirements 导航全部同步；make doc-check、tracking_check.py 与 git diff --check 通过并完成干净本地提交。",
+  "execution_ref": "archive/T-082.md#t-082",
+  "acceptance_evidence": [
+    "新增 docs/plans/milestone-2-core-engine.md 与 docs/archive/T-082.md，登记 D-015、M-002 及 T-083..T-086，同步 tasks.md、README.md 与 requirements.md。",
+    "本地 make doc-check、tracking_check.py 与 git diff --check 全部通过，无孤儿文档或源码改动。"
+  ],
+  "unplanned_reason": "2026-11-25 用户确认将对齐的通用注入引擎核心演进路线作为第二个里程碑落文档并提交。"
+}
+```
+
+[执行归档](archive/T-082.md#t-082)
 
 <a id="t-080"></a>
 ### T-080 · GitHub论文残留入口清理与复核
