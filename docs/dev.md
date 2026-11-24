@@ -16,6 +16,18 @@
 2. 如已有目标进程，是否退出与如何保存工作由用户决定。使用规划参数自行启动目标；部分应用不会开放或继承调试参数，不据此自动改包、重签名或绕过保护。
 3. 核对监听为回环地址，再执行`targets --port <PORT>`；检查title/url并使用精确ID。没有页面、页面消失或不支持时停止，不默选第一个窗口。
 4. `apply --port <PORT> --target <ID> --bundle <MANIFEST>`应用，`remove --port <PORT> --target <ID> --id <BUNDLE_ID>`移除。
+5. `list --port <PORT> --target <ID>`查询当前页面在共享runtime注册表中的受管Bundle（`id`、`nodes`、`cleanups`）；此操作只读注册表状态。
+6. `eval --port <PORT> --target <ID> (--expression <JS> | --file <PATH>)`在目标页面上下文执行JavaScript表达式并等待Promise返回JSON（顶层`undefined`归一为`null`；文件上限1 MiB）。`eval`以目标页面权限运行，并非沙箱或技术意义上的只读隔离；调用方负责所提交表达式的副作用。
+
+## 机器输出契约（`--machine`）
+
+默认模式保留原有输出：单次命令成功输出格式化JSON并返回退出码`0`；命令失败向`stderr`输出`injectra: <错误>`并返回`1`；CLI参数解析失败返回`2`。
+
+传入全局参数`--machine`后，单次命令统一向`stdout`输出单行JSON信封并按执行确定性返回退出码：
+
+- 成功：`{"ok":true,"data":...}`，退出码`0`。
+- 失败：`{"ok":false,"error":{"kind":"...","phase":"...","certainty":"NotExecuted|Executed|Unknown","message":"...","causes":[...]}}`。
+- 退出码映射：`2`为CLI参数无效（`NotExecuted`），`3`为执行前拒绝或目标缺失（`NotExecuted`，可在修正条件后重试），`4`为目标已执行但脚本/编码阶段失败（`Executed`），`5`为结果未知（`Unknown`，禁止自动重试）。`dev`子命令继续按JSONL流式输出事件，在启动前或异常终止错误时在`--machine`下返回同结构错误信封与退出码。
 
 可执行文件路径中存在空格时，使用`make build`产出的二进制并对路径正确加引号；Make的ARGS只适合自己编写的简单参数，不接收未经检查的第三方命令文本。二进制位置为外部缓存根下的`cargo-target/debug/injectra`，或显式`CARGO_TARGET_DIR`下的`debug/injectra`。
 

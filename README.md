@@ -87,7 +87,11 @@ The target application must already expose an authorized **loopback** debugging 
 make run ARGS="targets --port 9222"
 # Inspect title/URL, then use the exact target ID and an external manifest.
 make run ARGS="apply --port 9222 --target PAGE_ID --bundle MANIFEST_PATH"
+make run ARGS="list --port 9222 --target PAGE_ID"
+make run ARGS="eval --port 9222 --target PAGE_ID --expression 'document.title'"
 make run ARGS="remove --port 9222 --target PAGE_ID --id BUNDLE_ID"
+# Machine callers can pass --machine for single-line JSON envelopes and certainty exit codes (0/2/3/4/5).
+make run ARGS="--machine targets --port 9222"
 ```
 
 For paths with spaces, invoke the built executable directly with properly quoted arguments. A native Windows CDP build can use PowerShell:

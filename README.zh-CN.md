@@ -86,7 +86,11 @@ make run ARGS="--help"
 ```sh
 make run ARGS="targets --port 9222"
 make run ARGS="apply --port 9222 --target PAGE_ID --bundle MANIFEST_PATH"
+make run ARGS="list --port 9222 --target PAGE_ID"
+make run ARGS="eval --port 9222 --target PAGE_ID --expression 'document.title'"
 make run ARGS="remove --port 9222 --target PAGE_ID --id BUNDLE_ID"
+# 机器调用方可使用 --machine 获取单行 JSON 信封及按确定性区分的退出码（0/2/3/4/5）。
+make run ARGS="--machine targets --port 9222"
 ```
 
 路径含空格时，直接调用构建后的二进制并正确引用参数。Windows 原生 CDP 构建可使用 PowerShell：

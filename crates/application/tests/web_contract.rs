@@ -4,7 +4,7 @@ mod fixture {
         "/../../tests/support/bundle.rs"
     ));
 }
-use injectra_application::{apply, execute};
+use injectra_application::{apply, eval, execute, list};
 use injectra_core::{BackendId, Capability, Certainty, Error, ErrorKind, Phase, Result, TargetRef};
 use injectra_web::{PAGE_EVALUATE, WebBackend, WebSession, WebTarget};
 use serde_json::{Value, json};
@@ -161,4 +161,33 @@ fn dev_revisions_track_content_and_keep_unknown_attempts_distinct_from_saves() {
     assert_eq!(backend.programs.borrow().len(), 1);
     std::fs::write(&fixture.manifest, "{").unwrap();
     assert!(Revision::load(&fixture.manifest).is_err());
+}
+
+#[test]
+fn list_and_eval_reuse_contracts_and_preserve_certainty_without_retry() {
+    let a = Backend::page();
+    let b = Backend::page();
+    list(&a, &a.target()).unwrap();
+    list(&b, &b.target()).unwrap();
+    assert_eq!(*a.programs.borrow(), *b.programs.borrow());
+    assert!(a.programs.borrow()[0].contains(r#""operation":"list""#));
+
+    let mut missing_cap = Backend::page();
+    missing_cap.caps = vec![Capability("js.evaluate")];
+    assert_eq!(
+        list(&missing_cap, &missing_cap.target()).unwrap_err().kind,
+        ErrorKind::Unsupported
+    );
+    assert!(missing_cap.programs.borrow().is_empty());
+
+    let blank = Backend::page();
+    let err = eval(&blank, &blank.target(), "   ").unwrap_err();
+    assert_eq!(err.certainty, Certainty::NotExecuted);
+    assert_eq!(blank.connects.get(), 0);
+
+    let mut failing = Backend::page();
+    failing.fail = true;
+    let err = eval(&failing, &failing.target(), "document.title").unwrap_err();
+    assert_eq!(err.certainty, Certainty::Unknown);
+    assert_eq!(failing.programs.borrow().len(), 1);
 }

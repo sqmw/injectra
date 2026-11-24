@@ -73,3 +73,40 @@ test("independent bundle IDs do not remove one another", async () => {
     assert.equal(window.document.querySelectorAll('[data-injectra="second"]').length, 2);
   } finally { dom.window.close(); }
 });
+
+test("list reports managed bundles across empty, active, concurrent and cleaned states", async () => {
+  const { dom, runtime } = setup();
+  const list = async () => JSON.parse(JSON.stringify(await runtime({ operation: "list" }, null)));
+  try {
+    assert.deepEqual(await list(), { bundles: [] });
+    await runtime(request, async context => { context.onCleanup(() => {}); });
+    await runtime({ operation: "apply", id: "second", css: "a{}", html: "" }, async () => {});
+    assert.deepEqual(await list(), {
+      bundles: [
+        { id: "test", nodes: 2, cleanups: 1 },
+        { id: "second", nodes: 1, cleanups: 0 },
+      ],
+    });
+    let release;
+    const inflight = runtime(
+      { operation: "apply", id: "busy-one", css: "b{}", html: "" },
+      () => new Promise(resolve => { release = resolve; }),
+    );
+    assert.deepEqual(await list(), {
+      bundles: [
+        { id: "test", nodes: 2, cleanups: 1 },
+        { id: "second", nodes: 1, cleanups: 0 },
+      ],
+    });
+    release();
+    await inflight;
+    await runtime({ operation: "remove", id: "test" });
+    await runtime({ operation: "remove", id: "second" });
+    await runtime({ operation: "remove", id: "busy-one" });
+    await assert.rejects(
+      runtime(request, async () => { throw new Error("boom"); }),
+      /boom/,
+    );
+    assert.deepEqual(await list(), { bundles: [] });
+  } finally { dom.window.close(); }
+});

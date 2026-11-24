@@ -91,8 +91,8 @@ CDP发送或等待响应后失联、超时或无法解析响应保守记为Unkno
 - WebTarget具有TargetRef、title/url和PageContext。当前上下文是MainFrame；仅作页面目标，不包含worker或原生插桩环境。
 - WebBackend提供id/targets/connect；connect只能接受其本实例TargetRef，并返回绑定该目标的WebSession。
 - WebSession提供target/capabilities/evaluate_page；页面求值等待Promise、以JSON值返回，脚本异常必须保留。某个JS引擎可执行脚本并不足以声明`web.page.evaluate`。
-- application公开targets/apply/remove/execute；后端由调用者注入，不导入具体适配。apply保持manifest v1的目录/大小校验和原有共享程序生成；execute核对后端身份、会话目标与页面能力。
-- CLI在单次命令边界将显式端口和原target ID转换为内部TargetRef；输出投影回原id/title/url，不暴露实例ID。默认命令仍装配CDP，显式electron-gadget/webkit选择对应并列后端。
+- application公开targets/apply/remove/list/eval/execute；后端由调用者注入，不导入具体适配。apply保持manifest v1的目录/大小校验和原有共享程序生成；list读取共享runtime注册表；eval委托给web::evaluate_expression并走同一execute能力与目标门禁；execute核对后端身份、会话目标与页面能力。
+- CLI在单次命令边界将显式端口和原target ID转换为内部TargetRef；输出投影回原id/title/url，不暴露实例ID。默认命令仍装配CDP，显式electron-gadget/webkit选择对应并列后端。全局`--machine`开关向`stdout`投影单行JSON信封（含`ErrorKind`/`Phase`/`Certainty`与`causes`）并按确定性返回退出码`0/2/3/4/5`，同时保留默认模式输出与退出码`0/1/2`。
 
 当前CDP仅发现page目标并使用主页面默认上下文；不声明frame/isolated-world兼容性。`js.evaluate`等通用脚本能力不能替代页面能力。
 
@@ -124,7 +124,7 @@ Web runtime仍只有[一份JS](../../web/runtime.js)，按bundle id记录拥有�
 
 页面刷新或重建后由使用者决定再次注入；应用选择器、重渲染覆盖和业务交互不进入core或后端。载荷是受信任代码，页面权限和样式也不是沙箱。
 
-CLI命令、manifest v1、targets的id/title/url、apply/remove返回字段、launch-plan的executable/arguments/note及退出码保留。内部实例身份与错误类型不改变现有成功JSON。
+CLI命令、manifest v1、targets的id/title/url、apply/remove/list返回字段、launch-plan的executable/arguments/note及默认退出码（`0/1/2`）保留。`--machine`作为显式机器模式投影结构化错误与退出码`0/2/3/4/5`；内部实例身份不改变现有成功JSON。
 
 ## 演进与验证
 

@@ -7,18 +7,18 @@
 
 | 能力 | 源码入口与职责 | 上下游边界 | 测试与专题 |
 | --- | --- | --- | --- |
-| 核心契约 | [core](../../crates/core/src/lib.rs)：BackendId/TargetRef/Capability/Error | 无执行域/JSON依赖；能力检查与错误语义 | 身份隔离测试；[架构](boundaries.md) |
+| 核心契约 | [core](../../crates/core/src/lib.rs)：BackendId/TargetRef/Capability/Error | 无执行域/JSON依赖；能力检查、确定性标识与错误原因链 | 身份/错误测试；[架构](boundaries.md) |
 | Web载荷加载 | [bundle.rs](../../crates/web/src/bundle.rs)：版本、路径和资源限制 | 本地manifest → Bundle | 内联loader测试、[临时夹具](../../tests/support/bundle.rs)；[使用](../dev.md) |
-| 程序生成 | [web](../../crates/web/src/lib.rs)：共享runtime嵌入、数据序列化 | Bundle → JS程序 | Electron端到端测试 |
-| 共享注入执行 | [runtime.js](../../web/runtime.js)：拥有节点、清理、重复/并发注入 | 单次注入及既有辅助行为；无平台判断或导航恢复 | [runtime.test.mjs](../../tests/runtime.test.mjs) |
+| 程序生成 | [web](../../crates/web/src/lib.rs)：共享runtime嵌入、数据序列化、list/eval封装 | Bundle/表达式 → JS程序 | Electron端到端测试 |
+| 共享注入执行 | [runtime.js](../../web/runtime.js)：拥有节点、清理、list注册表查询、重复/并发注入 | 单次注入、只读查询及既有辅助行为；无平台判断或导航恢复 | [runtime.test.mjs](../../tests/runtime.test.mjs) |
 | CDP发现 | [discovery.rs](../../crates/cdp/src/discovery.rs)：本地HTTP发现 | CDP页面 → WebTarget | Electron发现实测 |
 | CDP连接执行 | [session.rs](../../crates/cdp/src/session.rs)、[WebBackend](../../crates/cdp/src/lib.rs) | WebSocket/CDP → WebSession | [传输合同测试](../../crates/cdp/src/session/tests.rs)；Electron实测 |
 | macOS平台 | [platform-macos](../../crates/platform-macos/src/lib.rs)：.app元数据 | 路径 → ApplicationInfo；无宿主识别或进程管理 | Electron.app规划实测 |
 | Web执行契约 | [contracts](../../crates/web/src/contracts.rs)：WebBackend/WebSession/页面上下文 | 只声明页面执行，区别于通用JS环境 | [应用合同测试](../../crates/application/tests/web_contract.rs) |
-| 应用用例 | [application](../../crates/application/src/lib.rs)：targets/apply/remove/execute | 注入后端；身份与能力检查，不固定CDP | 同上 |
+| 应用用例 | [application](../../crates/application/src/lib.rs)：targets/apply/remove/list/eval/execute | 注入后端；身份与能力检查，不固定CDP | 同上 |
 | 原生域 | [target](../../crates/native/src/target.rs)、[memory](../../crates/native/src/memory.rs)：原生目标、地址、独立读写端口 | 无Web、无真实后端 | [受控缓冲区测试](../../crates/native/src/memory/tests.rs)、[契约](boundaries.md) |
 | 宿主规划 | [hosts/electron](../../crates/hosts/src/electron.rs)：Electron识别与只读规划 | 平台元数据 → LaunchPlan | recipe单测、Electron实测 |
-| CLI装配 | [main.rs](../../crates/cli/src/main.rs)、[args.rs](../../crates/cli/src/args.rs) | 参数 → 适配/载荷 → JSON | [smoke](../../scripts/electron-smoke.mjs) |
+| CLI装配 | [main.rs](../../crates/cli/src/main.rs)、[args.rs](../../crates/cli/src/args.rs) | 参数 → 适配/载荷 → 默认JSON或`--machine`信封及确定性退出码 | [smoke](../../scripts/electron-smoke.mjs) |
 | 测试输入（非插件） | [临时夹具](../../tests/support/bundle.rs)、[Electron smoke](../../scripts/electron-smoke.mjs) | 仅在临时目录生成最小输入，结束后清理Rust夹具；不依赖插件库 | make check / make test-electron |
 | 工程入口 | [Makefile](../../Makefile)、[cargo.sh](../../scripts/cargo.sh)、[测试环境](../../scripts/test-env.mjs) | 外部缓存，不污染同步工作区 | make check；[开发](../dev.md) |
 | 软件参考源码（非产品模块） | [references](../../references/README.md)：apps按软件/路线归档，shared保留Electron/V8桥接及Web程序生成器 | 不加入根workspace；不参与默认构建/测试/发布；不复制Web runtime | make -C references check/stats；[抖音证据](../compatibility/douyin-gadget.md) |

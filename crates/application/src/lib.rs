@@ -18,6 +18,16 @@ pub fn apply(backend: &dyn WebBackend, target: &TargetRef, manifest: &Path) -> R
 pub fn remove(backend: &dyn WebBackend, target: &TargetRef, id: &str) -> Result<Value> {
     execute(backend, target, &injectra_web::remove(id)?)
 }
+pub fn list(backend: &dyn WebBackend, target: &TargetRef) -> Result<Value> {
+    execute(backend, target, &injectra_web::list())
+}
+pub fn eval(backend: &dyn WebBackend, target: &TargetRef, expression: &str) -> Result<Value> {
+    execute(
+        backend,
+        target,
+        &injectra_web::evaluate_expression(expression)?,
+    )
+}
 pub fn execute(backend: &dyn WebBackend, target: &TargetRef, program: &str) -> Result<Value> {
     target.ensure_backend(backend.id())?;
     let mut session = backend.connect(target)?;

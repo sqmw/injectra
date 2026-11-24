@@ -11,7 +11,7 @@
 {
   "id": "M-002",
   "name": "通用底层注入引擎与 CLI 底座夯实",
-  "status": "pending",
+  "status": "in_progress",
   "goal": "将 Injectra 打磨为人类开发者与各类 LLM Agent 可直接复用的通用底层注入引擎／SDK 与一等公民 CLI，消除正式能力与外部实验脚本之间的断层。",
   "scope": "按 D-015 四阶段渐进推进：CLI 机器契约与只读观测（T-083）、跨平台应用引擎诊断与非 CDP 会话收敛（T-084）、主流 Web 桌面架构调研与跨平台正式 crate 沉淀（T-085）、共享 Web Runtime 策略容错与依赖减重（T-086）。不纳入 iframe 子帧、重加壳/原生二进制补丁、内置 MCP Server、日常托管 runner 或图形工作台。",
   "acceptance": "所有成员任务均完成或获准收口：CLI 进程边界完整保留结构化错误与确定性且提供只读状态/观测原语；只读应用诊断覆盖主流 Web 桌面架构且非 CDP 会话接入不再依赖手拼外部脚本；已验证的 Windows 通用能力与 Electron ESM 入口按正规分层迁入正式 workspace 并通过对应平台实测；明确记录不支持边界与遗留限制，无应用品牌补丁侵入核心。",
@@ -32,18 +32,23 @@
   "name": "CLI 机器契约与只读观测原语",
   "version": "v1",
   "mode": "staged",
-  "status": "pending",
+  "status": "done",
   "priority": "P0",
   "milestone": "M-002",
   "goal": "使 Injectra CLI 在进程边界完整保留执行确定性语义，并补齐面向脚本与 AI Agent 的只读状态与观测命令。",
   "scope": "扩展 CLI 错误输出与退出码，保留 core::Error 的 kind/phase/certainty 语义；新增 list 查询当前页面已注入受管 bundle，以及受控只读 eval 原语；保持既有成功 JSON 输出与 core/web/application 分层不变，不引入内置 MCP Server。",
   "acceptance": "CLI 所有子命令在失败时提供机器可解析的结构化错误与可区分退出码（区分 NotExecuted/Executed/Unknown）；list 与只读 eval 在 Rust 契约测试及真实 Electron fixture 上通过验收；make check 全绿且既有 CLI 合同不破坏。",
-  "execution_ref": "",
-  "acceptance_evidence": []
+  "execution_ref": "archive/T-083.md#t-083",
+  "acceptance_evidence": [
+    "crates/core/src/error.rs 提供 ErrorKind/Phase/Certainty::as_str 与 Error::causes()；web/runtime.js 新增 operation=\"list\" 无锁读取受管注册表；crates/web 与 crates/application 新增 list 与 eval 原语并复用统一 WebSession 能力门禁。",
+    "crates/cli 新增全局 --machine 参数（单行 JSON 信封 ok/data/error 与 0/2/3/4/5 退出码映射）及 list/eval（--expression/--file）子命令，保留默认 v0.1 输出及 0/1/2 退出码完全兼容。",
+    "make check 全绿（Rust 39 项单测/合同测试、runtime.test.mjs 6 项、webkit host 8 项、gecko parsed-html 3 项、clippy -D warnings、13 crate 架构检查、133 份文档检查），make test-electron 在 Electron 45.2.1 真实夹具通过 13 项端到端验证（run electron-7t3qr0）。",
+    "docs/dev.md、docs/architecture/boundaries.md、docs/architecture/code-map.md、README.md 与 README.zh-CN.md 已同步更新；执行与步骤证据归档于 docs/archive/T-083.md。"
+  ]
 }
 ```
 
-关联规划：[M-002 阶段 1](plans/milestone-2-core-engine.md) · [D-015](DECISIONS.md#d-015)。
+关联规划：[M-002 阶段 1](plans/milestone-2-core-engine.md) · [D-015](DECISIONS.md#d-015) · [执行归档](archive/T-083.md#t-083)。
 
 <a id="t-084"></a>
 ### T-084 · 应用引擎只读诊断与非 CDP 会话收敛

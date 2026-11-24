@@ -1,6 +1,16 @@
 async function injectraRuntime(request, execute) {
   const key = Symbol.for("injectra.runtime.v1");
   const registry = globalThis[key] ??= new Map();
+  if (!request || typeof request !== "object") throw new Error("Invalid runtime request");
+  if (request.operation === "list") {
+    return {
+      bundles: Array.from(registry.entries(), ([bundleId, entry]) => ({
+        id: bundleId,
+        nodes: entry.nodes.length,
+        cleanups: entry.cleanups.length,
+      })),
+    };
+  }
   const { id } = request;
   const busy = registry.busy ??= new Set();
   if (busy.has(id)) throw new Error(`Bundle operation already in progress: ${id}`);

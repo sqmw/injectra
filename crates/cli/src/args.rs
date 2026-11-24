@@ -6,6 +6,9 @@ use std::path::PathBuf;
     about = "Injectra: runtime Web injection and pre-runtime CLI dev"
 )]
 pub struct Args {
+    /// Emit single-line structured JSON envelopes and certainty-mapped exit codes.
+    #[arg(long, global = true)]
+    pub machine: bool,
     #[command(subcommand)]
     pub command: Command,
 }
@@ -81,6 +84,28 @@ pub enum Command {
         #[arg(long)]
         id: String,
     },
+    /// List managed bundles currently registered in the selected page.
+    List {
+        #[command(flatten)]
+        endpoint: Endpoint,
+        #[arg(long)]
+        target: String,
+    },
+    /// Evaluate a JavaScript expression in the selected page context (trusted local code).
+    Eval {
+        #[command(flatten)]
+        endpoint: Endpoint,
+        #[arg(long)]
+        target: String,
+        #[arg(long, required_unless_present = "file", conflicts_with = "file")]
+        expression: Option<String>,
+        #[arg(
+            long,
+            required_unless_present = "expression",
+            conflicts_with = "expression"
+        )]
+        file: Option<PathBuf>,
+    },
     /// Print a macOS Electron launch plan; never starts an application.
     LaunchPlan {
         #[arg(long)]
@@ -141,5 +166,70 @@ mod tests {
             .is_err()
         );
         assert!(Args::try_parse_from(["injectra", "targets", "--session", "s.json"]).is_err());
+    }
+
+    #[test]
+    fn machine_flag_and_observation_subcommands_parse_as_specified() {
+        let before = Args::try_parse_from(["injectra", "--machine", "targets", "--port", "9222"])
+            .expect("global --machine before subcommand");
+        assert!(before.machine);
+
+        let after = Args::try_parse_from(["injectra", "targets", "--port", "9222", "--machine"])
+            .expect("global --machine after subcommand");
+        assert!(after.machine);
+
+        assert!(
+            Args::try_parse_from(["injectra", "list", "--port", "9222", "--target", "p1"]).is_ok()
+        );
+        assert!(
+            Args::try_parse_from([
+                "injectra",
+                "list",
+                "--backend",
+                "webkit",
+                "--session",
+                "s.json",
+                "--target",
+                "p1"
+            ])
+            .is_ok()
+        );
+        assert!(
+            Args::try_parse_from([
+                "injectra",
+                "eval",
+                "--port",
+                "9222",
+                "--target",
+                "p1",
+                "--expression",
+                "document.title"
+            ])
+            .is_ok()
+        );
+        assert!(
+            Args::try_parse_from([
+                "injectra", "eval", "--port", "9222", "--target", "p1", "--file", "probe.js"
+            ])
+            .is_ok()
+        );
+        assert!(
+            Args::try_parse_from(["injectra", "eval", "--port", "9222", "--target", "p1"]).is_err()
+        );
+        assert!(
+            Args::try_parse_from([
+                "injectra",
+                "eval",
+                "--port",
+                "9222",
+                "--target",
+                "p1",
+                "--expression",
+                "1",
+                "--file",
+                "probe.js"
+            ])
+            .is_err()
+        );
     }
 }
