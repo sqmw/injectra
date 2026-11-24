@@ -17,7 +17,8 @@ flowchart TD
   EG --> FRIDA[frida 可选通信]
   WK --> FRIDA
   FRIDA --> CORE
-  CLI --> HOST[hosts 宿主规划]
+  CLI --> HOST[hosts 宿主诊断与规划]
+  CLI --> FRIDA
   APP --> WEB[web 页面契约与载荷]
   CDP --> WEB
   WEB --> CORE[core 通用基础]
@@ -36,12 +37,12 @@ flowchart TD
 | web | WebTarget、PageContext、WebBackend/WebSession；manifest v1加载与共享程序生成；JSON返回值只属于Web域 |
 | application | targets/apply/remove/execute库用例；后端参数注入，连接前检查实例身份，执行前核对会话目标与页面能力 |
 | cdp | 既有CDP Web后端；回环端口、精确页面、CDP响应/异常映射；不包含应用名称、载荷加载或原生方法 |
-| frida | 可选助手通信、身份核对及截止；只依赖core，无Web/Node/应用业务假设 |
+| frida | 可选助手通信、身份核对、截止及`session_ops`受控启动/注册/校验；只依赖core，无Web/Node/应用业务假设 |
 | electron-gadget / webkit | 并列实现WebBackend/WebSession，各自持有宿主桥接；依赖core/web/frida |
 | native | NativeTarget、目标架构/地址、NativeSession及独立MemoryRead/MemoryWrite；受控测试与生产契约分开，无真实后端或Web依赖 |
-| platform-macos | inspect_app：.app可执行路径、Framework目录元数据；不识别Electron或生成调试参数 |
-| hosts | Electron识别及macOS只读启动规划；依赖平台元数据，不管理用户进程 |
-| cli | 解析参数、装配CDP/宿主实现、投影兼容JSON与退出码；不承载注入用例流程 |
+| platform-macos | inspect_app：.app可执行路径、Framework详情、otool动态库链接与codesign签名/entitlements摘要；不识别Electron或生成调试参数 |
+| hosts | 跨宿主只读识别（`inspect_app`）、纯Rust Electron ASAR/入口探测与通用CDP/WebView2启动规划（`launch_plan`）；依赖platform-macos，不管理用户进程 |
+| cli | 解析参数、装配CDP/Gadget/WK/Frida会话管理与宿主诊断、投影兼容JSON或`--machine`信封；不承载注入用例流程 |
 
 公共基础与原生契约可独立构建，不依赖浏览器库、Frida或原生FFI。当前采用静态crate装配；动态插件ABI和调度器不是此架构的必要前提。
 
@@ -109,7 +110,7 @@ CDP发送或等待响应后失联、超时或无法解析响应保守记为Unkno
 
 ## 平台与宿主
 
-platform-macos::inspect_app返回通用的macOS应用包元数据：规范化可执行文件、Framework目录名称。hosts::electron使用这些元数据识别标准Electron并生成既有LaunchPlan。非macOS仍明确拒绝当前规划；计划不启动/重启/结束用户应用。
+platform-macos::inspect_app返回通用的macOS应用包元数据：规范化可执行文件、Framework详情、动态库链接与签名/entitlements摘要。hosts::inspect_app基于包结构或跨平台目录/可执行组件只读识别Electron、NW.js、CEF、WKWebView与WebView2，评估可用路线及签名/ABI阻塞项并给出纯Rust Electron ASAR/入口探测，未知或原生无Web目标返回Unsupported；hosts::launch_plan为支持CDP回环入口的宿主生成只读LaunchPlan（包括WebView2环境变量规划），WKWebView无CDP路由明确拒绝，计划不自动启动/重启/结束既有用户应用。
 
 ## 验收句柄
 

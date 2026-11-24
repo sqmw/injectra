@@ -2,9 +2,57 @@
 mod controller;
 mod resources;
 mod response;
-use injectra_core::Result;
+use injectra_core::{Certainty, Error, ErrorKind, Result};
 use serde_json::{Value, json};
-use std::path::{Path, PathBuf};
+use std::{
+    path::{Path, PathBuf},
+    time::Duration,
+};
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum SessionRoute {
+    ElectronGadget,
+    Webkit,
+}
+impl SessionRoute {
+    pub const fn as_str(self) -> &'static str {
+        match self {
+            Self::ElectronGadget => "electron-gadget",
+            Self::Webkit => "webkit",
+        }
+    }
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum LauncherMode {
+    Direct,
+    LaunchServices,
+}
+impl LauncherMode {
+    pub const fn as_str(self) -> &'static str {
+        match self {
+            Self::Direct => "direct",
+            Self::LaunchServices => "launchservices",
+        }
+    }
+}
+
+#[derive(Clone, Debug)]
+pub struct LaunchSessionRequest {
+    pub app: PathBuf,
+    pub gadget: Option<PathBuf>,
+    pub arguments: Vec<String>,
+    pub route: SessionRoute,
+    pub launcher: LauncherMode,
+    pub output: Option<PathBuf>,
+}
+
+#[derive(Clone, Debug)]
+pub struct RegisterSessionRequest {
+    pub state: PathBuf,
+    pub output: PathBuf,
+    pub route: SessionRoute,
+}
 
 #[derive(Clone)]
 pub struct Bridge {
@@ -24,5 +72,131 @@ impl Bridge {
             resources::materialize(&self.resources)?,
             json!({"schema":1,"session":self.session,"operation":operation,"payload":payload}),
         )
+    }
+}
+
+fn resolve_gadget(explicit: Option<&Path>) -> Result<PathBuf> {
+    if let Some(path) = explicit {
+        let abs = std::path::absolute(path)?;
+        if !abs.is_file() {
+            return Err(Error::prepare(
+                ErrorKind::InvalidInput,
+                format!("Gadget library not found: {}", abs.display()),
+            ));
+        }
+        return Ok(abs);
+    }
+    if let Some(env_path) = std::env::var_os("INJECTRA_TEST_GADGET") {
+        let abs = std::path::absolute(PathBuf::from(env_path))?;
+        if abs.is_file() {
+            return Ok(abs);
+        }
+    }
+    let default = resources::cache()?.join("frida/gadget/FridaGadget.dylib");
+    if default.is_file() {
+        return Ok(default);
+    }
+    Err(Error::prepare(
+        ErrorKind::Unsupported,
+        "FridaGadget.dylib missing; pass --gadget or run make setup-gadget",
+    ))
+}
+
+pub fn launch_session(request: &LaunchSessionRequest) -> Result<Value> {
+    controller::ensure_supported()?;
+    let app = std::path::absolute(&request.app)?;
+    let gadget = resolve_gadget(request.gadget.as_deref())?;
+    let output = request
+        .output
+        .as_deref()
+        .map(std::path::absolute)
+        .transpose()?;
+    if let Some(out) = &output
+        && out.exists()
+    {
+        return Err(Error::prepare(
+            ErrorKind::InvalidInput,
+            "Session output file already exists",
+        ));
+    }
+    let root = resources::materialize(&[])?;
+    controller::invoke_with(
+        root,
+        "session_ops.py",
+        json!({
+            "schema": 1,
+            "operation": "launch",
+            "payload": {
+                "app": app,
+                "gadget": gadget,
+                "arguments": request.arguments,
+                "route": request.route.as_str(),
+                "launcher": request.launcher.as_str(),
+                "output": output,
+            }
+        }),
+        Duration::from_secs(40),
+        Certainty::NotExecuted,
+    )
+}
+
+pub fn register_session(request: &RegisterSessionRequest) -> Result<Value> {
+    controller::ensure_supported()?;
+    let state = std::path::absolute(&request.state)?;
+    let output = std::path::absolute(&request.output)?;
+    if output.exists() {
+        return Err(Error::prepare(
+            ErrorKind::InvalidInput,
+            "Session output file already exists",
+        ));
+    }
+    let root = resources::materialize(&[])?;
+    controller::invoke_with(
+        root,
+        "session_ops.py",
+        json!({
+            "schema": 1,
+            "operation": "register",
+            "payload": {
+                "state": state,
+                "output": output,
+                "route": request.route.as_str(),
+            }
+        }),
+        Duration::from_secs(20),
+        Certainty::NotExecuted,
+    )
+}
+
+pub fn verify_session(session: &Path, route: Option<SessionRoute>) -> Result<Value> {
+    controller::ensure_supported()?;
+    let session = std::path::absolute(session)?;
+    let root = resources::materialize(&[])?;
+    controller::invoke_with(
+        root,
+        "session_ops.py",
+        json!({
+            "schema": 1,
+            "operation": "verify",
+            "payload": {
+                "session": session,
+                "route": route.map(SessionRoute::as_str),
+            }
+        }),
+        Duration::from_secs(20),
+        Certainty::NotExecuted,
+    )
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn resolve_gadget_rejects_missing_explicit_file_before_helper_spawn() {
+        let missing = std::env::temp_dir().join("injectra-missing-gadget-dylib-test");
+        let err = resolve_gadget(Some(&missing)).unwrap_err();
+        assert_eq!(err.kind, ErrorKind::InvalidInput);
+        assert_eq!(err.certainty, Certainty::NotExecuted);
     }
 }

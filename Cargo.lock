@@ -704,6 +704,7 @@ dependencies = [
  "injectra-cdp",
  "injectra-core",
  "injectra-electron-gadget",
+ "injectra-frida",
  "injectra-hosts",
  "injectra-preparation",
  "injectra-web",
@@ -745,6 +746,7 @@ dependencies = [
  "injectra-core",
  "injectra-platform-macos",
  "serde",
+ "serde_json",
 ]
 
 [[package]]

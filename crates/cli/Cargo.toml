@@ -21,6 +21,7 @@ clap = { version = "4.6", features = ["derive"] }
 
 injectra-electron-gadget.workspace = true
 injectra-webkit.workspace = true
+injectra-frida.workspace = true
 
 injectra-bootstrap.workspace = true
 injectra-preparation.workspace = true

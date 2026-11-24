@@ -83,4 +83,33 @@ class DeadlineContract(unittest.TestCase):
         with deadline(.03) as cancellation:pass
         time.sleep(.05)
         self.assertFalse(cancellation.is_cancelled)
+
+class SessionOpsContract(unittest.TestCase):
+    def test_verify_session_redacts_secret_token_and_checks_route(self):
+        import session_ops
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "v2.json"
+            session = parse_descriptor(current())
+            write_session(path, session)
+            calls = []
+            class FakeConn:
+                def __init__(self, state):
+                    calls.append(("init", state.process.pid))
+                def load(self, source):
+                    calls.append(("load", "identity" in source))
+                def detach(self):
+                    calls.append(("detach", True))
+            with patch.object(session_ops, "Connection", FakeConn):
+                verified = session_ops.verify_session(path, route="webkit")
+                self.assertEqual(verified["valid"], True)
+                self.assertEqual(verified["schema"], 2)
+                self.assertEqual(verified["process"]["pid"], 123)
+                self.assertEqual(verified["routes"], ["electron-gadget", "webkit"])
+                self.assertNotIn("token", json.dumps(verified))
+                with self.assertRaises(BridgeError):
+                    session_ops.verify_session(path, route="unknown-route")
+            self.assertEqual(calls, [("init", 123), ("load", True), ("detach", True)])
+            path.chmod(0o644)
+            with self.assertRaises(BridgeError):
+                session_ops.verify_session(path)
 if __name__=="__main__":unittest.main()

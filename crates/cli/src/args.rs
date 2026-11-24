@@ -18,6 +18,51 @@ pub enum Backend {
     ElectronGadget,
     Webkit,
 }
+#[derive(Clone, Copy, Debug, ValueEnum)]
+pub enum SessionRouteArg {
+    ElectronGadget,
+    Webkit,
+}
+#[derive(Clone, Copy, Debug, ValueEnum)]
+pub enum LauncherArg {
+    Direct,
+    #[value(name = "launchservices")]
+    LaunchServices,
+}
+#[derive(Subcommand)]
+pub enum SessionCommand {
+    /// Launch an isolated macOS target instance with Gadget and register a v2 session descriptor.
+    Launch {
+        #[arg(long)]
+        app: PathBuf,
+        #[arg(long)]
+        gadget: Option<PathBuf>,
+        #[arg(long, value_enum, default_value_t = SessionRouteArg::ElectronGadget)]
+        route: SessionRouteArg,
+        #[arg(long, value_enum, default_value_t = LauncherArg::Direct)]
+        launcher: LauncherArg,
+        #[arg(long)]
+        output: Option<PathBuf>,
+        #[arg(long = "arg", allow_hyphen_values = true)]
+        args: Vec<String>,
+    },
+    /// Register a v2 session descriptor from an explicit state.json file without launching an app.
+    Register {
+        #[arg(long)]
+        state: PathBuf,
+        #[arg(long)]
+        output: PathBuf,
+        #[arg(long, value_enum, default_value_t = SessionRouteArg::ElectronGadget)]
+        route: SessionRouteArg,
+    },
+    /// Verify an existing Gadget/WebKit session file and attached process identity without exposing tokens.
+    Verify {
+        #[arg(long)]
+        session: PathBuf,
+        #[arg(long, value_enum)]
+        route: Option<SessionRouteArg>,
+    },
+}
 #[derive(ClapArgs)]
 pub struct Endpoint {
     /// Defaults to CDP when omitted.
@@ -106,12 +151,24 @@ pub enum Command {
         )]
         file: Option<PathBuf>,
     },
-    /// Print a macOS Electron launch plan; never starts an application.
+    /// Read-only host architecture detection and route diagnostics; never starts or modifies an application.
+    InspectApp {
+        #[arg(long)]
+        app: PathBuf,
+        #[arg(long)]
+        port: Option<u16>,
+    },
+    /// Print a read-only loopback CDP launch plan; never starts an application.
     LaunchPlan {
         #[arg(long)]
         app: PathBuf,
         #[arg(long)]
         port: u16,
+    },
+    /// Manage isolated Gadget/WKWebView session descriptors (launch, register, verify).
+    Session {
+        #[command(subcommand)]
+        action: SessionCommand,
     },
 }
 #[cfg(test)]
@@ -230,6 +287,82 @@ mod tests {
                 "probe.js"
             ])
             .is_err()
+        );
+    }
+
+    #[test]
+    fn inspect_app_and_session_subcommands_parse_as_specified() {
+        assert!(Args::try_parse_from(["injectra", "inspect-app", "--app", "App.app"]).is_ok());
+        assert!(
+            Args::try_parse_from([
+                "injectra",
+                "--machine",
+                "inspect-app",
+                "--app",
+                "App.app",
+                "--port",
+                "9222"
+            ])
+            .is_ok()
+        );
+        assert!(
+            Args::try_parse_from([
+                "injectra",
+                "session",
+                "launch",
+                "--app",
+                "App.app",
+                "--route",
+                "webkit",
+                "--launcher",
+                "launchservices",
+                "--arg",
+                "--foo"
+            ])
+            .is_ok()
+        );
+        assert!(
+            Args::try_parse_from([
+                "injectra",
+                "session",
+                "launch",
+                "--app",
+                "App.app",
+                "--gadget",
+                "FridaGadget.dylib",
+                "--route",
+                "electron-gadget",
+                "--arg",
+                "main.cjs"
+            ])
+            .is_ok()
+        );
+        assert!(
+            Args::try_parse_from([
+                "injectra",
+                "session",
+                "register",
+                "--state",
+                "state.json",
+                "--output",
+                "session.json",
+                "--route",
+                "electron-gadget"
+            ])
+            .is_ok()
+        );
+        assert!(
+            Args::try_parse_from([
+                "injectra",
+                "--machine",
+                "session",
+                "verify",
+                "--session",
+                "session.json",
+                "--route",
+                "webkit"
+            ])
+            .is_ok()
         );
     }
 }

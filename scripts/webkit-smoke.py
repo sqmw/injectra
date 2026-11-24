@@ -17,21 +17,29 @@ subprocess.run(["/usr/bin/xcrun","swiftc",str(ROOT/"tests/webkit/main.swift"),
 pid=None
 fixture_env={**os.environ,"INJECTRA_WK_FIXTURE_READY":str(run/"ready")}
 try:
-    launch=subprocess.run([str(python),"-B",str(ROOT/"scripts/frida-launch.py"),
-        "--app",str(app),"--gadget",str(gadget),"--route","webkit"],env=fixture_env,capture_output=True,text=True,timeout=35)
+    binary=Path(os.environ.get("CARGO_TARGET_DIR",cache/"cargo-target"))/"debug/injectra"
+    inspected=subprocess.run([str(binary),"--machine","inspect-app","--app",str(app)],env=fixture_env,capture_output=True,text=True,timeout=15)
+    if inspected.returncode:raise RuntimeError("inspect-app failed: "+inspected.stdout+inspected.stderr)
+    inspected_data=json.loads(inspected.stdout)["data"]
+    assert inspected_data["host_family"]=="system-webview" and inspected_data["engine"]=="wkwebview"
+    launch=subprocess.run([str(binary),"--machine","session","launch",
+        "--app",str(app),"--gadget",str(gadget),"--route","webkit"],env=fixture_env,capture_output=True,text=True,timeout=45)
     (run/"launch.log").write_text(launch.stdout+launch.stderr)
-    records=[json.loads(l) for l in launch.stdout.splitlines() if l.startswith("{")]
-    if records:pid=records[0].get("launcher_pid")
     if launch.returncode:raise RuntimeError("Launch failed; see "+str(run))
-    session=records[-1]["session"];pid=records[-1]["pid"]
+    launched=json.loads(launch.stdout)["data"]
+    session=launched["session"];pid=launched["pid"]
     descriptor=json.loads(Path(session).read_text())
     assert descriptor["schema"]==2 and descriptor["process"]["pid"]==pid
     assert descriptor["device"]["provider"]=="macos-local"
+    verified=subprocess.run([str(binary),"--machine","session","verify","--session",session,"--route","webkit"],env=fixture_env,capture_output=True,text=True,timeout=25)
+    if verified.returncode:raise RuntimeError("Session verify failed: "+verified.stdout+verified.stderr)
+    verified_data=json.loads(verified.stdout)["data"]
+    assert verified_data["valid"] is True and verified_data["process"]["pid"]==pid
+    assert "token" not in verified.stdout
     ready_deadline=time.monotonic()+25
     while not (run/"ready").exists():
         if time.monotonic()>=ready_deadline:raise RuntimeError("Owned WKWebView pages did not finish navigation")
         time.sleep(.05)
-    binary=Path(os.environ.get("CARGO_TARGET_DIR",cache/"cargo-target"))/"debug/injectra"
     for _ in range(20):
         p=subprocess.run([str(binary),"targets","--backend","webkit","--session",session],capture_output=True,text=True,timeout=30)
         if p.returncode:raise RuntimeError(p.stderr)

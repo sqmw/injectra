@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { spawn, spawnSync } from "node:child_process";
 import { once } from "node:events";
-import { mkdir, mkdtemp, writeFile } from "node:fs/promises";
+import { copyFile, mkdir, mkdtemp, writeFile } from "node:fs/promises";
 import { createServer } from "node:net";
 import { resolve } from "node:path";
 import { setTimeout as delay } from "node:timers/promises";
@@ -149,9 +149,29 @@ try {
   assert.equal(plan.executable, electron);
   assert.deepEqual(Object.keys(plan).sort(), ["arguments", "executable", "note"]);
   assert.deepEqual(plan.arguments, [`--remote-debugging-port=${port}`, "--remote-debugging-address=127.0.0.1"]);
+
+  const inspected = cli(["inspect-app", "--app", appPath, "--port", String(port)]);
+  assert.equal(inspected.host_family, "electron");
+  assert.equal(inspected.engine, "chromium");
+  assert.equal(inspected.routes.find(r => r.route === "cdp")?.supported, true);
+  assert.equal(inspected.routes.find(r => r.route === "electron-gadget")?.supported, false);
+  assert.equal(inspected.launch_plan?.executable, electron);
+
+  const dummyApp = resolve(run, "DummyNative.app");
+  await mkdir(resolve(dummyApp, "Contents/MacOS"), { recursive: true });
+  await copyFile("/usr/bin/true", resolve(dummyApp, "Contents/MacOS/DummyNative"));
+  await writeFile(
+    resolve(dummyApp, "Contents/Info.plist"),
+    '<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd"><plist version="1.0"><dict><key>CFBundleExecutable</key><string>DummyNative</string><key>CFBundleIdentifier</key><string>io.injectra.dummy.native</string></dict></plist>',
+  );
+  const unsupported = cliMachine(["inspect-app", "--app", dummyApp], 3);
+  assert.equal(unsupported.ok, false);
+  assert.equal(unsupported.error.kind, "Unsupported");
+  assert.equal(unsupported.error.certainty, "NotExecuted");
+
   const version = await fetch(`http://127.0.0.1:${port}/json/version`).then(r => r.json());
   const evidence = { passed: true, platform: process.platform, arch: process.arch, electron: requireTool("electron/package.json").version,
-    browser: version.Browser, checks: ["discovery", "CSS computed style", "HTML mount", "JS interaction", "replace without duplicates", "cleanup", "absent removal", "missing target rejection", "script failure cleanup", "macOS launch plan", "bundle list", "page eval", "machine contract"] };
+    browser: version.Browser, checks: ["discovery", "CSS computed style", "HTML mount", "JS interaction", "replace without duplicates", "cleanup", "absent removal", "missing target rejection", "script failure cleanup", "macOS launch plan", "bundle list", "page eval", "machine contract", "inspect-app"] };
   await writeFile(resolve(run, "result.json"), JSON.stringify(evidence, null, 2));
   console.log(JSON.stringify({ ...evidence, evidenceDirectory: run }, null, 2));
 } finally {

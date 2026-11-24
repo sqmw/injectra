@@ -19,18 +19,27 @@ env["INJECTRA_FIXTURE_PROFILE"]=str(run/"profile")
 env.pop("INJECTRA_FIXTURE_PORT",None)
 pid=None
 try:
-    command=[str(python),"-B",str(ROOT/"scripts/frida-launch.py"),"--app",str(app),
-        "--gadget",str(gadget),"--argument",str(ROOT/"tests/electron/main.cjs")]
-    launch=subprocess.run(command,env=env,capture_output=True,text=True,timeout=35)
+    binary=Path(env.get("CARGO_TARGET_DIR",cache/"cargo-target"))/"debug/injectra"
+    inspected=subprocess.run([str(binary),"--machine","inspect-app","--app",str(app)],env=env,capture_output=True,text=True,timeout=15)
+    if inspected.returncode:raise RuntimeError("inspect-app failed: "+inspected.stdout+inspected.stderr)
+    inspected_data=json.loads(inspected.stdout)["data"]
+    assert inspected_data["host_family"]=="electron"
+    assert next(r for r in inspected_data["routes"] if r["route"]=="electron-gadget")["supported"] is True
+    command=[str(binary),"--machine","session","launch","--app",str(app),
+        "--gadget",str(gadget),"--route","electron-gadget","--arg",str(ROOT/"tests/electron/main.cjs")]
+    launch=subprocess.run(command,env=env,capture_output=True,text=True,timeout=45)
     (run/"launch.log").write_text(launch.stdout+launch.stderr)
-    records=[json.loads(l) for l in launch.stdout.splitlines() if l.startswith("{")]
-    if records:pid=records[0].get("launcher_pid")
     if launch.returncode:raise RuntimeError("Owned launch failed; see "+str(run))
-    session=records[-1]["session"];pid=records[-1]["pid"]
+    launched=json.loads(launch.stdout)["data"]
+    session=launched["session"];pid=launched["pid"]
     descriptor=json.loads(Path(session).read_text())
     assert descriptor["schema"]==2 and descriptor["process"]["pid"]==pid
     assert descriptor["device"]["provider"]=="macos-local"
-    binary=Path(env.get("CARGO_TARGET_DIR",cache/"cargo-target"))/"debug/injectra"
+    verified=subprocess.run([str(binary),"--machine","session","verify","--session",session,"--route","electron-gadget"],env=env,capture_output=True,text=True,timeout=25)
+    if verified.returncode:raise RuntimeError("Session verify failed: "+verified.stdout+verified.stderr)
+    verified_data=json.loads(verified.stdout)["data"]
+    assert verified_data["valid"] is True and verified_data["process"]["pid"]==pid
+    assert "token" not in verified.stdout
     for _ in range(20):
         p=subprocess.run([str(binary),"targets","--backend","electron-gadget","--session",session],env=env,capture_output=True,text=True,timeout=30)
         if p.returncode:raise RuntimeError(p.stderr)

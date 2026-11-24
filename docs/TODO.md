@@ -59,18 +59,23 @@
   "name": "应用引擎只读诊断与非 CDP 会话收敛",
   "version": "v1",
   "mode": "staged",
-  "status": "pending",
+  "status": "done",
   "priority": "P1",
   "milestone": "M-002",
   "goal": "降低调用方与 Agent 在接入前识别应用架构和准备非 CDP 会话的门槛，收敛外部脚本胶水。",
   "scope": "按 platform-* 与 hosts 分层实现只读 inspect-app 及扩展 launch-plan，识别 Electron/NW.js/CEF/Tauri/WebView2 架构、适用路线与缺失前置条件；梳理 Gadget/WKWebView 会话建立与校验契约，收口对 scripts/ 手工串联的依赖；保持不自动强杀用户实例、不静默降级。",
   "acceptance": "只读诊断命令对主流宿主夹具与已记录样本输出结构化架构/路线/前置清单，对未知或重加壳目标明确报 Unsupported；非 CDP 会话管理边界清晰并通过回归与受控实机验证。",
-  "execution_ref": "",
-  "acceptance_evidence": []
+  "execution_ref": "archive/T-084.md#t-084",
+  "acceptance_evidence": [
+    "crates/platform-macos 扩展 Framework 详情、otool 动态库链接与 codesign 签名/entitlements 采集；crates/hosts 新增纯 Rust ASAR/入口探测（asar_probe.rs）与跨宿主只读诊断（inspect.rs）及通用 launch_plan，覆盖 Electron（CJS/ESM/字节码/嵌套 ASAR 与 HandleScope 检查）、NW.js、CEF、WKWebView 与 WebView2，未知/原生目标返回 Unsupported。",
+    "crates/frida 新增 embedded session_ops.py 及 Rust launch_session/register_session/verify_session 接口（验证过程拒绝泄漏 token 并保持 0600 私有存储）；crates/cli 装配 inspect-app、通用 launch-plan 与 session launch/register/verify，scripts/frida-launch.py 与 scripts/frida-session.py 保持兼容包装。",
+    "make check（Rust 45 项通过/4 项显式真机用例默认 ignored、Web runtime 6 项、WebKit host 8 项、Gecko parsed-html 3 项、clippy -D warnings、13 crate 架构白名单、134 份文档检查）与 make test-frida（39 项）全绿。",
+    "真实夹具实机闭环通过：make test-electron（Electron 45.2.1 14 项含 inspect-app 与 DummyNative.app Unsupported，run electron-y0V6zm）、make test-webkit（run webkit-pe95aakm）、make test-gadget（Electron 36.4.0，run gadget-electron-bckv_75n）及缓存 CEF 156/NW.js 0.119.2 只读 inspect-app 与 launch-plan 核验全部通过。"
+  ]
 }
 ```
 
-关联规划：[M-002 阶段 2](plans/milestone-2-core-engine.md) · [D-015](DECISIONS.md#d-015)。
+关联规划：[M-002 阶段 2](plans/milestone-2-core-engine.md) · [D-015](DECISIONS.md#d-015) · [执行归档](archive/T-084.md#t-084)。
 
 <a id="t-085"></a>
 ### T-085 · Web 桌面架构调研与跨平台核心正式化

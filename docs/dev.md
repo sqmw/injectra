@@ -12,12 +12,15 @@
 
 ## 目标应用接入
 
-1. 对你有权定制的标准Electron .app，`launch-plan --app <APP_BUNDLE> --port <PORT>`输出可执行文件与参数数组，仅只读解析，不启动应用。
+1. 只读识别与参数规划：
+   - `inspect-app --app <PATH> [--port <PORT>]`只读探测目标应用的宿主架构（Electron/NW.js/CEF/WKWebView/WebView2）、ASAR/目录入口形态（含ESM或字节码识别）、代码签名/符号阻塞项、可用路线及可选启动规划，不启动或修改目标；未知或原生无Web应用明确返回`Unsupported`。
+   - `launch-plan --app <PATH> --port <PORT>`复用同一只读识别层输出回环CDP启动参数或环境变量规划（覆盖Electron、NW.js、CEF与WebView2；无CDP参数路由如WKWebView则明确拒绝）。
 2. 如已有目标进程，是否退出与如何保存工作由用户决定。使用规划参数自行启动目标；部分应用不会开放或继承调试参数，不据此自动改包、重签名或绕过保护。
-3. 核对监听为回环地址，再执行`targets --port <PORT>`；检查title/url并使用精确ID。没有页面、页面消失或不支持时停止，不默选第一个窗口。
-4. `apply --port <PORT> --target <ID> --bundle <MANIFEST>`应用，`remove --port <PORT> --target <ID> --id <BUNDLE_ID>`移除。
-5. `list --port <PORT> --target <ID>`查询当前页面在共享runtime注册表中的受管Bundle（`id`、`nodes`、`cleanups`）；此操作只读注册表状态。
-6. `eval --port <PORT> --target <ID> (--expression <JS> | --file <PATH>)`在目标页面上下文执行JavaScript表达式并等待Promise返回JSON（顶层`undefined`归一为`null`；文件上限1 MiB）。`eval`以目标页面权限运行，并非沙箱或技术意义上的只读隔离；调用方负责所提交表达式的副作用。
+3. 使用`electron-gadget`或`webkit`路由时，可通过`session launch --app <APP> --route <ROUTE> [--gadget <DYLIB>]`、`session register --state <STATE_JSON> --output <SESSION_JSON> --route <ROUTE>`与`session verify --session <SESSION_JSON> [--route <ROUTE>]`管理受控实例与v2会话（见[Frida说明](frida-backends.md)），不自动终止已运行的同可执行文件实例。
+4. 核对监听为回环地址或确认会话就绪后，执行`targets --port <PORT>`（或`--backend <BACKEND> --session <SESSION_JSON>`）；检查title/url并使用精确ID。没有页面、页面消失或不支持时停止，不默选第一个窗口。
+5. `apply --port <PORT> --target <ID> --bundle <MANIFEST>`应用，`remove --port <PORT> --target <ID> --id <BUNDLE_ID>`移除。
+6. `list --port <PORT> --target <ID>`查询当前页面在共享runtime注册表中的受管Bundle（`id`、`nodes`、`cleanups`）；此操作只读注册表状态。
+7. `eval --port <PORT> --target <ID> (--expression <JS> | --file <PATH>)`在目标页面上下文执行JavaScript表达式并等待Promise返回JSON（顶层`undefined`归一为`null`；文件上限1 MiB）。`eval`以目标页面权限运行，并非沙箱或技术意义上的只读隔离；调用方负责所提交表达式的副作用。
 
 ## 机器输出契约（`--machine`）
 

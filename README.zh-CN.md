@@ -84,11 +84,16 @@ make run ARGS="--help"
 应用须先开放获授权的**回环调试入口**。工具不自动退出用户进程，也不保证为所有宿主开启入口。替换下列目标 ID 与外部 manifest 路径后运行：
 
 ```sh
+make run ARGS="inspect-app --app PATH --port 9222"
+make run ARGS="launch-plan --app PATH --port 9222"
 make run ARGS="targets --port 9222"
 make run ARGS="apply --port 9222 --target PAGE_ID --bundle MANIFEST_PATH"
 make run ARGS="list --port 9222 --target PAGE_ID"
 make run ARGS="eval --port 9222 --target PAGE_ID --expression 'document.title'"
 make run ARGS="remove --port 9222 --target PAGE_ID --id BUNDLE_ID"
+# 可选 Gadget/WKWebView 会话（需先运行 make setup-frida 与 make setup-gadget）：
+make run ARGS="session launch --app APP_BUNDLE --route webkit"
+make run ARGS="session verify --session SESSION_JSON --route webkit"
 # 机器调用方可使用 --machine 获取单行 JSON 信封及按确定性区分的退出码（0/2/3/4/5）。
 make run ARGS="--machine targets --port 9222"
 ```

@@ -12,7 +12,7 @@ make setup-frida准备锁定Python3.13/Frida17.25.2及frida-objc-bridge8.0.6源�
 - injectra apply --backend webkit --session SESSION_JSON --target TARGET_ID --bundle MANIFEST
 - injectra remove --backend webkit --session SESSION_JSON --target TARGET_ID --id BUNDLE_ID
 
-独立启动/既有会话注册复用[Frida入口](frida-backends.md)，选择route webkit。不会自动附加任意PID，也不会自动改变isInspectable、系统授权或目标签名。需要宿主允许加载Gadget；WebKit引擎存在不意味着加载条件满足。
+独立启动/既有会话注册与核验复用[Frida入口](frida-backends.md)（`injectra session launch/register/verify`），选择`--route webkit`。不会自动附加任意PID，也不会自动改变isInspectable、系统授权或目标签名。需要宿主允许加载Gadget；WebKit引擎存在不意味着加载条件满足。
 
 ## 页面执行与资源
 

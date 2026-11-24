@@ -1,9 +1,13 @@
 mod args;
 mod backend;
 mod dev;
-use args::{Args, Command};
+use args::{Args, Command, LauncherArg, SessionCommand, SessionRouteArg};
 use clap::Parser;
 use injectra_core::{Certainty, Error, ErrorKind, Phase, Result, TargetRef};
+use injectra_frida::{
+    LaunchSessionRequest, LauncherMode, RegisterSessionRequest, SessionRoute, launch_session,
+    register_session, verify_session,
+};
 use serde_json::{Value, json};
 use std::{ffi::OsStr, fs, io::Read, path::PathBuf, process::ExitCode};
 
@@ -74,6 +78,20 @@ fn format_machine_error(error: &Error) -> Value {
         &error.to_string(),
         error.causes(),
     )
+}
+
+fn session_route(route: SessionRouteArg) -> SessionRoute {
+    match route {
+        SessionRouteArg::ElectronGadget => SessionRoute::ElectronGadget,
+        SessionRouteArg::Webkit => SessionRoute::Webkit,
+    }
+}
+
+fn launcher_mode(mode: LauncherArg) -> LauncherMode {
+    match mode {
+        LauncherArg::Direct => LauncherMode::Direct,
+        LauncherArg::LaunchServices => LauncherMode::LaunchServices,
+    }
 }
 
 fn run(args: Args) -> Result<Value> {
@@ -161,10 +179,43 @@ fn run(args: Args) -> Result<Value> {
                 &source,
             )
         }
-        Command::LaunchPlan { app, port } => Ok(serde_json::to_value(
-            injectra_hosts::electron::macos_launch_plan(&app, port)?,
-        )
+        Command::InspectApp { app, port } => Ok(serde_json::to_value(injectra_hosts::inspect_app(
+            &app, port,
+        )?)
+        .expect("inspection report serializes")),
+        Command::LaunchPlan { app, port } => Ok(serde_json::to_value(injectra_hosts::launch_plan(
+            &app, port,
+        )?)
         .expect("launch plan serializes")),
+        Command::Session { action } => match action {
+            SessionCommand::Launch {
+                app,
+                gadget,
+                route,
+                launcher,
+                output,
+                args,
+            } => launch_session(&LaunchSessionRequest {
+                app,
+                gadget,
+                arguments: args,
+                route: session_route(route),
+                launcher: launcher_mode(launcher),
+                output,
+            }),
+            SessionCommand::Register {
+                state,
+                output,
+                route,
+            } => register_session(&RegisterSessionRequest {
+                state,
+                output,
+                route: session_route(route),
+            }),
+            SessionCommand::Verify { session, route } => {
+                verify_session(&session, route.map(session_route))
+            }
+        },
     }
 }
 

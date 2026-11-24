@@ -20,7 +20,7 @@ const allowed = {
   "injectra-electron-gadget": ["injectra-core", "injectra-web", "injectra-frida"],
   "injectra-webkit": ["injectra-core", "injectra-web", "injectra-frida"],
   "injectra-preparation": ["injectra-core", "injectra-bootstrap"],
-  "injectra-cli": ["injectra-preparation", "injectra-bootstrap", "injectra-webkit", "injectra-electron-gadget", "injectra-core", "injectra-web", "injectra-application", "injectra-cdp", "injectra-hosts"],
+  "injectra-cli": ["injectra-preparation", "injectra-bootstrap", "injectra-webkit", "injectra-electron-gadget", "injectra-frida", "injectra-core", "injectra-web", "injectra-application", "injectra-cdp", "injectra-hosts"],
 };
 for (const name of packages.keys()) assert.ok(Object.hasOwn(allowed, name), `unregistered architectural role: ${name}`);
 for (const [name, dependencies] of Object.entries(allowed)) {

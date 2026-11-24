@@ -84,12 +84,17 @@ Build products default to `${XDG_CACHE_HOME:-$HOME/.cache}/injectra/cargo-target
 The target application must already expose an authorized **loopback** debugging entry. Injectra does not automatically stop user processes or enable an entry on every host.
 
 ```sh
+make run ARGS="inspect-app --app PATH --port 9222"
+make run ARGS="launch-plan --app PATH --port 9222"
 make run ARGS="targets --port 9222"
 # Inspect title/URL, then use the exact target ID and an external manifest.
 make run ARGS="apply --port 9222 --target PAGE_ID --bundle MANIFEST_PATH"
 make run ARGS="list --port 9222 --target PAGE_ID"
 make run ARGS="eval --port 9222 --target PAGE_ID --expression 'document.title'"
 make run ARGS="remove --port 9222 --target PAGE_ID --id BUNDLE_ID"
+# Optional Gadget/WKWebView sessions (after make setup-frida and make setup-gadget):
+make run ARGS="session launch --app APP_BUNDLE --route webkit"
+make run ARGS="session verify --session SESSION_JSON --route webkit"
 # Machine callers can pass --machine for single-line JSON envelopes and certainty exit codes (0/2/3/4/5).
 make run ARGS="--machine targets --port 9222"
 ```

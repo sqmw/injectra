@@ -6,16 +6,18 @@
 
 先运行 make setup-frida，准备仓库外锁定 Python 3.13 / Frida 17.25.2。CDP无需该环境。INJECTRA_FRIDA_PYTHON可以选择已准备的同版本解释器；INJECTRA_CACHE_DIR控制缓存根。Rust可执行文件内嵌Python/agent源码，按内容标识展开到外部缓存，不依赖编译机器源路径。
 
-现有已加载Gadget的受控实例：用可选环境解释器运行 scripts/frida-session.py --state STATE_JSON --output SESSION_JSON。必须显式选择历史state；不自动追随latest或猜测进程。注册只核对身份，不启动/恢复/结束应用。会话文件含凭据，0600保存，不提交、不输出正文。
+现有已加载Gadget的受控实例：通过正式CLI执行 `injectra session register --state STATE_JSON --output SESSION_JSON --route electron-gadget`（或显式使用兼容包装 `scripts/frida-session.py`）。必须显式选择历史state；不自动追随latest或猜测进程。注册只核对身份，不启动/恢复/结束应用。`injectra session verify --session SESSION_JSON [--route ROUTE]`可复核已注册会话的设备/进程/代理身份并保持token不外泄。会话文件含凭据，0600保存，不提交、不输出正文。
 
 CLI使用：
 - injectra targets --backend electron-gadget --session SESSION_JSON
 - injectra apply --backend electron-gadget --session SESSION_JSON --target TARGET_ID --bundle MANIFEST
+- injectra list --backend electron-gadget --session SESSION_JSON --target TARGET_ID
+- injectra eval --backend electron-gadget --session SESSION_JSON --target TARGET_ID --expression 'document.title'
 - injectra remove --backend electron-gadget --session SESSION_JSON --target TARGET_ID --id BUNDLE_ID
 
 默认仍为CDP；原 --port 方式及JSON字段不变。后端选择显式，不在失败时自动换路线。
 
-新实例启动是独立显式命令：scripts/frida-launch.py --app APP --gadget LIBRARY，使用同一可选解释器。只有用户授权启动目标后使用；已存在同可执行文件实例时拒绝，不退出旧进程。Gadget来源为官方17.25.2 macos-universal，安装准备见make setup-gadget。启动创建独立home/profile，验证实际PID和可执行路径，并在恢复前清除DYLD对子进程的继承。不能把独立profile等同于账号、钥匙串或全部系统副作用隔离。
+新实例启动可使用正式CLI子命令：`injectra session launch --app APP --route electron-gadget [--gadget LIBRARY] [--arg ARG...]`（`scripts/frida-launch.py`作为兼容脚本包装继续保留，均复用嵌入式 `session_ops.py` 与可选Python/Frida环境）。未指定 `--gadget` 时按 `INJECTRA_TEST_GADGET` 或缓存 `frida/gadget/FridaGadget.dylib` 解析。只有用户授权启动目标后使用；已存在同可执行文件实例时拒绝，不退出旧进程。Gadget来源为官方17.25.2 macos-universal，安装准备见make setup-gadget。启动创建独立home/profile，验证实际PID和可执行路径，并在恢复前清除DYLD对子进程的继承。不能把独立profile等同于账号、钥匙串或全部系统副作用隔离。
 
 ## 支持边界与身份
 

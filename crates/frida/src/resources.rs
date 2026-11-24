@@ -21,6 +21,7 @@ const COMMON: &[(&str, &str)] = &[
         include_str!("../helper/target_macos_identity.js"),
     ),
     ("deadline.py", include_str!("../helper/deadline.py")),
+    ("session_ops.py", include_str!("../helper/session_ops.py")),
 ];
 pub(crate) fn cache() -> Result<PathBuf> {
     if let Some(value) = std::env::var_os("INJECTRA_CACHE_DIR") {

@@ -20,6 +20,22 @@ pub(crate) fn ensure_supported() -> Result<()> {
     Ok(())
 }
 pub(crate) fn invoke(root: PathBuf, request: Value) -> Result<Value> {
+    invoke_with(
+        root,
+        "main.py",
+        request,
+        Duration::from_secs(25),
+        Certainty::Unknown,
+    )
+}
+
+pub(crate) fn invoke_with(
+    root: PathBuf,
+    entry: &str,
+    request: Value,
+    timeout: Duration,
+    timeout_certainty: Certainty,
+) -> Result<Value> {
     let cache = resources::cache()?;
     let python = std::env::var_os("INJECTRA_FRIDA_PYTHON")
         .map(PathBuf::from)
@@ -58,7 +74,7 @@ pub(crate) fn invoke(root: PathBuf, request: Value) -> Result<Value> {
     let output = run.join("response.json");
     let mut child = Command::new(python)
         .arg("-B")
-        .arg(root.join("main.py"))
+        .arg(root.join(entry))
         .arg(&input)
         .stdin(Stdio::null())
         .stdout(fs::File::create(&output)?)
@@ -70,9 +86,13 @@ pub(crate) fn invoke(root: PathBuf, request: Value) -> Result<Value> {
                 format!("Cannot start Frida helper: {e}"),
             )
         })?;
-    let deadline = Instant::now() + Duration::from_secs(25);
+    let deadline = Instant::now() + timeout;
     loop {
-        if child.try_wait().map_err(uncertain_io)?.is_some() {
+        if child
+            .try_wait()
+            .map_err(|e| uncertain_io(e, timeout_certainty))?
+            .is_some()
+        {
             break;
         }
         if Instant::now() >= deadline {
@@ -80,7 +100,7 @@ pub(crate) fn invoke(root: PathBuf, request: Value) -> Result<Value> {
             return Err(Error::new(
                 ErrorKind::Timeout,
                 Phase::Execute,
-                Certainty::Unknown,
+                timeout_certainty,
                 format!(
                     "Frida helper deadline; no replay or forced unload. Inspect {}",
                     run.display()
@@ -89,33 +109,30 @@ pub(crate) fn invoke(root: PathBuf, request: Value) -> Result<Value> {
         }
         thread::sleep(Duration::from_millis(20));
     }
-    let length = fs::metadata(&output).map_err(uncertain_io)?.len();
+    let length = fs::metadata(&output)
+        .map_err(|e| uncertain_io(e, timeout_certainty))?
+        .len();
     if length > 4 * 1024 * 1024 {
         return Err(Error::new(
             ErrorKind::ResultEncoding,
             Phase::Decode,
-            Certainty::Unknown,
+            timeout_certainty,
             "Frida response exceeds 4 MiB",
         ));
     }
     let value: Value =
-        serde_json::from_slice(&fs::read(output).map_err(uncertain_io)?).map_err(|e| {
-            Error::new(
-                ErrorKind::Protocol,
-                Phase::Decode,
-                Certainty::Unknown,
-                format!("Invalid helper response: {e}"),
-            )
-        })?;
+        serde_json::from_slice(&fs::read(output).map_err(|e| uncertain_io(e, timeout_certainty))?)
+            .map_err(|e| {
+                Error::new(
+                    ErrorKind::Protocol,
+                    Phase::Decode,
+                    timeout_certainty,
+                    format!("Invalid helper response: {e}"),
+                )
+            })?;
     response::decode(value)
 }
 
-fn uncertain_io(error: std::io::Error) -> Error {
-    Error::new(
-        ErrorKind::Io,
-        Phase::Decode,
-        Certainty::Unknown,
-        error.to_string(),
-    )
-    .caused_by(error)
+fn uncertain_io(error: std::io::Error, certainty: Certainty) -> Error {
+    Error::new(ErrorKind::Io, Phase::Decode, certainty, error.to_string()).caused_by(error)
 }
