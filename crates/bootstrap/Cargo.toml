@@ -11,7 +11,7 @@ serde.workspace = true
 serde_json.workspace = true
 axum = { version = "0.8", features = ["json"] }
 tokio = { version = "1", features = ["time", "sync"] }
-hmac = "0.12"
+hmac = "0.13"
 sha2 = "0.10"
 uuid = { version = "1", features = ["v4"] }
 [dev-dependencies]
