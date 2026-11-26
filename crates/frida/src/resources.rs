@@ -22,16 +22,30 @@ const COMMON: &[(&str, &str)] = &[
     ),
     ("deadline.py", include_str!("../helper/deadline.py")),
     ("session_ops.py", include_str!("../helper/session_ops.py")),
+    (
+        "target_windows.py",
+        include_str!("../helper/target_windows.py"),
+    ),
+    ("v8_windows.js", include_str!("../helper/v8_windows.js")),
+    ("v8_attach.py", include_str!("../helper/v8_attach.py")),
 ];
 pub(crate) fn cache() -> Result<PathBuf> {
     if let Some(value) = std::env::var_os("INJECTRA_CACHE_DIR") {
         return Ok(value.into());
     }
-    let root = if let Some(value) = std::env::var_os("XDG_CACHE_HOME") {
-        PathBuf::from(value)
-    } else {
-        PathBuf::from(std::env::var_os("HOME").ok_or("HOME unavailable")?).join(".cache")
-    };
+    if let Some(value) = std::env::var_os("XDG_CACHE_HOME") {
+        return Ok(PathBuf::from(value).join("injectra"));
+    }
+    #[cfg(windows)]
+    {
+        if let Some(value) = std::env::var_os("LOCALAPPDATA") {
+            return Ok(PathBuf::from(value).join("injectra"));
+        }
+        if let Some(value) = std::env::var_os("USERPROFILE") {
+            return Ok(PathBuf::from(value).join(".cache").join("injectra"));
+        }
+    }
+    let root = PathBuf::from(std::env::var_os("HOME").ok_or("HOME unavailable")?).join(".cache");
     Ok(root.join("injectra"))
 }
 pub(crate) fn materialize(extra: &[(&str, &str)]) -> Result<PathBuf> {

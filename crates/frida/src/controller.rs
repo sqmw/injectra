@@ -14,7 +14,17 @@ pub(crate) fn ensure_supported() -> Result<()> {
     if !cfg!(target_os = "macos") {
         return Err(Error::prepare(
             ErrorKind::Unsupported,
-            "The local Python controller is currently supported on macOS; target-device support is selected separately",
+            "The local macOS Gadget controller is currently supported on macOS; Windows targets use attach-v8 or prepare/dev",
+        ));
+    }
+    Ok(())
+}
+pub(crate) fn ensure_windows_supported() -> Result<()> {
+    if !(cfg!(target_os = "windows") && (cfg!(target_arch = "x86_64") || cfg!(target_arch = "x86")))
+    {
+        return Err(Error::prepare(
+            ErrorKind::Unsupported,
+            "Windows MSVC V8 attach requires a Windows x64/x86 host",
         ));
     }
     Ok(())
@@ -39,11 +49,17 @@ pub(crate) fn invoke_with(
     let cache = resources::cache()?;
     let python = std::env::var_os("INJECTRA_FRIDA_PYTHON")
         .map(PathBuf::from)
-        .unwrap_or_else(|| cache.join("frida/venv/bin/python3"));
+        .unwrap_or_else(|| {
+            if cfg!(windows) {
+                cache.join("frida/venv/Scripts/python.exe")
+            } else {
+                cache.join("frida/venv/bin/python3")
+            }
+        });
     if !python.is_file() {
         return Err(Error::prepare(
             ErrorKind::Unsupported,
-            "Optional Frida environment missing; run make setup-frida",
+            "Optional Frida environment missing; run make setup-frida or set INJECTRA_FRIDA_PYTHON",
         ));
     }
     let run = cache.join("frida/requests").join(format!(

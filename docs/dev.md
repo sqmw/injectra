@@ -16,7 +16,7 @@
    - `inspect-app --app <PATH> [--port <PORT>]`只读探测目标应用的宿主架构（Electron/NW.js/CEF/WKWebView/WebView2）、ASAR/目录入口形态（含ESM或字节码识别）、代码签名/符号阻塞项、可用路线及可选启动规划，不启动或修改目标；未知或原生无Web应用明确返回`Unsupported`。
    - `launch-plan --app <PATH> --port <PORT>`复用同一只读识别层输出回环CDP启动参数或环境变量规划（覆盖Electron、NW.js、CEF与WebView2；无CDP参数路由如WKWebView则明确拒绝）。
 2. 如已有目标进程，是否退出与如何保存工作由用户决定。使用规划参数自行启动目标；部分应用不会开放或继承调试参数，不据此自动改包、重签名或绕过保护。
-3. 使用`electron-gadget`或`webkit`路由时，可通过`session launch --app <APP> --route <ROUTE> [--gadget <DYLIB>]`、`session register --state <STATE_JSON> --output <SESSION_JSON> --route <ROUTE>`与`session verify --session <SESSION_JSON> [--route <ROUTE>]`管理受控实例与v2会话（见[Frida说明](frida-backends.md)），不自动终止已运行的同可执行文件实例。
+3. 使用`electron-gadget`或`webkit`路由时，可通过`session launch --app <APP> --route <ROUTE> [--gadget <DYLIB>]`、`session register --state <STATE_JSON> --output <SESSION_JSON> --route <ROUTE>`与`session verify --session <SESSION_JSON> [--route <ROUTE>]`管理受控实例与v2会话（见[Frida说明](frida-backends.md)），不自动终止已运行的同可执行文件实例。在Windows x64/x86上可使用`session attach-v8 --pid <PID> --exe <EXE> [--module <DLL>] (--bootstrap-output <DIR> | --source-file <JS>)`向已核验身份的运行中进程派发Bootstrap或受控脚本。
 4. 核对监听为回环地址或确认会话就绪后，执行`targets --port <PORT>`（或`--backend <BACKEND> --session <SESSION_JSON>`）；检查title/url并使用精确ID。没有页面、页面消失或不支持时停止，不默选第一个窗口。
 5. `apply --port <PORT> --target <ID> --bundle <MANIFEST>`应用，`remove --port <PORT> --target <ID> --id <BUNDLE_ID>`移除。
 6. `list --port <PORT> --target <ID>`查询当前页面在共享runtime注册表中的受管Bundle（`id`、`nodes`、`cleanups`）；此操作只读注册表状态。
@@ -78,7 +78,7 @@ injectra dev --artifact "$ARTIFACT_JSON" --bundle "$MANIFEST"
 injectra dev --artifact "$ARTIFACT_JSON" --bundle "$MANIFEST" --target "$PAGE_ID"
 ```
 
-prepare输出artifact_file；将其作为ARTIFACT_JSON。APP为原应用路径，DERIVED_DIR为仓库外新副本父目录；manifest沿用v1格式，用户用现有编辑器修改声明的文件。shared需要用户明确接受该应用共享数据；isolated不是账号安全沙箱承诺，沙箱宿主无法建立条件时拒绝。不支持用户startup.cjs。准备记录entry_strategy为cjs-insert或main-delegate；旧记录缺少此字段仍可加载。后者保留原归档，通过宿主加载器执行原主模块，见[QQ复验](validation/qq-cli-dev.md)。
+prepare输出artifact_file；将其作为ARTIFACT_JSON。APP为原应用路径（macOS `.app` 或 Windows 应用目录/可执行文件），DERIVED_DIR为仓库外新副本父目录；manifest沿用v1格式，用户用现有编辑器修改声明的文件。shared需要用户明确接受该应用共享数据；isolated不是账号安全沙箱承诺，沙箱宿主无法建立条件时拒绝。不支持用户startup.cjs或`.jsc`字节码入口。准备记录`entry_strategy`为`cjs-insert`、`main-delegate`或`esm-delegate`（Windows V8附加模式为`windows-v8-attach`）；旧记录缺少此字段仍可加载。macOS端通过`make test-preparation`验收5类布局（含ESM目录与ASAR）；Windows端提供`make test-windows`（`scripts/windows-formal-smoke.mjs`）用于宿主验收。
 
 dev为前台命令，stdout为JSONL事件：dev-ready、目标列表/选择、execution、source-error和可关联log；stderr仍以injectra前缀报告最终失败。execution包含request_id、version、target、files、certainty、result/error与可确定的JS位置。窗口效果直接在App查看。
 

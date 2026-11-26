@@ -125,6 +125,10 @@ test-preparation: build
 	node --test crates/preparation/tests/entry.test.mjs
 	node scripts/preparation-smoke.mjs
 
-.PHONY: test-windows-format
+.PHONY: test-windows-format test-windows
 test-windows-format:
 	node --test tests/windows/pe-integrity.test.mjs tests/windows/append-asar.test.mjs tests/windows/copy-tree.test.mjs tests/windows/cef-init.test.mjs
+
+# Windows host only: inspect-app, session attach-v8 and prepare/dev (directory/ASAR+PE/nested/ESM) on owned fixtures.
+test-windows: build
+	node scripts/windows-formal-smoke.mjs

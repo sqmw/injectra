@@ -5,7 +5,8 @@ use args::{Args, Command, LauncherArg, SessionCommand, SessionRouteArg};
 use clap::Parser;
 use injectra_core::{Certainty, Error, ErrorKind, Phase, Result, TargetRef};
 use injectra_frida::{
-    LaunchSessionRequest, LauncherMode, RegisterSessionRequest, SessionRoute, launch_session,
+    LaunchSessionRequest, LauncherMode, RegisterSessionRequest, SessionRoute,
+    WindowsV8AttachRequest, attach_windows_v8, ensure_windows_v8_supported, launch_session,
     register_session, verify_session,
 };
 use serde_json::{Value, json};
@@ -214,6 +215,48 @@ fn run(args: Args) -> Result<Value> {
             }),
             SessionCommand::Verify { session, route } => {
                 verify_session(&session, route.map(session_route))
+            }
+            SessionCommand::AttachV8 {
+                pid,
+                exe,
+                started,
+                module,
+                bootstrap_output,
+                source_file,
+            } => {
+                ensure_windows_v8_supported()?;
+                if let Some(out_dir) = bootstrap_output {
+                    let (artifact, bootstrap_path) =
+                        injectra_preparation::prepare_attached_bootstrap(&out_dir, &exe, pid)?;
+                    let escaped = serde_json::to_string(&bootstrap_path.to_string_lossy())
+                        .expect("path serializes");
+                    let source = format!(
+                        "(function(){{const r=(process.mainModule&&process.mainModule.require)||globalThis.require;if(typeof r!=='function')throw new Error('Node require unavailable in target isolate');return r({escaped});}})()"
+                    );
+                    let dispatch = attach_windows_v8(&WindowsV8AttachRequest {
+                        pid,
+                        exe,
+                        started,
+                        module,
+                        source,
+                    })?;
+                    Ok(json!({
+                        "artifact_file": artifact.artifact_file,
+                        "controller_origin": artifact.controller_origin,
+                        "pid": pid,
+                        "entry_strategy": artifact.entry_strategy,
+                        "dispatch": dispatch,
+                    }))
+                } else {
+                    let source = read_eval_source(None, source_file)?;
+                    attach_windows_v8(&WindowsV8AttachRequest {
+                        pid,
+                        exe,
+                        started,
+                        module,
+                        source,
+                    })
+                }
             }
         },
     }

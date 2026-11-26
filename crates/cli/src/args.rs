@@ -62,6 +62,29 @@ pub enum SessionCommand {
         #[arg(long, value_enum)]
         route: Option<SessionRouteArg>,
     },
+    /// Attach to an explicit verified Windows process via MSVC V8 symbols (x64/x86) to dispatch a Bootstrap runtime or script.
+    AttachV8 {
+        #[arg(long)]
+        pid: u32,
+        #[arg(long)]
+        exe: PathBuf,
+        #[arg(long)]
+        started: Option<u64>,
+        #[arg(long)]
+        module: Option<PathBuf>,
+        #[arg(
+            long,
+            required_unless_present = "source_file",
+            conflicts_with = "source_file"
+        )]
+        bootstrap_output: Option<PathBuf>,
+        #[arg(
+            long,
+            required_unless_present = "bootstrap_output",
+            conflicts_with = "bootstrap_output"
+        )]
+        source_file: Option<PathBuf>,
+    },
 }
 #[derive(ClapArgs)]
 pub struct Endpoint {
@@ -363,6 +386,49 @@ mod tests {
                 "webkit"
             ])
             .is_ok()
+        );
+        assert!(
+            Args::try_parse_from([
+                "injectra",
+                "session",
+                "attach-v8",
+                "--pid",
+                "1234",
+                "--exe",
+                "Host.exe",
+                "--source-file",
+                "probe.js"
+            ])
+            .is_ok()
+        );
+        assert!(
+            Args::try_parse_from([
+                "injectra",
+                "--machine",
+                "session",
+                "attach-v8",
+                "--pid",
+                "1234",
+                "--exe",
+                "Host.exe",
+                "--module",
+                "Engine.dll",
+                "--bootstrap-output",
+                "out"
+            ])
+            .is_ok()
+        );
+        assert!(
+            Args::try_parse_from([
+                "injectra",
+                "session",
+                "attach-v8",
+                "--pid",
+                "1234",
+                "--exe",
+                "Host.exe"
+            ])
+            .is_err()
         );
     }
 }

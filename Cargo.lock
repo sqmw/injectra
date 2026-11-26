@@ -745,6 +745,7 @@ version = "0.1.0"
 dependencies = [
  "injectra-core",
  "injectra-platform-macos",
+ "injectra-platform-windows",
  "serde",
  "serde_json",
 ]
@@ -761,6 +762,15 @@ name = "injectra-platform-macos"
 version = "0.1.0"
 dependencies = [
  "injectra-core",
+]
+
+[[package]]
+name = "injectra-platform-windows"
+version = "0.1.0"
+dependencies = [
+ "injectra-core",
+ "serde",
+ "serde_json",
 ]
 
 [[package]]

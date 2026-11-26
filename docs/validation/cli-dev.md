@@ -24,6 +24,15 @@ Claude控制台事件未收到，页面内DOM/CSS断言和执行回执通过；�
 
 仓库外证据：runs/preparation-fixtures-iNzd88/下两类acceptance.json；runs/t040-cli-real/claude/e791b34e-911b-48a5-a345-6796f0f80f5b/acceptance.json。早期资源封印读取、摘要空slot及日志事件名调试失败由对应派生目录/日志保留，不回填为成功。原包未修改；关键资源摘要校验不等于整包逐字节核对。
 
+## T-085 跨平台与 Electron ESM 扩展验收
+
+[T-085](../TODO.md#t-085)（[执行归档](../archive/T-085.md#t-085)）在不修改上述 T-040 历史表的前提下，将准备器扩展至 Electron ESM（`esm-delegate`）与 Windows x64/x86 正式 CLI：
+
+| 平台 / 对象 | 结果 | 证据边界 |
+| --- | --- | --- |
+| macOS Electron 45.2.1 5 类夹具（`directory` / `asar` / `nested_asar` / `esm` / `esm_asar`） | 通过 | `make test-preparation`（`runs/preparation-fixtures-gGsbj5`）：验证 `esm-delegate` 保持原 ESM 字节、`import.meta.url` 与相对导入语义、两版增量更新、错误行定位与页面重建停止；`.jsc` 字节码在创建输出前拒绝 |
+| Windows x64 Electron 45.2.1 4 类夹具（`directory`+Junction / `asar`+PE `INTEGRITY` / `nested_asar` / `esm`）与 `session attach-v8` | 通过 | `scripts/windows-formal-smoke.mjs`（Lenovo Windows `DESKTOP-F4B6E6C`，`win-formal-0XELcm`）：验证包内 Junction 重建、ASAR `appendRewrite` 与 PE `INTEGRITY`/`ELECTRONASAR` 摘要同步更新、原安装 SHA-256 不变、`INJECTRA_PREFLIGHT_FILE` 预检、两版实时更新与错误行定位、自有 Windows Node x64 `session attach-v8` 派发与 PID/exe 失配拒绝、`.jsc` 拒绝及真实 Windows 应用 Folo 只读 `inspect-app` 识别 |
+
 ## 恢复
 
 平台删除提交a403982可独立审查/反向撤销；旧main基线85ce983、代码07d55a3及各platform工作树保留。仓库外recovery/t040-cli-20261112保存五树的HEAD、patch和源码tar；不能为恢复而覆盖已有工作区或删除运行证据。

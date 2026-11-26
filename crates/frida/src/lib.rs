@@ -54,6 +54,19 @@ pub struct RegisterSessionRequest {
     pub route: SessionRoute,
 }
 
+#[derive(Clone, Debug)]
+pub struct WindowsV8AttachRequest {
+    pub pid: u32,
+    pub exe: PathBuf,
+    pub started: Option<u64>,
+    pub module: Option<PathBuf>,
+    pub source: String,
+}
+
+pub fn ensure_windows_v8_supported() -> Result<()> {
+    controller::ensure_windows_supported()
+}
+
 #[derive(Clone)]
 pub struct Bridge {
     session: PathBuf,
@@ -185,6 +198,46 @@ pub fn verify_session(session: &Path, route: Option<SessionRoute>) -> Result<Val
         }),
         Duration::from_secs(20),
         Certainty::NotExecuted,
+    )
+}
+
+pub fn attach_windows_v8(request: &WindowsV8AttachRequest) -> Result<Value> {
+    controller::ensure_windows_supported()?;
+    if request.pid == 0 {
+        return Err(Error::prepare(
+            ErrorKind::InvalidInput,
+            "Target PID must be nonzero",
+        ));
+    }
+    if request.source.trim().is_empty() {
+        return Err(Error::prepare(
+            ErrorKind::InvalidInput,
+            "V8 dispatch source must not be empty",
+        ));
+    }
+    let exe = std::path::absolute(&request.exe)?;
+    let module = request
+        .module
+        .as_deref()
+        .map(std::path::absolute)
+        .transpose()?;
+    let root = resources::materialize(&[])?;
+    controller::invoke_with(
+        root,
+        "v8_attach.py",
+        json!({
+            "schema": 1,
+            "operation": "attach-v8",
+            "payload": {
+                "pid": request.pid,
+                "exe": exe,
+                "started": request.started,
+                "module": module,
+                "source": request.source,
+            }
+        }),
+        Duration::from_secs(25),
+        Certainty::Unknown,
     )
 }
 

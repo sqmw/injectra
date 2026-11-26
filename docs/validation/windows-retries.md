@@ -28,7 +28,7 @@
 
 ## 泛化边界与工具
 
-- **接入由技术条件选择。** QQ/WorkBuddy/Figma共用[Windows MSVC V8实验](../../tests/windows/v8-windows.js)和[显式目标附加器](../../tests/windows/v8-attach.py)，只配置PID、世代、exe与引擎模块；随后复用[原Bootstrap](../../crates/bootstrap/helper/bootstrap.cjs)和共享Web runtime，没有按品牌的执行代码。x64与ia32分别通过自有Node进程验证；ia32夹具通过不代表优酷成功。
+- **接入由技术条件选择。** QQ/WorkBuddy/Figma共用[Windows MSVC V8实验](../../crates/frida/helper/v8_windows.js)和[显式目标附加器](../../tests/windows/v8-attach.py)，只配置PID、世代、exe与引擎模块；随后复用[原Bootstrap](../../crates/bootstrap/helper/bootstrap.cjs)和共享Web runtime，没有按品牌的执行代码。x64与ia32分别通过自有Node进程验证；ia32夹具通过不代表优酷成功。
 - **准备按资源格式处理。** [副本准备器](../../tests/windows/prepare-copy.mjs)共用CJS、目录/ASAR与PE摘要逻辑。包内Junction规范化并重建为指向副本；外部链接拒绝。抖音的已确认运行锁目录作为显式相对路径排除配置，写入proof，不静默跳过其他EBUSY文件。
 - **CEF不是Electron。** [初始化实验](../../tests/windows/cef-init.js)只接受官方版本/结构尺寸匹配的设置副本；本轮未触达三款CEF页面，不把测试代码列作正式支持。登录前原生窗口不能包装成DOM。
 - **目标必须明确。** [远程Web合同](../../crates/bootstrap/tests/remote_live.rs)记录选定目标、去查询参数URL，要求世代/URL连续稳定3秒。首次世代拒绝保留；另开明确连接run，不自动重放未知请求。新增启动退出元数据，区别应用退出、端口存在和真实页面；Windows缺失的退出码/退出时间保留null，不因诊断字段缺失中断收尾。默认附加启动参数也替换profile/port占位符，供空项目独立home配置使用。

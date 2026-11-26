@@ -323,8 +323,8 @@ impl Broker {
         let mut i = self.inner.lock().unwrap();
         sweep(&mut i);
         i.connections
-            .iter()
-            .flat_map(|(_, c)| {
+            .values()
+            .flat_map(|c| {
                 c.pages.values().map(|p| TargetStatus {
                     id: target_key(&c.public_id, p),
                     artifact: c.artifact.clone(),

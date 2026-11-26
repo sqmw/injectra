@@ -26,8 +26,10 @@ flowchart TD
   CDP --> CORE
   NATIVE[native 原生契约] --> CORE
   HOST --> MAC[platform-macos 应用元数据]
+  HOST --> WIN[platform-windows 布局与PE元数据]
   HOST --> CORE
   MAC --> CORE
+  WIN --> CORE
   WEB --> JS[唯一 web/runtime.js]
 ```
 
@@ -37,12 +39,13 @@ flowchart TD
 | web | WebTarget、PageContext、WebBackend/WebSession；manifest v1加载与共享程序生成；JSON返回值只属于Web域 |
 | application | targets/apply/remove/execute库用例；后端参数注入，连接前检查实例身份，执行前核对会话目标与页面能力 |
 | cdp | 既有CDP Web后端；回环端口、精确页面、CDP响应/异常映射；不包含应用名称、载荷加载或原生方法 |
-| frida | 可选助手通信、身份核对、截止及`session_ops`受控启动/注册/校验；只依赖core，无Web/Node/应用业务假设 |
+| frida | 可选助手通信、身份核对、截止、macOS `session_ops` 与 Windows MSVC V8 `v8_attach`；只依赖core，无Web/Node/应用业务假设 |
 | electron-gadget / webkit | 并列实现WebBackend/WebSession，各自持有宿主桥接；依赖core/web/frida |
 | native | NativeTarget、目标架构/地址、NativeSession及独立MemoryRead/MemoryWrite；受控测试与生产契约分开，无真实后端或Web依赖 |
 | platform-macos | inspect_app：.app可执行路径、Framework详情、otool动态库链接与codesign签名/entitlements摘要；不识别Electron或生成调试参数 |
-| hosts | 跨宿主只读识别（`inspect_app`）、纯Rust Electron ASAR/入口探测与通用CDP/WebView2启动规划（`launch_plan`）；依赖platform-macos，不管理用户进程 |
-| cli | 解析参数、装配CDP/Gadget/WK/Frida会话管理与宿主诊断、投影兼容JSON或`--machine`信封；不承载注入用例流程 |
+| platform-windows | inspect_layout 与纯Rust只读PE解析：Windows目录/版本子目录布局、PE架构（x86/x64/arm64）与`INTEGRITY`/`ELECTRONASAR`元数据；无unsafe、不识别浏览器策略 |
+| hosts | 跨宿主只读识别（`inspect_app`）、纯Rust Electron ASAR/入口探测与通用CDP/WebView2启动规划（`launch_plan`）；依赖platform-macos与platform-windows，不管理用户进程 |
+| cli | 解析参数、装配CDP/Gadget/WK/Frida会话管理（含`session attach-v8`）、跨平台`prepare`/`dev`与宿主诊断、投影兼容JSON或`--machine`信封；不承载注入用例流程 |
 
 公共基础与原生契约可独立构建，不依赖浏览器库、Frida或原生FFI。当前采用静态crate装配；动态插件ABI和调度器不是此架构的必要前提。
 
@@ -52,7 +55,7 @@ flowchart TD
 
 适配方案指需要独立维护的接入/执行实现或策略，包括具有独立代码路径的宿主ABI变体、应用专有接入特例；不按软件名称、文件/crate数、实例或纯配置记录计数。相同实现覆盖多个应用只算同一方案，改变路径/端口/目标ID不产生新方案。共用身份、传输、日志等辅助模块不各算一套完整方案；不能把不同适配代码塞进同一模块来少计。
 
-当前静态登记六项独立接入/入口策略：CDP、Electron Gadget、WKWebView、Electron Bootstrap四条Web路线，以及cjs-insert和main-delegate两种准备入口策略。资源格式的读取/重建和平台签名是这些策略的辅助适配，不按应用重复计数；[委托条件与验证](../validation/qq-cli-dev.md)。Hook实验与一次性演示脚本未成为正式适配方案；以后纳入产品时，需同时登记其真实独立策略及支持条件，不能用CLI后端枚举数量掩盖内部新增的适配变体。
+当前静态登记八项独立接入/入口策略：CDP、Electron Gadget、WKWebView、Electron Bootstrap、Windows MSVC V8 附加（`windows-v8`）五条运行/桥接路线，以及 `cjs-insert`、`main-delegate` 和 `esm-delegate` 三种准备入口策略（详尽机制与边界见[多架构宿主机制](host-mechanisms.md)）。资源格式的读取/重建、包内链接隔离与平台签名/PE 摘要更新是这些策略的辅助适配，不按应用重复计数；[委托条件与验证](../validation/qq-cli-dev.md)。Hook 实验与一次性演示脚本未成为正式适配方案；以后纳入产品时，需同时登记其真实独立策略及支持条件，不能用 CLI 后端枚举数量掩盖内部新增的适配变体。
 
 | 实现层 | 实际复用粒度 | 当前限制 |
 | --- | --- | --- |
@@ -110,7 +113,7 @@ CDP发送或等待响应后失联、超时或无法解析响应保守记为Unkno
 
 ## 平台与宿主
 
-platform-macos::inspect_app返回通用的macOS应用包元数据：规范化可执行文件、Framework详情、动态库链接与签名/entitlements摘要。hosts::inspect_app基于包结构或跨平台目录/可执行组件只读识别Electron、NW.js、CEF、WKWebView与WebView2，评估可用路线及签名/ABI阻塞项并给出纯Rust Electron ASAR/入口探测，未知或原生无Web目标返回Unsupported；hosts::launch_plan为支持CDP回环入口的宿主生成只读LaunchPlan（包括WebView2环境变量规划），WKWebView无CDP路由明确拒绝，计划不自动启动/重启/结束既有用户应用。
+platform-macos::inspect_app返回通用的macOS应用包元数据；platform-windows::inspect_layout返回Windows目录/版本子目录布局、PE架构与只读`INTEGRITY`/`ELECTRONASAR`记录。hosts::inspect_app基于包结构或跨平台目录/可执行组件只读识别Electron、NW.js、CEF、WKWebView与WebView2，评估可用路线（含macOS/Windows `prepare-dev` 与 `windows-v8`）及签名/ABI阻塞项并给出纯Rust Electron ASAR/入口探测（含ESM与字节码识别），未知或原生无Web目标返回Unsupported；hosts::launch_plan为支持CDP回环入口的宿主生成只读LaunchPlan（包括WebView2环境变量规划），WKWebView无CDP路由明确拒绝，计划不自动启动/重启/结束既有用户应用。
 
 ## 验收句柄
 

@@ -56,7 +56,7 @@ The common `core` contains identity, capabilities, errors, and execution certain
 | Area | Current evidence and boundary |
 | --- | --- |
 | macOS | Apple Silicon only. CDP, Electron Gadget, and WKWebView have recorded fixture/application results under specific versions and access conditions. Intel Mac is outside the current scope. |
-| CLI `prepare` / `dev` | macOS Electron CommonJS directory, ASAR, and nested-ASAR fixtures; QQ main page and Claude local shell. Unsupported layouts are rejected; this is not a promise to handle every proprietary loader. |
+| CLI `prepare` / `dev` | macOS Electron CommonJS & ESM (`directory`, `asar`, `nested-asar`, `esm`, `esm-asar`) fixtures, plus QQ main page and Claude local shell; Windows x64 Electron `prepare` / `dev` (`directory` + junction, `asar` + PE `INTEGRITY`, `nested-asar`, `esm`) and `session attach-v8` verified on owned Windows fixtures via `make test-windows`. Unsupported layouts (such as `.jsc` bytecode) are rejected. |
 | Windows | **35 of 38 installed applications obtained page-injection evidence** in the recorded campaign. This combines native CLI/CDP, Gecko test clients, and experimental Bootstrap/V8 routes; it is not 35 formal Windows CLI backends or an unrestricted compatibility rate. Three results retain HTML-string limitations with JS/DOM alternatives. |
 | Windows gaps | Youku: startup/Widevine dependency failure. Baidu Netdisk and WeCom: Web entry not obtained in the observed native welcome/login state. FlowUs and Manus were skipped separately by user request. |
 | Gecko | Firefox/Thunderbird experiments use separate test clients and host APIs. They are not formal Gecko CLI backends. |

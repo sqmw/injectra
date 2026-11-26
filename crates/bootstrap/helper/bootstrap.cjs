@@ -9,8 +9,15 @@ const { guardedSource, installDocumentNonce } = require('./evaluation.cjs');
 const config = JSON.parse(fs.readFileSync(path.join(__dirname, 'config.json'), 'utf8'));
 const VERSION = 1;
 if (process.env.INJECTRA_PREFLIGHT_NONCE) {
-  try { fs.writeSync(1,'INJECTRA_PREFLIGHT:'+JSON.stringify({artifact:config.artifact,nonce:process.env.INJECTRA_PREFLIGHT_NONCE})+'\n'); process.exit(0); }
-  catch(error) { fs.writeSync(2,'INJECTRA_PREFLIGHT_ERROR:'+String(error)+'\n'); process.exit(1); }
+  try {
+    const payload = JSON.stringify({artifact:config.artifact,nonce:process.env.INJECTRA_PREFLIGHT_NONCE});
+    if (process.env.INJECTRA_PREFLIGHT_FILE) {
+      fs.writeFileSync(process.env.INJECTRA_PREFLIGHT_FILE, payload + '\n', 'utf8');
+    }
+    try { fs.writeSync(1,'INJECTRA_PREFLIGHT:'+payload+'\n'); } catch {}
+    process.exit(0);
+  }
+  catch(error) { try { fs.writeSync(2,'INJECTRA_PREFLIGHT_ERROR:'+String(error)+'\n'); } catch {} process.exit(1); }
   throw Error('Preflight must not continue into original entry');
 }
 const documentKey = 'injectra.document.' + config.artifact;

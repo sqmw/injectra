@@ -86,18 +86,23 @@
   "name": "Web 桌面架构调研与跨平台核心正式化",
   "version": "v1",
   "mode": "staged",
-  "status": "pending",
+  "status": "done",
   "priority": "P1",
   "milestone": "M-002",
   "goal": "以多架构调研基线指导 platform/hosts/preparation 跨平台重构，将已验证的 Windows 通用能力与 Electron ESM 准备沉淀为正式 crate 代码。",
   "scope": "系统核验 macOS 与 Windows 下 Electron（CJS/ESM）、Tauri/WebView2、CEF、NW.js 的调试与资源控制层边界；重构 preparation 解耦 macOS 硬编码，按正规分层迁入 Windows 通用准备/Bootstrap/V8 等已验证核心能力，不以应用品牌补丁或二进制脱壳换取覆盖。",
   "acceptance": "架构调研文档与核心 crate 抽象一致；Windows 正式 CLI 能力超越纯 CDP 并在 Windows 宿主完成对应实测验收；macOS 与 Windows 回归测试与架构边界检查全部通过。",
-  "execution_ref": "",
-  "acceptance_evidence": []
+  "execution_ref": "archive/T-085.md#t-085",
+  "acceptance_evidence": [
+    "新增 docs/architecture/host-mechanisms.md 并同步 boundaries/code-map/dev-mode/dev/README/cli-dev，调研基线与 14 个 workspace crate 抽象一致，D-010 静态策略登记更新为 8/32（新增 esm-delegate 与 windows-v8）。",
+    "新增无 unsafe 的 injectra-platform-windows crate（PE32/64 架构与 INTEGRITY/ELECTRONASAR 只读解析、版本子目录主 exe 识别），升级 injectra-hosts 跨平台诊断，重构 injectra-preparation 支持 macOS 与 Windows（copyTree/appendRewrite/PE integrity/INJECTRA_PREFLIGHT_FILE/Electron ESM esm-delegate），并在 injectra-frida 与 CLI 正式化 session attach-v8。",
+    "macOS 全量回归全绿：make check（14 crate 架构、clippy -D warnings、Rust/Web/WebKit/Gecko 测试、文档检查）、make test-windows-format（7/7）、make test-frida、make test-electron、make test-preparation（Electron 45.2.1 5 布局含 ESM 目录/ASAR 及 .jsc 拒绝，run preparation-fixtures-gGsbj5）。",
+    "Lenovo Windows（DESKTOP-F4B6E6C，rustc 1.96.1 MSVC，node v24.18.0，frida 17.25.2）原生构建、clippy -D warnings、cargo test（48 passed/0 failed）、Node 12/12 与 scripts/windows-formal-smoke.mjs（run win-formal-0XELcm：真实 Folo inspect-app、WebView2/native、session attach-v8 及 Windows Electron directory+Junction/asar+PE/nested_asar/esm 四布局 prepare/dev 与 .jsc 拒绝）全部实机通过。"
+  ]
 }
 ```
 
-关联规划：[M-002 阶段 3](plans/milestone-2-core-engine.md) · [D-015](DECISIONS.md#d-015)。
+关联规划：[M-002 阶段 3](plans/milestone-2-core-engine.md) · [D-015](DECISIONS.md#d-015) · [执行归档](archive/T-085.md#t-085)。
 
 <a id="t-086"></a>
 ### T-086 · 共享 Web Runtime 策略容错与依赖减重

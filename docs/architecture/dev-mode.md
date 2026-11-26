@@ -18,7 +18,7 @@
 - Bootstrap：App内小型Node引导和独立Web后端，连接CLI回环服务；随机挑战/角色认证，拒绝浏览器Origin。没有浏览器文件API或界面。
 - CLI：prepare/dev装配、启动或连接精确派生实例、监听与JSONL回执。异步仅用于连接I/O，不反向改变core/Web/native契约。
 
-准备器限macOS Apple Silicon、Electron CommonJS宿主、目录/ASAR及目录内嵌套ASAR。明文入口采用cjs-insert；嵌套/不透明JS或CJS通过main-delegate保留原字节，使用原宿主加载器建立原主模块身份。框架按元数据识别。纯ESM、模糊入口、无法保持语义/签名/资源条件的目标Unsupported。Node及锁定ASAR/Acorn工具只用于准备；runtime命令不要求这些工具已安装。
+准备器支持 macOS Apple Silicon 与 Windows x64/x86 上的 Electron（CommonJS 与 ESM）宿主，覆盖目录、ASAR 及目录内嵌套 ASAR 布局。明文 CommonJS 入口采用 `cjs-insert`；嵌套/不透明 CJS 通过 `main-delegate` 保留原字节并使用原宿主加载器建立原主模块身份；ESM 入口（`type: "module"` 或 `.mjs`）通过 `esm-delegate` 先同步加载 `./bootstrap.cjs` 再相对 `import` 原 ESM 入口并保留原入口字节。macOS 侧按框架元数据识别并重签派生副本；Windows 侧通过 `copyTree` 隔离包内 Junction、以 `appendRewrite` 保留原归档数据段并按基线更新 PE `INTEGRITY`/`ELECTRONASAR` 资源。V8 字节码（`.jsc`）、模糊入口、无法保持语义/签名/资源条件的目标返回 `Unsupported`。Node 及锁定准备工具（`@electron/asar`、`acorn`、Windows 侧另含 `chromium-pickle-js` 与 `resedit`）仅用于准备；runtime CDP 命令不要求这些工具已安装。详见[多架构宿主机制](host-mechanisms.md)。
 
 ## 目标与更新
 

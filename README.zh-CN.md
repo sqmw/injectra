@@ -56,7 +56,7 @@ flowchart TD
 | 方向 | 当前证据与边界 |
 | --- | --- |
 | macOS | 仅 Apple Silicon。CDP、Electron Gadget、WKWebView 有指定版本与接入条件下的夹具或应用验证；Intel Mac 不在当前范围。 |
-| CLI `prepare` / `dev` | macOS Electron CommonJS 的目录、ASAR、嵌套 ASAR 夹具，以及 QQ 主页面和 Claude 本地壳。未支持布局明确拒绝，不承诺任意专有加载器。 |
+| CLI `prepare` / `dev` | macOS Electron CommonJS 与 ESM（目录、ASAR、嵌套 ASAR、ESM 目录、ESM ASAR）夹具，以及 QQ 主页面和 Claude 本地壳；Windows x64 Electron `prepare` / `dev`（目录含包内 Junction、ASAR 含 PE `INTEGRITY`、嵌套 ASAR、ESM）与 `session attach-v8` 已在 Windows 宿主自有夹具完成 `make test-windows` 实机验收。未支持布局（如 `.jsc` 字节码）明确拒绝。 |
 | Windows | 既有验证批次的 **38 款安装应用中，35 款取得页面注入证据**。包含本机 CLI/CDP、Gecko 测试客户端和实验 Bootstrap/V8，不等于 35 个正式 Windows CLI 后端或无条件兼容率。3 项仍有 HTML 字符串限制，使用 JS/DOM 替代路线。 |
 | Windows 缺口 | 优酷：启动/Widevine 依赖失败；百度网盘、企业微信：观测到原生欢迎/登录窗口时仍未取得 Web 入口。FlowUs、Manus 按用户要求另行跳过。 |
 | Gecko | Firefox/Thunderbird 使用独立测试客户端与宿主 API，尚未成为正式 Gecko CLI 后端。 |

@@ -46,6 +46,9 @@ impl Journal {
         file.write_all(&serde_json::to_vec(value).unwrap())?;
         file.sync_all()?;
         fs::rename(temporary, self.root.join(name))?;
+        // Directory handles are not openable as files on Windows; rename durability
+        // there relies on the file's own sync before the atomic replace.
+        #[cfg(unix)]
         fs::File::open(&self.root)?.sync_all()?;
         Ok(())
     }

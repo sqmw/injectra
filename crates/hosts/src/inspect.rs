@@ -84,10 +84,7 @@ fn scan_binary_markers(path: &Path, markers: &[&[u8]]) -> Vec<bool> {
     let chunk_size = 1024 * 1024;
     let mut buf = vec![0u8; chunk_size + overlap];
     let mut carry = 0usize;
-    loop {
-        let Ok(n) = file.read(&mut buf[carry..]) else {
-            break;
-        };
+    while let Ok(n) = file.read(&mut buf[carry..]) {
         if n == 0 {
             break;
         }
@@ -124,7 +121,11 @@ fn dyld_gadget_blocker(codesign: &CodeSignSummary) -> Option<String> {
     None
 }
 
-fn electron_prepare_route(package: &PackageSummary, sandboxed: bool) -> RouteAssessment {
+fn electron_prepare_route(
+    package: &PackageSummary,
+    sandboxed: bool,
+    macos_bundle: bool,
+) -> RouteAssessment {
     let mut prerequisites = vec!["Optional preparation tools (make setup-preparation)".into()];
     if sandboxed {
         prerequisites.push(
@@ -133,13 +134,19 @@ fn electron_prepare_route(package: &PackageSummary, sandboxed: bool) -> RouteAss
         );
     }
     let mut blockers = Vec::new();
-    if !(cfg!(target_os = "macos") && cfg!(target_arch = "aarch64")) {
-        blockers.push("CLI prepare/dev currently supports macOS Apple Silicon only".into());
+    if macos_bundle {
+        if !(cfg!(target_os = "macos") && cfg!(target_arch = "aarch64")) {
+            blockers.push("macOS .app preparation requires macOS Apple Silicon host".into());
+        }
+    } else if !(cfg!(target_os = "windows")
+        && (cfg!(target_arch = "x86_64") || cfg!(target_arch = "x86")))
+    {
+        blockers.push("Windows Electron preparation requires a Windows x64/x86 host".into());
     }
     if !matches!(package.layout, "asar" | "directory" | "nested-asar") {
         blockers.push(format!("Unsupported package layout: {}", package.layout));
     }
-    if !matches!(package.entry_kind, "commonjs" | "commonjs-delegate") {
+    if !matches!(package.entry_kind, "commonjs" | "commonjs-delegate" | "esm") {
         blockers.push(format!(
             "Unsupported main entry kind: {}",
             package.entry_kind
@@ -149,6 +156,25 @@ fn electron_prepare_route(package: &PackageSummary, sandboxed: bool) -> RouteAss
         route: "prepare-dev",
         supported: blockers.is_empty(),
         prerequisites,
+        blockers,
+    }
+}
+
+fn windows_v8_route(pe_arch: Option<injectra_platform_windows::pe::PeArch>) -> RouteAssessment {
+    let mut blockers = Vec::new();
+    if !cfg!(target_os = "windows") {
+        blockers.push("Windows V8 attach requires a Windows host".into());
+    }
+    if let Some(injectra_platform_windows::pe::PeArch::Arm64) = pe_arch {
+        blockers.push("Windows V8 MSVC ABI attach currently supports x64 and x86 only".into());
+    }
+    RouteAssessment {
+        route: "windows-v8",
+        supported: blockers.is_empty(),
+        prerequisites: vec![
+            "Optional Python/Frida environment (INJECTRA_FRIDA_PYTHON)".into(),
+            "Running explicit target PID with matching executable path and exported MSVC V8 symbols (x64/x86)".into(),
+        ],
         blockers,
     }
 }
@@ -199,7 +225,7 @@ pub(crate) fn classify_macos_bundle(
                 ],
                 blockers: gadget_blockers,
             },
-            electron_prepare_route(&package, info.codesign.sandboxed),
+            electron_prepare_route(&package, info.codesign.sandboxed, true),
         ];
         return Ok(InspectionReport {
             target_path: info.bundle_path.clone(),
@@ -300,117 +326,44 @@ pub(crate) fn classify_macos_bundle(
     ))
 }
 
-fn is_executable_candidate(path: &Path) -> bool {
-    if !path.is_file() {
-        return false;
-    }
-    if path
-        .extension()
-        .and_then(|s| s.to_str())
-        .is_some_and(|ext| ext.eq_ignore_ascii_case("exe"))
-    {
-        return true;
-    }
-    #[cfg(unix)]
-    {
-        use std::os::unix::fs::PermissionsExt;
-        if let Ok(meta) = path.metadata() {
-            return (meta.permissions().mode() & 0o111) != 0;
-        }
-    }
-    false
-}
-
-fn collect_shallow_files(root: &Path, max_depth: usize, max_entries: usize) -> Vec<PathBuf> {
-    let mut files = Vec::new();
-    let mut stack = vec![(root.to_path_buf(), 0usize)];
-    while let Some((dir, depth)) = stack.pop() {
-        if files.len() >= max_entries {
-            break;
-        }
-        let Ok(entries) = std::fs::read_dir(&dir) else {
-            continue;
-        };
-        for entry in entries.flatten() {
-            if files.len() >= max_entries {
-                break;
-            }
-            let path = entry.path();
-            if path.is_symlink() {
-                continue;
-            }
-            if path.is_dir() {
-                if depth < max_depth {
-                    stack.push((path, depth + 1));
-                }
-            } else {
-                files.push(path);
-            }
-        }
-    }
-    files
-}
-
 fn classify_directory_or_executable(path: &Path, port: Option<u16>) -> Result<InspectionReport> {
-    let (root_dir, explicit_exe) = if path.is_file() {
-        let parent = path.parent().ok_or_else(|| {
-            Error::prepare(
-                ErrorKind::InvalidInput,
-                "executable has no parent directory",
-            )
-        })?;
-        (parent.to_path_buf(), Some(path.to_path_buf()))
-    } else if path.is_dir() {
-        (path.to_path_buf(), None)
-    } else {
-        return Err(Error::prepare(
-            ErrorKind::InvalidInput,
-            "target path must be a bundle, directory or executable",
-        ));
-    };
-
-    let files = collect_shallow_files(&root_dir, 3, 512);
-    let executable = explicit_exe
-        .or_else(|| {
-            files
-                .iter()
-                .filter(|p| p.parent() == Some(root_dir.as_path()) && is_executable_candidate(p))
-                .min()
-                .cloned()
-        })
-        .or_else(|| files.iter().find(|p| is_executable_candidate(p)).cloned())
-        .ok_or_else(|| {
-            Error::prepare(
-                ErrorKind::Unsupported,
-                "Unsupported: no executable or recognized Web UI host architecture in target path",
-            )
-        })?;
+    let layout = injectra_platform_windows::inspect_layout(path)?;
+    let executable = layout.executable;
 
     let mut detected = Vec::new();
+    if let Some(arch) = layout.pe_arch {
+        detected.push(format!("pe-{}", arch.as_str()));
+    }
+    if !layout.asar_integrity.is_empty() {
+        detected.push("pe-asar-integrity".into());
+    }
+
     let mut has_nw = false;
     let mut has_cef = false;
     let mut has_webview2 = false;
-    let mut electron_resources: Option<PathBuf> = None;
+    let electron_resources = layout.resources_dirs.first().cloned();
 
-    for file in &files {
+    for file in &layout.component_files {
         let name = file
             .file_name()
             .and_then(|s| s.to_str())
             .unwrap_or_default();
         if name.eq_ignore_ascii_case("nw.dll") || name == "libnw.so" {
             has_nw = true;
-            detected.push(name.to_owned());
+            if !detected.iter().any(|d| d == name) {
+                detected.push(name.to_owned());
+            }
         } else if name.eq_ignore_ascii_case("libcef.dll") || name == "libcef.so" {
             has_cef = true;
-            detected.push(name.to_owned());
+            if !detected.iter().any(|d| d == name) {
+                detected.push(name.to_owned());
+            }
         } else if name.eq_ignore_ascii_case("WebView2Loader.dll") {
             has_webview2 = true;
-            detected.push(name.to_owned());
-        } else if name == "app.asar"
-            && let Some(parent) = file.parent()
-            && electron_resources.is_none()
-        {
-            electron_resources = Some(parent.to_path_buf());
+            if !detected.iter().any(|d| d == name) {
+                detected.push(name.to_owned());
+            }
+        } else if name == "app.asar" && !detected.iter().any(|d| d == "app.asar") {
             detected.push("app.asar".into());
         } else if name == "package.json"
             && file
@@ -418,10 +371,8 @@ fn classify_directory_or_executable(path: &Path, port: Option<u16>) -> Result<In
                 .and_then(|p| p.file_name())
                 .and_then(|s| s.to_str())
                 == Some("app")
-            && let Some(res) = file.parent().and_then(|p| p.parent())
-            && electron_resources.is_none()
+            && !detected.iter().any(|d| d == "app/package.json")
         {
-            electron_resources = Some(res.to_path_buf());
             detected.push("app/package.json".into());
         }
     }
@@ -456,7 +407,8 @@ fn classify_directory_or_executable(path: &Path, port: Option<u16>) -> Result<In
                 ],
                 blockers: Vec::new(),
             },
-            electron_prepare_route(&package, false),
+            electron_prepare_route(&package, false, false),
+            windows_v8_route(layout.pe_arch),
         ];
         return Ok(InspectionReport {
             target_path: path.to_path_buf(),
@@ -547,7 +499,7 @@ pub fn inspect_app(path: &Path, port: Option<u16>) -> Result<InspectionReport> {
             "debugging port must be nonzero",
         ));
     }
-    let canonical = path.canonicalize()?;
+    let canonical = injectra_platform_windows::normalize_canonical_path(path)?;
     if cfg!(target_os = "macos") && canonical.extension().and_then(|s| s.to_str()) == Some("app") {
         let info = injectra_platform_macos::inspect_app(&canonical)?;
         let electron_fw_exe = info
@@ -750,5 +702,34 @@ mod tests {
             ErrorKind::Unsupported
         );
         let _ = fs::remove_dir_all(&native);
+
+        let win_esm = temp_dir("win-esm");
+        let app_dir = win_esm.join("app-1.0.0/resources/app");
+        fs::create_dir_all(&app_dir).unwrap();
+        fs::write(win_esm.join("Update.exe"), b"MZ").unwrap();
+        fs::write(win_esm.join("app-1.0.0/Sample.exe"), b"MZ").unwrap();
+        fs::write(
+            app_dir.join("package.json"),
+            br#"{"name":"esm-app","type":"module","main":"main.mjs"}"#,
+        )
+        .unwrap();
+        fs::write(app_dir.join("main.mjs"), b"export default {};").unwrap();
+        let esm_report = inspect_app(&win_esm, Some(9444)).unwrap();
+        assert_eq!(esm_report.host_family, HostFamily::Electron);
+        assert_eq!(esm_report.executable.file_name().unwrap(), "Sample.exe");
+        assert_eq!(esm_report.package.as_ref().unwrap().entry_kind, "esm");
+        let prep = esm_report
+            .routes
+            .iter()
+            .find(|r| r.route == "prepare-dev")
+            .unwrap();
+        assert!(
+            !prep
+                .blockers
+                .iter()
+                .any(|b| b.contains("Unsupported main entry kind"))
+        );
+        assert!(esm_report.routes.iter().any(|r| r.route == "windows-v8"));
+        let _ = fs::remove_dir_all(&win_esm);
     }
 }

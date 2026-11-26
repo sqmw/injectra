@@ -37,7 +37,11 @@ pub struct PreparationPlan {
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct PreparedArtifact {
     #[serde(default)]
+    pub platform: String,
+    #[serde(default)]
     pub entry_strategy: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub attached_pid: Option<u32>,
     pub version: u32,
     pub id: String,
     pub source_app: PathBuf,

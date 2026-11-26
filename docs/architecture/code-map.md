@@ -14,6 +14,7 @@
 | CDP发现 | [discovery.rs](../../crates/cdp/src/discovery.rs)：本地HTTP发现 | CDP页面 → WebTarget | Electron发现实测 |
 | CDP连接执行 | [session.rs](../../crates/cdp/src/session.rs)、[WebBackend](../../crates/cdp/src/lib.rs) | WebSocket/CDP → WebSession | [传输合同测试](../../crates/cdp/src/session/tests.rs)；Electron实测 |
 | macOS平台 | [platform-macos](../../crates/platform-macos/src/lib.rs)：.app元数据、Framework详情、otool链接与codesign签名摘要 | 路径 → ApplicationInfo；无宿主识别或进程管理 | 只读诊断与Electron.app规划实测 |
+| Windows平台 | [platform-windows](../../crates/platform-windows/src/lib.rs)、[pe.rs](../../crates/platform-windows/src/pe.rs)：目录/版本子目录布局、PE架构与`INTEGRITY`/`ELECTRONASAR`只读解析 | 路径 → WindowsAppLayout；无unsafe、无宿主决策 | PE32/64与版本化目录单测；[多架构机制](host-mechanisms.md) |
 | Web执行契约 | [contracts](../../crates/web/src/contracts.rs)：WebBackend/WebSession/页面上下文 | 只声明页面执行，区别于通用JS环境 | [应用合同测试](../../crates/application/tests/web_contract.rs) |
 | 应用用例 | [application](../../crates/application/src/lib.rs)：targets/apply/remove/list/eval/execute | 注入后端；身份与能力检查，不固定CDP | 同上 |
 | 原生域 | [target](../../crates/native/src/target.rs)、[memory](../../crates/native/src/memory.rs)：原生目标、地址、独立读写端口 | 无Web、无真实后端 | [受控缓冲区测试](../../crates/native/src/memory/tests.rs)、[契约](boundaries.md) |
@@ -64,13 +65,14 @@ QQ外部主题预览：[开发加载器](../../scripts/qq-theme-preview.mjs)复�
 | 能力 | 当前入口 |
 | --- | --- |
 | 页面增量版本与执行 | [application dev](../../crates/application/src/dev/mod.rs)，复用Web契约与共享runtime |
-| 入口布局/委托 | [入口策略](../../crates/preparation/helper/entry.mjs)，明文插入或原加载器主模块委托；[QQ复验](../validation/qq-cli-dev.md) |
-| 通用准备 | [preparation](../../crates/preparation/src/lib.rs)、[平台helper](../../crates/preparation/helper/platform.py)，probe/plan/prepare与派生实例启动；[验收](../validation/cli-dev.md) |
-| CLI dev装配 | [dev](../../crates/cli/src/dev.rs)、[最小未决记录](../../crates/cli/src/dev/journal.rs)；[夹具](../../scripts/preparation-smoke.mjs) |
+| 入口布局/委托 | [入口策略](../../crates/preparation/helper/entry.mjs)，CJS明文插入（`cjs-insert`）、原加载器委托（`main-delegate`）与ESM委托（`esm-delegate`）；[QQ复验](../validation/qq-cli-dev.md) |
+| 通用准备 | [preparation](../../crates/preparation/src/lib.rs)、[prepare.mjs](../../crates/preparation/helper/prepare.mjs)、[copy_tree.mjs](../../crates/preparation/helper/copy_tree.mjs)、[pe_integrity.mjs](../../crates/preparation/helper/pe_integrity.mjs)、[platform.py](../../crates/preparation/helper/platform.py)，macOS与Windows probe/plan/prepare与派生实例启动；[多架构机制](host-mechanisms.md) · [验收](../validation/cli-dev.md) |
+| CLI dev装配 | [dev](../../crates/cli/src/dev.rs)、[最小未决记录](../../crates/cli/src/dev/journal.rs)；[macOS夹具](../../scripts/preparation-smoke.mjs) · [Windows验收脚本](../../scripts/windows-formal-smoke.mjs) |
+| Windows V8附加 | [v8_attach.py](../../crates/frida/helper/v8_attach.py)、[v8_windows.js](../../crates/frida/helper/v8_windows.js)、[target_windows.py](../../crates/frida/helper/target_windows.py)与`session attach-v8` |
 | App引导与认证通信 | [Bootstrap](../../crates/bootstrap/src/lib.rs)，没有浏览器工作台API |
 
 当前范围见[dev模式](dev-mode.md)，旧方案见[历史入口](../implementation/platform-v1.md)。
 
 Windows复验：[逐应用证据](../validation/windows-apps.md)、[交互启动/原生CLI编排](../../scripts/windows-cdp-smoke.py)、[共享ASAR格式](../../crates/preparation/helper/archive.mjs)。Windows Gecko/Hook/资源副本目前是测试工具，不额外宣称正式产品后端支持。
 
-Windows九项复验：[实机与剩余入口](../validation/windows-retries.md)。实验[MSVC V8](../../tests/windows/v8-windows.js)/[受控Node验证](../../tests/windows/v8-fixture.py)、[CEF初始化](../../tests/windows/cef-init.js)、[包内链接复制](../../tests/windows/copy-tree.mjs)分别独立；都不进入公共core或正式适配方案注册。
+Windows九项复验：[实机与剩余入口](../validation/windows-retries.md)。实验[MSVC V8](../../crates/frida/helper/v8_windows.js)/[受控Node验证](../../tests/windows/v8-fixture.py)、[CEF初始化](../../tests/windows/cef-init.js)、[包内链接复制](../../tests/windows/copy-tree.mjs)分别独立；都不进入公共core或正式适配方案注册。

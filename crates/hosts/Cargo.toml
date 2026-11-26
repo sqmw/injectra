@@ -8,5 +8,6 @@ publish.workspace = true
 [dependencies]
 injectra-core.workspace = true
 injectra-platform-macos.workspace = true
+injectra-platform-windows.workspace = true
 serde.workspace = true
 serde_json.workspace = true

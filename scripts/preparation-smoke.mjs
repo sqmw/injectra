@@ -1,4 +1,4 @@
-// Owned Electron directory/ASAR acceptance; all payloads and output stay in external cache.
+// Owned Electron directory/ASAR/ESM acceptance; all payloads and output stay in external cache.
 import assert from 'node:assert/strict';
 import {execFileSync,spawn} from 'node:child_process';
 import {mkdir,readFile,writeFile,unlink,access} from 'node:fs/promises';
@@ -8,20 +8,28 @@ import {binary,root} from './test-env.mjs';
 const fixtures=JSON.parse(process.env.INJECTRA_FIXTURES_FILE?await readFile(process.env.INJECTRA_FIXTURES_FILE,'utf8'):execFileSync(process.execPath,[resolve(root,'scripts/preparation-fixtures.mjs')],{encoding:'utf8'}));
 const sha=async p=>createHash('sha256').update(await readFile(p)).digest('hex');
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
-for(const layout of ['directory','asar','nested_asar']) {
- const original=fixtures[layout]; const originalEntry=layout==='asar'?resolve(original,'Contents/Resources/app.asar'):resolve(original,layout==='nested_asar'?'Contents/Resources/app/nested.asar':'Contents/Resources/app/main.cjs');
+for(const layout of ['directory','asar','nested_asar','esm','esm_asar']) {
+ const isEsm=layout==='esm'||layout==='esm_asar';
+ const original=fixtures[layout];
+ const originalEntry=(layout==='asar'||layout==='esm_asar')
+  ?resolve(original,'Contents/Resources/app.asar')
+  :resolve(original,layout==='nested_asar'?'Contents/Resources/app/nested.asar':isEsm?'Contents/Resources/app/main.mjs':'Contents/Resources/app/main.cjs');
  const before=await sha(originalEntry);
  const artifact=JSON.parse(execFileSync(binary,['prepare','--app',original,'--output',resolve(fixtures.run,'cli-artifacts'),'--data-mode','isolated'],{encoding:'utf8'}));
  assert.equal(await sha(originalEntry),before);
- const prepared=resolve(artifact.app,layout==='asar'?'Contents/Resources/app.asar':layout==='nested_asar'?'Contents/Resources/app/nested.asar':'Contents/Resources/app/main.cjs');
- const preparedHash=await sha(prepared);if(layout==='nested_asar')assert.equal(preparedHash,before,'nested archive must remain unchanged');
+ if(isEsm)assert.equal(artifact.entry_strategy,'esm-delegate');
+ const prepared=resolve(artifact.app,(layout==='asar'||layout==='esm_asar')?'Contents/Resources/app.asar':layout==='nested_asar'?'Contents/Resources/app/nested.asar':isEsm?'Contents/Resources/app/main.mjs':'Contents/Resources/app/main.cjs');
+ const preparedHash=await sha(prepared);
+ if(layout==='nested_asar'||layout==='esm')assert.equal(preparedHash,before,'delegated original entry must remain byte-for-byte unchanged');
  await assert.rejects(access(resolve(artifact.artifact_file,'../preflight-home/profile/entry.json')));
  const source=resolve(fixtures.run,'increments-'+layout);await mkdir(source,{recursive:true});
  const manifest=resolve(source,'manifest.json');
  await writeFile(manifest,JSON.stringify({version:1,id:'injectra.test.dev',js:'page.js',css:'page.css',html:'page.html'}));
  await writeFile(resolve(source,'page.css'),'[data-proof] { color: rgb(1, 2, 3); }');
  await writeFile(resolve(source,'page.html'),'<span data-proof>first</span>');
- const js=stage=>`if (!globalThis.fixture?.is_main || !globalThis.fixture?.process_main || !globalThis.fixture?.filename?.endsWith('/main.cjs') || globalThis.fixture?.relative !== 'relative-module' || !globalThis.fixture?.strict) throw Error('entry semantics');\nif(context.root.textContent!==${JSON.stringify(stage)})throw Error('HTML update');\nif(getComputedStyle(context.root.firstElementChild).color!=='rgb(1, 2, 3)')throw Error('CSS update');\nconsole.log('INJECTRA_PROOF_${stage}');`;
+ const expectedSuffix=isEsm?'/main.mjs':'/main.cjs';
+ const expectedRel=isEsm?'relative-esm-module':'relative-module';
+ const js=stage=>`if (!globalThis.fixture?.is_main || !globalThis.fixture?.process_main || !globalThis.fixture?.filename?.endsWith(${JSON.stringify(expectedSuffix)}) || globalThis.fixture?.relative !== ${JSON.stringify(expectedRel)} || !globalThis.fixture?.strict) throw Error('entry semantics');\nif(context.root.textContent!==${JSON.stringify(stage)})throw Error('HTML update');\nif(getComputedStyle(context.root.firstElementChild).color!=='rgb(1, 2, 3)')throw Error('CSS update');\nconsole.log('INJECTRA_PROOF_${stage}');`;
  await writeFile(resolve(source,'page.js'),js('first'));
  let events=[],stderr='',partial='';
  const child=spawn(binary,['dev','--artifact',artifact.artifact_file,'--bundle',manifest,'--target','1'],{stdio:['ignore','pipe','pipe']});
@@ -54,13 +62,13 @@ for(const layout of ['directory','asar','nested_asar']) {
  console.log(JSON.stringify({layout,status:'passed',artifact:artifact.artifact_file}));
 }
 
-// Explicitly unsupported ESM is rejected before creating an output artifact.
+// Explicitly unsupported bytecode (.jsc) is rejected before creating an output artifact.
 const packageFile=resolve(fixtures.directory,'Contents/Resources/app/package.json');
-const originalPackage=await readFile(packageFile);const esm=resolve(fixtures.directory,'Contents/Resources/app/main.mjs');
+const originalPackage=await readFile(packageFile);const jsc=resolve(fixtures.directory,'Contents/Resources/app/main.jsc');
 const rejected=resolve(fixtures.run,'rejected-output');
 try {
- await writeFile(packageFile,JSON.stringify({name:'unsupported-fixture',main:'main.mjs',type:'module'}));await writeFile(esm,'export default {};');
+ await writeFile(packageFile,JSON.stringify({name:'unsupported-fixture',main:'main.jsc'}));await writeFile(jsc,Buffer.from([0xde,0xad,0xbe,0xef]));
  let error;try{execFileSync(binary,['prepare','--app',fixtures.directory,'--output',rejected,'--data-mode','isolated'],{encoding:'utf8',stdio:'pipe'});}catch(e){error=e;}
- assert.ok(error);assert.match(String(error.stderr),/Unsupported.*ESM/);await assert.rejects(access(rejected));
-}finally{await writeFile(packageFile,originalPackage);await unlink(esm);}
-console.log(JSON.stringify({unsupported:'esm',status:'rejected-before-mutation'}));
+ assert.ok(error);assert.match(String(error.stderr),/Unsupported.*(bytecode|non-JavaScript)/);await assert.rejects(access(rejected));
+}finally{await writeFile(packageFile,originalPackage);await unlink(jsc);}
+console.log(JSON.stringify({unsupported:'jsc-bytecode',status:'rejected-before-mutation'}));

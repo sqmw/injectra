@@ -7,6 +7,6 @@ await mkdir(dependencies, { recursive: true });
 for (const name of ["package.json", "package-lock.json"]) {
   await copyFile(resolve(root, "tests", name), resolve(dependencies, name));
 }
-const result = spawnSync("npm", ["ci", "--prefix", dependencies, "--no-audit", "--no-fund"], { stdio: "inherit" });
+const result = spawnSync("npm", ["ci", "--prefix", dependencies, "--no-audit", "--no-fund"], { stdio: "inherit", shell: process.platform === "win32" });
 if (result.error) throw result.error;
 process.exitCode = result.status ?? 1;
