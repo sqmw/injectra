@@ -55,7 +55,8 @@ impl Revision {
             "{:x}",
             Sha256::digest(serde_json::to_vec(&json!([before, content(&bundle)])).unwrap())
         );
-        let description: Value = serde_json::from_slice(&before)
+        let json_bytes = before.strip_prefix(&[0xEF, 0xBB, 0xBF]).unwrap_or(&before);
+        let description: Value = serde_json::from_slice(json_bytes)
             .map_err(|e| Error::prepare(ErrorKind::InvalidInput, e.to_string()))?;
         let files = json!({"manifest":manifest, "js":description["js"],"css":description["css"],"html":description["html"]});
         let mut program = injectra_web::apply(&bundle)?;
@@ -94,5 +95,32 @@ impl Updates {
     ) -> Result<Value> {
         self.last_attempt = Some(revision.hash.clone());
         crate::execute(backend, target, &revision.program)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn loads_dev_revision_with_utf8_bom_manifest() {
+        let dir = std::env::temp_dir().join(format!(
+            "injectra-dev-bom-{}",
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        ));
+        fs::create_dir_all(&dir).unwrap();
+        let manifest = dir.join("manifest.json");
+        fs::write(
+            &manifest,
+            "\u{feff}{\"version\":1,\"id\":\"dev.bom\",\"js\":\"page.js\"}",
+        )
+        .unwrap();
+        fs::write(dir.join("page.js"), "console.log('bom');").unwrap();
+        let rev = Revision::load(&manifest).unwrap();
+        assert_eq!(rev.files["js"], "page.js");
+        let _ = fs::remove_dir_all(&dir);
     }
 }

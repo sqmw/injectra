@@ -55,6 +55,9 @@ fn read_small(path: &Path) -> Result<String> {
     if text.len() as u64 > LIMIT {
         return Err("bundle file exceeds 1 MiB".into());
     }
+    if let Some(stripped) = text.strip_prefix('\u{feff}') {
+        return Ok(stripped.to_owned());
+    }
     Ok(text)
 }
 
@@ -141,5 +144,24 @@ mod tests {
         .unwrap();
         let version = Bundle::load(&input.manifest).err().unwrap();
         assert!(version.to_string().contains("unsupported bundle version"));
+    }
+
+    #[test]
+    fn loads_utf8_bom_manifest_and_assets() {
+        let input = BundleFixture::new();
+        std::fs::write(
+            &input.manifest,
+            "\u{feff}{\"version\":1,\"id\":\"bom.bundle\",\"html_mode\":\"dom\",\"html\":\"panel.html\"}",
+        )
+        .unwrap();
+        std::fs::write(
+            input.manifest.parent().unwrap().join("panel.html"),
+            "\u{feff}<div id=\"bom-ok\">ok</div>",
+        )
+        .unwrap();
+        let loaded = Bundle::load(&input.manifest).unwrap();
+        assert_eq!(loaded.id, "bom.bundle");
+        assert_eq!(loaded.html_mode, HtmlMode::Dom);
+        assert_eq!(loaded.html, "<div id=\"bom-ok\">ok</div>");
     }
 }

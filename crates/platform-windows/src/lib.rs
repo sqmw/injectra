@@ -66,8 +66,43 @@ fn is_auxiliary_windows_exe(path: &Path) -> bool {
         || lower == "update.exe"
         || lower == "squirrel.exe"
         || lower.ends_with("_executionstub.exe")
+        || lower.ends_with("_proxy.exe")
+        || lower.ends_with("_helper.exe")
+        || lower.ends_with("_launcher.exe")
+        || lower.ends_with("_guard.exe")
+        || lower.ends_with("_downloader.exe")
+        || lower.ends_with("_doctor.exe")
+        || lower.ends_with("cmd.exe")
+        || lower.contains("updater")
         || lower.contains("crashpad")
-        || lower.contains("elevate")
+        || lower.contains("crash_handler")
+        || lower.contains("crash_reporter")
+        || lower.contains("dump_reporter")
+        || lower.contains("elevat")
+}
+
+fn version_sort_key(path: &Path) -> Vec<u64> {
+    let Some(name) = path.file_name().and_then(|s| s.to_str()) else {
+        return Vec::new();
+    };
+    name.split(|c: char| !c.is_ascii_digit())
+        .filter(|part| !part.is_empty())
+        .filter_map(|part| part.parse::<u64>().ok())
+        .collect()
+}
+
+fn file_size_or_zero(path: &Path) -> u64 {
+    fs::metadata(path).map(|meta| meta.len()).unwrap_or(0)
+}
+
+fn stem_matches_dir_name(exe: &Path, dir: &Path) -> bool {
+    match (
+        exe.file_stem().and_then(|s| s.to_str()),
+        dir.file_name().and_then(|s| s.to_str()),
+    ) {
+        (Some(stem), Some(dir_name)) => stem.eq_ignore_ascii_case(dir_name),
+        _ => false,
+    }
 }
 
 fn collect_shallow_files(root: &Path, max_depth: usize, max_entries: usize) -> Vec<PathBuf> {
@@ -106,28 +141,40 @@ fn select_executable(
     files: &[PathBuf],
     resources_dirs: &[PathBuf],
 ) -> Option<PathBuf> {
-    let mut primary_in_component: Vec<&PathBuf> = resources_dirs
-        .iter()
-        .filter_map(|res| res.parent())
-        .flat_map(|comp| {
-            files.iter().filter(move |p| {
-                p.parent() == Some(comp) && is_executable_file(p) && !is_auxiliary_windows_exe(p)
-            })
-        })
-        .collect();
-    primary_in_component.sort();
-    if let Some(found) = primary_in_component.first() {
-        return Some((*found).clone());
+    let mut ranked: Vec<(bool, bool, u64, &PathBuf)> = Vec::new();
+    for (idx, res) in resources_dirs.iter().enumerate() {
+        let Some(comp) = res.parent() else {
+            continue;
+        };
+        let is_newest_component = idx == 0;
+        for file in files.iter().filter(|p| {
+            p.parent() == Some(comp) && is_executable_file(p) && !is_auxiliary_windows_exe(p)
+        }) {
+            ranked.push((
+                stem_matches_dir_name(file, root_dir),
+                is_newest_component,
+                file_size_or_zero(file),
+                file,
+            ));
+        }
     }
-
-    let mut top_primary: Vec<&PathBuf> = files
-        .iter()
-        .filter(|p| {
-            p.parent() == Some(root_dir) && is_executable_file(p) && !is_auxiliary_windows_exe(p)
-        })
-        .collect();
-    top_primary.sort();
-    if let Some(found) = top_primary.first() {
+    for file in files.iter().filter(|p| {
+        p.parent() == Some(root_dir) && is_executable_file(p) && !is_auxiliary_windows_exe(p)
+    }) {
+        ranked.push((
+            stem_matches_dir_name(file, root_dir),
+            false,
+            file_size_or_zero(file),
+            file,
+        ));
+    }
+    ranked.sort_by(|a, b| {
+        b.0.cmp(&a.0)
+            .then_with(|| b.1.cmp(&a.1))
+            .then_with(|| b.2.cmp(&a.2))
+            .then_with(|| a.3.cmp(b.3))
+    });
+    if let Some((_, _, _, found)) = ranked.first() {
         return Some((*found).clone());
     }
 
@@ -186,7 +233,11 @@ pub fn inspect_layout(path: &Path) -> Result<WindowsAppLayout> {
             resources_dirs.push(res.to_path_buf());
         }
     }
-    resources_dirs.sort();
+    resources_dirs.sort_by(|a, b| {
+        let ka = a.parent().map(version_sort_key).unwrap_or_default();
+        let kb = b.parent().map(version_sort_key).unwrap_or_default();
+        kb.cmp(&ka).then_with(|| b.cmp(a))
+    });
 
     let executable = explicit_exe
         .or_else(|| select_executable(&root_dir, &component_files, &resources_dirs))
@@ -263,6 +314,62 @@ mod tests {
         assert_eq!(layout.executable.file_name().unwrap(), "Host.exe");
         assert_eq!(layout.resources_dirs.len(), 1);
         assert_eq!(layout.component_dir.file_name().unwrap(), "app-1.17.0");
+
+        let _ = fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn prefers_newest_version_and_root_named_host_over_helpers() {
+        let dir = std::env::temp_dir().join(format!(
+            "injectra-win-multiver-{}",
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        ));
+        let app_root = dir.join("SampleApp");
+        let old_res = app_root.join("7.5.2.1065").join("resources");
+        let new_res = app_root.join("7.5.4.1068").join("resources");
+        fs::create_dir_all(&old_res).unwrap();
+        fs::create_dir_all(&new_res).unwrap();
+        fs::write(old_res.join("app.asar"), b"asar").unwrap();
+        fs::write(new_res.join("app.asar"), b"asar").unwrap();
+        fs::write(app_root.join("7.5.2.1065").join("apollocmd.exe"), b"MZ").unwrap();
+        fs::write(app_root.join("7.5.4.1068").join("apollocmd.exe"), b"MZ").unwrap();
+        fs::write(
+            app_root.join("7.5.4.1068").join("sampleapp.exe"),
+            vec![b'M', b'Z', 0, 0, 0, 0],
+        )
+        .unwrap();
+        fs::write(app_root.join("sampleapp.exe"), b"MZ").unwrap();
+
+        let layout = inspect_layout(&app_root).unwrap();
+        assert_eq!(layout.executable.file_name().unwrap(), "sampleapp.exe");
+        assert_eq!(layout.component_dir.file_name().unwrap(), "7.5.4.1068");
+
+        let _ = fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn falls_back_to_root_host_when_version_dir_only_has_helpers() {
+        let dir = std::env::temp_dir().join(format!(
+            "injectra-win-root-fallback-{}",
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        ));
+        let app_root = dir.join("StreamApp");
+        let ver_res = app_root.join("8.8.0").join("resources");
+        fs::create_dir_all(&ver_res).unwrap();
+        fs::write(ver_res.join("app.asar"), b"asar").unwrap();
+        fs::write(app_root.join("8.8.0").join("app_shell_updater.exe"), b"MZ").unwrap();
+        fs::write(app_root.join("8.8.0").join("dump_reporter.exe"), b"MZ").unwrap();
+        fs::write(app_root.join("streamapp.exe"), vec![b'M', b'Z', 1, 2]).unwrap();
+        fs::write(app_root.join("streamapp_guard.exe"), vec![b'M', b'Z', 1]).unwrap();
+
+        let layout = inspect_layout(&app_root).unwrap();
+        assert_eq!(layout.executable.file_name().unwrap(), "streamapp.exe");
 
         let _ = fs::remove_dir_all(&dir);
     }
