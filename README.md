@@ -126,7 +126,7 @@ Here `injectra` denotes the compiled executable. The original installation is re
 
 ## External Bundles and ownership
 
-A manifest v1 specifies a unique `id`, `version: 1`, and relative `js` / `html` / `css` resource paths, with at least one non-empty resource. JS is an async function body with optional `context.root` and `context.onCleanup(callback)` support. Paths, file sizes, versions, and IDs are checked before execution. Detailed rules are in the [Bundle contract](docs/dev.md).
+A manifest v1 specifies a unique `id`, `version: 1`, and relative `js` / `html` / `css` resource paths, with at least one non-empty resource, plus optional `html_mode` (`"inner-html"` default or `"dom"` for declarative safe DOM construction via `createElement`/`createElementNS`/`createTextNode` on Trusted Types / strict CSP pages, reporting policy blocks separately as `PolicyBlocked`). JS is an async function body with optional `context.root` and `context.onCleanup(callback)` support. Paths, file sizes, versions, and IDs are checked before execution. Detailed rules are in the [Bundle contract](docs/dev.md) and [dependency evaluation](docs/architecture/dependency-reduction.md).
 
 **Actual plugins and distributable examples live in the separate `web-ui-plugins` repository.** This repository contains the injector, access implementations, shared runtime, and minimal test fixtures; it does not vendor an application plugin catalog. Use an external manifest path rather than copying plugins into Injectra.
 

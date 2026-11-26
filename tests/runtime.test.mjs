@@ -110,3 +110,69 @@ test("list reports managed bundles across empty, active, concurrent and cleaned 
     assert.deepEqual(await list(), { bundles: [] });
   } finally { dom.window.close(); }
 });
+
+test("declarative dom mount works when innerHTML is blocked by Trusted Types and policy errors separate from script errors", async () => {
+  const { dom, window, runtime } = setup();
+  const blockedDesc = Object.getOwnPropertyDescriptor(window.Element.prototype, "innerHTML");
+  Object.defineProperty(window.Element.prototype, "innerHTML", {
+    configurable: true,
+    get: blockedDesc.get,
+    set() {
+      throw new window.TypeError(
+        "Failed to set the 'innerHTML' property on 'Element': This document requires 'TrustedHTML' assignment.",
+      );
+    },
+  });
+  try {
+    // 1. innerHTML path reports structured policy block and cleans up mounted <style>.
+    await assert.rejects(
+      runtime(request, async () => {}),
+      /\[injectra:policy:html-mount\].*TrustedHTML/,
+    );
+    assert.equal(window.document.querySelectorAll("[data-injectra]").length, 0);
+
+    // 2. Declarative DOM path mounts HTML controls, text, and SVG without touching innerHTML.
+    const domReq = {
+      operation: "apply",
+      id: "tt.safe",
+      css: '[data-injectra="tt.safe"] button { color: rgb(1, 2, 3); }',
+      html: "",
+      dom: [
+        { t: "button", a: [["type", "button"], ["data-v", "a&b"]], c: ["<Safe>"] },
+        { t: "svg", ns: "svg", a: [["viewBox", "0 0 10 10"]], c: [{ t: "circle", ns: "svg", a: [["r", "4"]] }] },
+      ],
+    };
+    let cleaned = 0;
+    const applied = await runtime(domReq, async context => {
+      assert.ok(context.root);
+      context.onCleanup(() => { cleaned++; });
+    });
+    assert.equal(applied.status, "applied");
+    assert.equal(window.document.querySelector('[data-injectra="tt.safe"] button').textContent, "<Safe>");
+    assert.equal(
+      window.document.querySelector('[data-injectra="tt.safe"] circle').namespaceURI,
+      "http://www.w3.org/2000/svg",
+    );
+
+    const updated = await runtime({ ...domReq, dom: [{ t: "span", c: ["v2"] }] }, async context => {
+      context.onCleanup(() => { cleaned++; });
+    });
+    assert.equal(updated.status, "updated");
+    assert.equal(cleaned, 1);
+    assert.equal(window.document.querySelectorAll('[data-injectra="tt.safe"]').length, 2);
+
+    // 3. User script failure is NOT mislabeled as a policy block.
+    let scriptErr;
+    try {
+      await runtime(domReq, async () => { throw new Error("user-logic-error"); });
+    } catch (e) {
+      scriptErr = e;
+    }
+    assert.match(String(scriptErr), /user-logic-error/);
+    assert.doesNotMatch(String(scriptErr), /\[injectra:policy:/);
+    assert.equal(window.document.querySelectorAll('[data-injectra="tt.safe"]').length, 0);
+  } finally {
+    Object.defineProperty(window.Element.prototype, "innerHTML", blockedDesc);
+    dom.window.close();
+  }
+});

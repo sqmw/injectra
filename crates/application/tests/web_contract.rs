@@ -191,3 +191,72 @@ fn list_and_eval_reuse_contracts_and_preserve_certainty_without_retry() {
     assert_eq!(err.certainty, Certainty::Unknown);
     assert_eq!(failing.programs.borrow().len(), 1);
 }
+
+#[test]
+fn policy_blocked_mount_error_is_separated_from_script_execution_error() {
+    struct CustomErrBackend {
+        id: BackendId,
+        msg: &'static str,
+    }
+    struct CustomErrSession {
+        target: TargetRef,
+        msg: &'static str,
+    }
+    impl WebSession for CustomErrSession {
+        fn target(&self) -> &TargetRef {
+            &self.target
+        }
+        fn capabilities(&self) -> &[Capability] {
+            &[PAGE_EVALUATE]
+        }
+        fn evaluate_page(&mut self, _source: &str) -> Result<Value> {
+            Err(Error::new(
+                ErrorKind::Execution,
+                Phase::Execute,
+                Certainty::Executed,
+                self.msg,
+            ))
+        }
+    }
+    impl WebBackend for CustomErrBackend {
+        fn id(&self) -> &BackendId {
+            &self.id
+        }
+        fn targets(&self) -> Result<Vec<WebTarget>> {
+            Ok(vec![])
+        }
+        fn connect(&self, target: &TargetRef) -> Result<Box<dyn WebSession>> {
+            Ok(Box::new(CustomErrSession {
+                target: target.clone(),
+                msg: self.msg,
+            }))
+        }
+    }
+
+    let policy_backend = CustomErrBackend {
+        id: BackendId::fresh(),
+        msg: "[injectra:policy:html-mount] TrustedHTML required",
+    };
+    let policy_err = execute(
+        &policy_backend,
+        &TargetRef::new(&policy_backend.id, "p1"),
+        "x",
+    )
+    .unwrap_err();
+    assert_eq!(policy_err.kind, ErrorKind::PolicyBlocked);
+    assert_eq!(policy_err.phase, Phase::Execute);
+    assert_eq!(policy_err.certainty, Certainty::Executed);
+
+    let script_backend = CustomErrBackend {
+        id: BackendId::fresh(),
+        msg: "ReferenceError: foo is not defined",
+    };
+    let script_err = execute(
+        &script_backend,
+        &TargetRef::new(&script_backend.id, "p1"),
+        "x",
+    )
+    .unwrap_err();
+    assert_eq!(script_err.kind, ErrorKind::Execution);
+    assert_eq!(script_err.certainty, Certainty::Executed);
+}

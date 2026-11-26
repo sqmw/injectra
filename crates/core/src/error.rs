@@ -10,6 +10,7 @@ pub enum ErrorKind {
     Io,
     Connection,
     Protocol,
+    PolicyBlocked,
     Execution,
     Timeout,
     ResultEncoding,
@@ -23,6 +24,7 @@ impl ErrorKind {
             Self::Io => "Io",
             Self::Connection => "Connection",
             Self::Protocol => "Protocol",
+            Self::PolicyBlocked => "PolicyBlocked",
             Self::Execution => "Execution",
             Self::Timeout => "Timeout",
             Self::ResultEncoding => "ResultEncoding",
@@ -164,6 +166,7 @@ mod tests {
         assert_eq!(ErrorKind::Io.as_str(), "Io");
         assert_eq!(ErrorKind::Connection.as_str(), "Connection");
         assert_eq!(ErrorKind::Protocol.as_str(), "Protocol");
+        assert_eq!(ErrorKind::PolicyBlocked.as_str(), "PolicyBlocked");
         assert_eq!(ErrorKind::Execution.as_str(), "Execution");
         assert_eq!(ErrorKind::Timeout.as_str(), "Timeout");
         assert_eq!(ErrorKind::ResultEncoding.as_str(), "ResultEncoding");

@@ -84,6 +84,7 @@ fn owned_remote_electron_page_contract() {
                 js: format!(
                     "const b=context.root.querySelector('button');if(b.textContent!=={label:?}||getComputedStyle(b).color!=='rgb(12, 34, 56)')throw Error('page markup/style mismatch');if((globalThis.{counter}??0)!=={stage})throw Error('cleanup order');let n=0;const click=()=>{{b.dataset.count=String(++n)}};b.addEventListener('click',click);context.onCleanup(()=>{{b.removeEventListener('click',click);globalThis.{counter}=(globalThis.{counter}??0)+1}});b.click();if(b.dataset.count!=='1')throw Error('own click callback');"
                 ),
+                html_mode: injectra_web::HtmlMode::InnerHtml,
             };
             let result = backend.evaluate_revision(
                 &target.reference,

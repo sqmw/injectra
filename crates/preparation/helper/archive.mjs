@@ -24,8 +24,21 @@ export async function rebuild(asar,source,dest,replacements){
  for(const [p,b]of replacements)if(hash(asar.extractFile(dest,path.normalize(p)))!==hash(b))throw Error('Inserted bytes mismatch: '+p);
  return hash(asar.getRawHeader(dest).headerString);
 }
+function encodePickleHeader(text){
+ const textBuf=Buffer.from(text,'utf8');
+ const pad=(4-(textBuf.length%4))%4;
+ const stringObjSize=4+textBuf.length+pad;
+ const headerSize=stringObjSize+4;
+ const out=Buffer.alloc(8+headerSize);
+ out.writeUInt32LE(4,0);
+ out.writeUInt32LE(headerSize,4);
+ out.writeUInt32LE(stringObjSize,8);
+ out.writeUInt32LE(textBuf.length,12);
+ textBuf.copy(out,16);
+ return out;
+}
 // Preserve vendor archive payload and opaque metadata; replace only declared owned entries.
-export async function appendRewrite({asar,pickle,source,destination,replacements}) {
+export async function appendRewrite({asar,source,destination,replacements}) {
  const raw=asar.getRawHeader(source),header=JSON.parse(raw.headerString),packedLength=fs.statSync(source).size-8-raw.headerSize;
  if(packedLength<0)throw Error('Invalid ASAR header boundary');
  const appended=[];let offset=packedLength;
@@ -46,8 +59,8 @@ export async function appendRewrite({asar,pickle,source,destination,replacements
   else {node.offset=String(offset);offset+=bytes.length;appended.push(bytes);}
   Object.defineProperty(parent.files,leaf,{value:node,enumerable:true,writable:true,configurable:true});
  }
- const text=JSON.stringify(header),head=pickle.createEmpty();head.writeString(text);const headBytes=head.toBuffer(),size=pickle.createEmpty();size.writeUInt32(headBytes.length);
- const out=fs.createWriteStream(destination);out.write(size.toBuffer());out.write(headBytes);
+ const text=JSON.stringify(header);
+ const out=fs.createWriteStream(destination);out.write(encodePickleHeader(text));
  await pipeline(fs.createReadStream(source,{start:8+raw.headerSize}),out,{end:false});for(const bytes of appended)out.write(bytes);out.end();await finished(out);asar.uncache(destination);
  for(const [name,bytes]of replacements){if(hash(asar.extractFile(destination,path.normalize(name)))!==hash(bytes))throw Error('Appended replacement mismatch');}
  return hash(text);

@@ -8,9 +8,9 @@
 | 能力 | 源码入口与职责 | 上下游边界 | 测试与专题 |
 | --- | --- | --- | --- |
 | 核心契约 | [core](../../crates/core/src/lib.rs)：BackendId/TargetRef/Capability/Error | 无执行域/JSON依赖；能力检查、确定性标识与错误原因链 | 身份/错误测试；[架构](boundaries.md) |
-| Web载荷加载 | [bundle.rs](../../crates/web/src/bundle.rs)：版本、路径和资源限制 | 本地manifest → Bundle | 内联loader测试、[临时夹具](../../tests/support/bundle.rs)；[使用](../dev.md) |
-| 程序生成 | [web](../../crates/web/src/lib.rs)：共享runtime嵌入、数据序列化、list/eval封装 | Bundle/表达式 → JS程序 | Electron端到端测试 |
-| 共享注入执行 | [runtime.js](../../web/runtime.js)：拥有节点、清理、list注册表查询、重复/并发注入 | 单次注入、只读查询及既有辅助行为；无平台判断或导航恢复 | [runtime.test.mjs](../../tests/runtime.test.mjs) |
+| Web载荷加载 | [bundle.rs](../../crates/web/src/bundle.rs)、[dom.rs](../../crates/web/src/dom.rs)：版本、路径、资源限制与纯Rust安全DOM编译 | 本地manifest → Bundle / DOM树 | 内联loader/DOM测试、[临时夹具](../../tests/support/bundle.rs)；[使用](../dev.md) |
+| 程序生成 | [web](../../crates/web/src/lib.rs)：共享runtime嵌入、数据序列化、list/eval封装 | Bundle/表达式 → JS程序 | Electron端到端与Trusted Types实测 |
+| 共享注入执行 | [runtime.js](../../web/runtime.js)：拥有节点、清理、声明式安全DOM挂载、策略错误标记、list注册表查询、重复/并发注入 | 单次注入、只读查询及既有辅助行为；无平台判断或导航恢复 | [runtime.test.mjs](../../tests/runtime.test.mjs) |
 | CDP发现 | [discovery.rs](../../crates/cdp/src/discovery.rs)：本地HTTP发现 | CDP页面 → WebTarget | Electron发现实测 |
 | CDP连接执行 | [session.rs](../../crates/cdp/src/session.rs)、[WebBackend](../../crates/cdp/src/lib.rs) | WebSocket/CDP → WebSession | [传输合同测试](../../crates/cdp/src/session/tests.rs)；Electron实测 |
 | macOS平台 | [platform-macos](../../crates/platform-macos/src/lib.rs)：.app元数据、Framework详情、otool链接与codesign签名摘要 | 路径 → ApplicationInfo；无宿主识别或进程管理 | 只读诊断与Electron.app规划实测 |
@@ -66,7 +66,7 @@ QQ外部主题预览：[开发加载器](../../scripts/qq-theme-preview.mjs)复�
 | --- | --- |
 | 页面增量版本与执行 | [application dev](../../crates/application/src/dev/mod.rs)，复用Web契约与共享runtime |
 | 入口布局/委托 | [入口策略](../../crates/preparation/helper/entry.mjs)，CJS明文插入（`cjs-insert`）、原加载器委托（`main-delegate`）与ESM委托（`esm-delegate`）；[QQ复验](../validation/qq-cli-dev.md) |
-| 通用准备 | [preparation](../../crates/preparation/src/lib.rs)、[prepare.mjs](../../crates/preparation/helper/prepare.mjs)、[copy_tree.mjs](../../crates/preparation/helper/copy_tree.mjs)、[pe_integrity.mjs](../../crates/preparation/helper/pe_integrity.mjs)、[platform.py](../../crates/preparation/helper/platform.py)，macOS与Windows probe/plan/prepare与派生实例启动；[多架构机制](host-mechanisms.md) · [验收](../validation/cli-dev.md) |
+| 通用准备 | [preparation](../../crates/preparation/src/lib.rs)、[asar.rs](../../crates/preparation/src/asar.rs)、[prepare.mjs](../../crates/preparation/helper/prepare.mjs)、[copy_tree.mjs](../../crates/preparation/helper/copy_tree.mjs)、[pe_integrity.mjs](../../crates/preparation/helper/pe_integrity.mjs)、[platform.py](../../crates/preparation/helper/platform.py)，macOS与Windows probe/plan/prepare与派生实例启动；[多架构机制](host-mechanisms.md) · [依赖减重](dependency-reduction.md) · [验收](../validation/cli-dev.md) |
 | CLI dev装配 | [dev](../../crates/cli/src/dev.rs)、[最小未决记录](../../crates/cli/src/dev/journal.rs)；[macOS夹具](../../scripts/preparation-smoke.mjs) · [Windows验收脚本](../../scripts/windows-formal-smoke.mjs) |
 | Windows V8附加 | [v8_attach.py](../../crates/frida/helper/v8_attach.py)、[v8_windows.js](../../crates/frida/helper/v8_windows.js)、[target_windows.py](../../crates/frida/helper/target_windows.py)与`session attach-v8` |
 | App引导与认证通信 | [Bootstrap](../../crates/bootstrap/src/lib.rs)，没有浏览器工作台API |

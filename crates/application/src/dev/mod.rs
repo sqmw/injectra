@@ -13,7 +13,13 @@ pub struct Revision {
     pub js_lines: usize,
 }
 fn content(bundle: &Bundle) -> Value {
-    json!([bundle.id, bundle.js, bundle.css, bundle.html])
+    json!([
+        bundle.id,
+        bundle.js,
+        bundle.css,
+        bundle.html,
+        bundle.html_mode
+    ])
 }
 impl Revision {
     pub fn source_location(&self, error: &str) -> Option<Value> {

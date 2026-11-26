@@ -35,8 +35,8 @@ flowchart TD
 
 | 模块 | 职责与边界 |
 | --- | --- |
-| core | BackendId、TargetRef、Capability、错误类别/阶段/执行确定性；无项目crate依赖、无serde_json，无页面/进程操作方法 |
-| web | WebTarget、PageContext、WebBackend/WebSession；manifest v1加载与共享程序生成；JSON返回值只属于Web域 |
+| core | BackendId、TargetRef、Capability、错误类别（含`PolicyBlocked`策略拦截分离）/阶段/执行确定性；无项目crate依赖、无serde_json，无页面/进程操作方法 |
+| web | WebTarget、PageContext、WebBackend/WebSession；manifest v1（含`html_mode: inner-html|dom`）加载、纯Rust安全DOM编译与共享程序生成；JSON返回值只属于Web域 |
 | application | targets/apply/remove/execute库用例；后端参数注入，连接前检查实例身份，执行前核对会话目标与页面能力 |
 | cdp | 既有CDP Web后端；回环端口、精确页面、CDP响应/异常映射；不包含应用名称、载荷加载或原生方法 |
 | frida | 可选助手通信、身份核对、截止、macOS `session_ops` 与 Windows MSVC V8 `v8_attach`；只依赖core，无Web/Node/应用业务假设 |

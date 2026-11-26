@@ -125,7 +125,7 @@ injectra dev --artifact "$ARTIFACT_JSON" --bundle "$BUNDLE_MANIFEST"
 
 ## 外部 Bundle 与插件归属
 
-manifest v1 包含 `version: 1`、唯一 `id` 和相对 `js` / `html` / `css` 资源路径，至少一项资源非空。JS 以 async 函数体执行，支持可选 `context.root` 与 `context.onCleanup(callback)`。执行前检查路径、文件大小、版本和 ID，详见[Bundle 合同](docs/dev.md)。
+manifest v1 包含 `version: 1`、唯一 `id` 和相对 `js` / `html` / `css` 资源路径（至少一项资源非空），并支持可选 `html_mode`（默认 `"inner-html"`；在启用 Trusted Types / 严格 CSP 的页面可显式设为 `"dom"`，由纯 Rust 编译为安全 DOM 节点树并以 `createElement`/`createElementNS`/`createTextNode` 挂载，策略拦截会以 `PolicyBlocked` 与用户脚本异常分离报告）。JS 以 async 函数体执行，支持可选 `context.root` 与 `context.onCleanup(callback)`。执行前检查路径、文件大小、版本和 ID，详见[Bundle 合同](docs/dev.md)与[依赖减重评估](docs/architecture/dependency-reduction.md)。
 
 **所有实际插件和可分发示例归独立 `web-ui-plugins` 仓库。** 本库只保存注入器、接入实现、共享 runtime 和最小测试夹具，不内置应用插件目录；请传入外部 manifest，不复制插件进 Injectra。
 

@@ -11,15 +11,21 @@
 {
   "id": "M-002",
   "name": "通用底层注入引擎与 CLI 底座夯实",
-  "status": "in_progress",
+  "status": "done",
   "goal": "将 Injectra 打磨为人类开发者与各类 LLM Agent 可直接复用的通用底层注入引擎／SDK 与一等公民 CLI，消除正式能力与外部实验脚本之间的断层。",
   "scope": "按 D-015 四阶段渐进推进：CLI 机器契约与只读观测（T-083）、跨平台应用引擎诊断与非 CDP 会话收敛（T-084）、主流 Web 桌面架构调研与跨平台正式 crate 沉淀（T-085）、共享 Web Runtime 策略容错与依赖减重（T-086）。不纳入 iframe 子帧、重加壳/原生二进制补丁、内置 MCP Server、日常托管 runner 或图形工作台。",
   "acceptance": "所有成员任务均完成或获准收口：CLI 进程边界完整保留结构化错误与确定性且提供只读状态/观测原语；只读应用诊断覆盖主流 Web 桌面架构且非 CDP 会话接入不再依赖手拼外部脚本；已验证的 Windows 通用能力与 Electron ESM 入口按正规分层迁入正式 workspace 并通过对应平台实测；明确记录不支持边界与遗留限制，无应用品牌补丁侵入核心。",
-  "acceptance_evidence": []
+  "closure_ref": "archive/T-086.md#m-002",
+  "acceptance_evidence": [
+    "阶段 1（T-083，64e00bb）：CLI 全局 --machine 单行 JSON 信封与 0/2/3/4/5 确定性退出码、无锁 list 与受控只读 eval 原语在 macOS Electron 45.2.1 实机通过。",
+    "阶段 2（T-084，aa8e194）：跨宿主只读 inspect-app、通用 launch-plan（Electron/NW.js/CEF/WKWebView/WebView2 与未知目标 Unsupported）及 session launch/register/verify 收敛在 Electron/WKWebView/Gadget/CEF/NW.js 实机通过。",
+    "阶段 3（T-085，ad76b92）：产出多架构调研基线 host-mechanisms.md；新增无 unsafe 的 injectra-platform-windows，重构 injectra-preparation 支持 macOS 与 Windows（含 Electron ESM esm-delegate、Junction、PE INTEGRITY）并正式化 session attach-v8，在 macOS 5 布局与 Lenovo Windows（win-formal-0XELcm）全部实机通过。",
+    "阶段 4（T-086）：唯一 web/runtime.js 落地声明式安全 DOM 挂载（html_mode=\"dom\"）与 ErrorKind::PolicyBlocked 策略错误分离并通过真实 Chromium Trusted Types（trusted-types 'none'）实机验收；落地纯 Rust asar.rs 与依赖减重评估 dependency-reduction.md 并通过 macOS 与 Lenovo Windows 跨平台全绿验证。"
+  ]
 }
 ```
 
-[规划与架构边界](plans/milestone-2-core-engine.md) · [D-015](DECISIONS.md#d-015)。
+[规划与架构边界](plans/milestone-2-core-engine.md) · [D-015](DECISIONS.md#d-015) · [里程碑收口](archive/T-086.md#m-002)。
 
 ## 当前执行
 
@@ -113,18 +119,23 @@
   "name": "共享 Web Runtime 策略容错与依赖减重",
   "version": "v1",
   "mode": "lightweight",
-  "status": "pending",
+  "status": "done",
   "priority": "P2",
   "milestone": "M-002",
   "goal": "减少共享 Web Runtime 在 Trusted Types/严格 CSP 页面上的挂载摩擦，并评估准备器核心去重型外部运行时依赖。",
   "scope": "在唯一 web/runtime.js 中设计显式、可控的安全 DOM 挂载模式并将策略拦截与脚本运行异常分离报告；评估并按收益用纯 Rust 替换部分 Node ASAR/解析依赖；保持既有 manifest v1 与单文件运行语义。",
   "acceptance": "受限 Trusted Types 测试页面可通过声明式安全路径完成挂载、更新与清理且错误分类清晰；依赖减重方案给出明确收益/边界并在实施部分通过跨平台测试。",
-  "execution_ref": "",
-  "acceptance_evidence": []
+  "execution_ref": "archive/T-086.md#t-086",
+  "acceptance_evidence": [
+    "crates/core 新增 ErrorKind::PolicyBlocked，crates/application 统一分离策略拦截与用户脚本 Execution 异常；crates/web 新增纯 Rust 声明式 DOM 编译器 dom.rs 与 manifest v1 可选 html_mode=\"dom\"（默认保持 inner-html）；唯一 web/runtime.js 新增无 innerHTML 沉槽的声明式 DOM 挂载与策略错误标记。",
+    "crates/preparation 新增纯 Rust asar.rs（read_header/extract_file/append_rewrite，零新增 Cargo 依赖）并去除 archive.mjs/prepare.mjs 对 chromium-pickle-js 的运行期依赖；产出 docs/architecture/dependency-reduction.md 给出各外部依赖的收益与保留边界。",
+    "macOS 全量回归与真实 Electron 45.2.1 Trusted Types 烟测（run electron-aRIFgF，16/16 通过：require-trusted-types-for 'script'; trusted-types 'none' 页面验证 PolicyBlocked 0 残留与 html_mode=\"dom\" 挂载/交互/SVG/更新/清理）全部通过。",
+    "Lenovo Windows（DESKTOP-F4B6E6C，rustc 1.96.1 MSVC，快照 becfb75）原生构建、clippy -D warnings、cargo test（53 passed / 0 failed / 4 ignored）、Node 12/12 与 architecture-check 全绿。"
+  ]
 }
 ```
 
-关联规划：[M-002 阶段 4](plans/milestone-2-core-engine.md) · [D-015](DECISIONS.md#d-015)。
+关联规划：[M-002 阶段 4](plans/milestone-2-core-engine.md) · [D-015](DECISIONS.md#d-015) · [执行归档](archive/T-086.md#t-086)。
 
 <a id="t-082"></a>
 ### T-082 · 建立第二个里程碑与核心演进路线文档

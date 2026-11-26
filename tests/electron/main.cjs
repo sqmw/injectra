@@ -13,5 +13,12 @@ app.whenReady().then(async () => {
     webPreferences: { contextIsolation: true, nodeIntegration: false, sandbox: true },
   });
   await window.loadFile(path.join(__dirname, "index.html"));
+  const trustedTypesWindow = new BrowserWindow({
+    show: false,
+    width: 600,
+    height: 400,
+    webPreferences: { contextIsolation: true, nodeIntegration: false, sandbox: true },
+  });
+  await trustedTypesWindow.loadFile(path.join(__dirname, "trusted-types.html"));
 });
 process.on("SIGTERM", () => app.quit());

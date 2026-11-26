@@ -38,7 +38,20 @@ pub fn execute(backend: &dyn WebBackend, target: &TargetRef, program: &str) -> R
         ));
     }
     require_capability(session.capabilities(), PAGE_EVALUATE)?;
-    session.evaluate_page(program)
+    session.evaluate_page(program).map_err(|error| {
+        let message = error.to_string();
+        if error.kind == ErrorKind::Execution && message.contains("[injectra:policy:") {
+            Error::new(
+                ErrorKind::PolicyBlocked,
+                error.phase,
+                error.certainty,
+                message,
+            )
+            .caused_by(error)
+        } else {
+            error
+        }
+    })
 }
 
 pub mod dev;

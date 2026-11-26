@@ -1,8 +1,16 @@
 use injectra_core::{Error, ErrorKind, Result};
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use std::{fs, path::Path};
 
 const LIMIT: u64 = 1024 * 1024;
+
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Deserialize, Serialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum HtmlMode {
+    #[default]
+    InnerHtml,
+    Dom,
+}
 
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -12,6 +20,8 @@ struct Manifest {
     css: Option<String>,
     html: Option<String>,
     js: Option<String>,
+    #[serde(default)]
+    html_mode: HtmlMode,
 }
 
 pub struct Bundle {
@@ -19,6 +29,7 @@ pub struct Bundle {
     pub css: String,
     pub html: String,
     pub js: String,
+    pub html_mode: HtmlMode,
 }
 
 pub fn validate_id(id: &str) -> Result<()> {
@@ -77,6 +88,7 @@ impl Bundle {
             css: read(manifest.css)?,
             html: read(manifest.html)?,
             js: read(manifest.js)?,
+            html_mode: manifest.html_mode,
         };
         if bundle.css.is_empty() && bundle.html.is_empty() && bundle.js.is_empty() {
             return Err("bundle must contain CSS, HTML or JavaScript".into());

@@ -75,6 +75,32 @@ fn webview2_cdp_plan(executable: PathBuf, port: u16) -> LaunchPlan {
     }
 }
 
+fn find_subslice_bmh(haystack: &[u8], needle: &[u8]) -> bool {
+    let m = needle.len();
+    if m == 0 {
+        return true;
+    }
+    if haystack.len() < m {
+        return false;
+    }
+    let last = m - 1;
+    let last_byte = needle[last];
+    let mut shift = [m; 256];
+    for (idx, &b) in needle[..last].iter().enumerate() {
+        shift[usize::from(b)] = last - idx;
+    }
+    let mut i = 0usize;
+    let limit = haystack.len() - m;
+    while i <= limit {
+        let end_byte = haystack[i + last];
+        if end_byte == last_byte && &haystack[i..i + m] == needle {
+            return true;
+        }
+        i += shift[usize::from(end_byte)];
+    }
+    false
+}
+
 fn scan_binary_markers(path: &Path, markers: &[&[u8]]) -> Vec<bool> {
     let mut found = vec![false; markers.len()];
     let Ok(mut file) = File::open(path) else {
@@ -91,7 +117,7 @@ fn scan_binary_markers(path: &Path, markers: &[&[u8]]) -> Vec<bool> {
         let valid = carry + n;
         let window = &buf[..valid];
         for (idx, marker) in markers.iter().enumerate() {
-            if !found[idx] && window.windows(marker.len()).any(|w| w == *marker) {
+            if !found[idx] && find_subslice_bmh(window, marker) {
                 found[idx] = true;
             }
         }

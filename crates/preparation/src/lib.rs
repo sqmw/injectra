@@ -13,6 +13,7 @@ use std::{
     process::{Command, Stdio},
 };
 use uuid::Uuid;
+pub mod asar;
 mod launch;
 mod model;
 
@@ -158,11 +159,7 @@ fn run<T: DeserializeOwned>(request: Value) -> Result<T> {
         .join("node_modules/@electron/asar/package.json")
         .is_file()
         && tools.join("node_modules/acorn/package.json").is_file();
-    let win_ok = !cfg!(windows)
-        || (tools
-            .join("node_modules/chromium-pickle-js/package.json")
-            .is_file()
-            && tools.join("node_modules/resedit/package.json").is_file());
+    let win_ok = !cfg!(windows) || tools.join("node_modules/resedit/package.json").is_file();
     if !base_ok || !win_ok {
         return Err(Error::prepare(
             ErrorKind::Unsupported,

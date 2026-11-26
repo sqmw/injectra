@@ -269,14 +269,13 @@ try{
    return true;
   });
   const replacements=buildReplacements(p,input.config);
-  const pickle=tools('chromium-pickle-js');
   const pe=await import(pathToFileURL(tools.resolve('resedit')).href);
   const nativeChanges=[];
   if(p.public.layout==='asar'){
    const archive=path.join(dest,p.public.package_root);
    const oldHash=hash(asar.getRawHeader(archive).headerString);
    const rebuilt=path.join(path.dirname(dest),'rebuilt.asar');
-   const nextHash=await appendRewrite({asar,pickle,source:archive,destination:rebuilt,replacements});
+   const nextHash=await appendRewrite({asar,source:archive,destination:rebuilt,replacements});
    await fsp.copyFile(rebuilt,archive);
    if(fs.existsSync(rebuilt+'.unpacked'))await fsp.cp(rebuilt+'.unpacked',archive+'.unpacked',{recursive:true,force:true,dereference:false});
    const destComponent=path.dirname(path.dirname(archive));

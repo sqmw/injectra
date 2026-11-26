@@ -41,7 +41,7 @@ Electron官方列出了[remote-debugging-port](https://www.electronjs.org/docs/l
 所有实际插件和可复用载荷统一在独立插件库（独立 web-ui-plugins 仓库内 README.md），Injectra不维护主题/应用插件副本。通过`BUNDLE_MANIFEST`或CLI的`--bundle`显式传入所选文件；不把插件库路径写入构建依赖。核心测试只生成仓库外临时Bundle，不读取插件库。
 
 
-外部插件manifest包含`version:1`、唯一`id`和可选`css`/`html`/`js`相对文件名，至少一个非空。ID限1–80个ASCII字母、数字、点、下划线或连字符；未知字段、未知版本、绝对资源路径、解析后逃出manifest目录的路径/符号链接均拒绝。单文件上限1 MiB。
+外部插件manifest包含`version:1`、唯一`id`、可选`css`/`html`/`js`相对文件名（至少一个非空）以及可选`html_mode`（`"inner-html"`默认，或`"dom"`声明式安全DOM树模式，供启用Trusted Types / 严格CSP的页面绕过`innerHTML`沉槽；`"dom"`模式在准备期由纯Rust静态编译HTML片段并拒绝`<script>`与`on*`内联事件属性，页面侧仅以`createElement`/`createElementNS`/`createTextNode`挂载；若`inner-html`触发宿主策略拦截，`--machine`返回`ErrorKind::PolicyBlocked`与用户脚本`Execution`异常区分）。ID限1–80个ASCII字母、数字、点、下划线或连字符；未知字段、未知版本、绝对资源路径、解析后逃出manifest目录的路径/符号链接均拒绝。单文件上限1 MiB。
 
 JS文件作为async函数体执行，可使用`context.root`访问本bundle插入的HTML容器；没有HTML时root为null。可选的既有接口`context.onCleanup(callback)`由载荷作者登记清理，回调按逆序执行；需要使用时先登记，再执行对应副作用，不要求所有脚本可撤销。HTML中的script标签不作为脚本加载机制，行为代码放JS文件；HTML事件属性等仍属于受信任代码，不进行净化。
 

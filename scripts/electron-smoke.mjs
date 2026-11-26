@@ -62,16 +62,19 @@ async function evaluate(expression) {
 
 try {
   let page;
+  let ttPage;
   for (let attempt = 0; attempt < 100; attempt++) {
     if (child.exitCode !== null) throw Error(`Electron exited: ${log}`);
     try {
       const response = await fetch(`http://127.0.0.1:${port}/json/list`, { signal: AbortSignal.timeout(300) });
-      page = (await response.json()).find(page => page.type === "page" && page.title === "Injectra · Electron fixture");
-      if (page) break;
+      const list = await response.json();
+      page = list.find(p => p.type === "page" && p.title === "Injectra · Electron fixture");
+      ttPage = list.find(p => p.type === "page" && p.title === "Injectra · Trusted Types fixture");
+      if (page && ttPage) break;
     } catch {}
     await delay(100);
   }
-  assert.ok(page, `fixture not ready: ${log}`);
+  assert.ok(page && ttPage, `fixtures not ready: ${log}`);
   const discovered = cli(["targets", "--port", String(port)]);
   assert.ok(discovered.some(target => target.id === page.id));
   for (const target of discovered) assert.deepEqual(Object.keys(target).sort(), ["id", "title", "url"]);
@@ -144,6 +147,38 @@ try {
   assert.equal(await evaluate('document.querySelectorAll("[data-injectra]").length'), 0);
   assert.equal(await evaluate('document.body.hasAttribute("data-test")'), false);
 
+  // Real Chromium Trusted Types ("require-trusted-types-for 'script'; trusted-types 'none'") verification:
+  const ttFlags = ["--port", String(port), "--target", ttPage.id];
+  const ttInnerBlocked = cliMachine(["apply", ...ttFlags, "--bundle", manifest], 4);
+  assert.equal(ttInnerBlocked.ok, false);
+  assert.equal(ttInnerBlocked.error.kind, "PolicyBlocked");
+  assert.equal(ttInnerBlocked.error.phase, "Execute");
+  assert.equal(ttInnerBlocked.error.certainty, "Executed");
+  assert.deepEqual(cli(["list", ...ttFlags]), { bundles: [] });
+
+  const ttDomManifest = resolve(run, "tt-dom.json");
+  await writeFile(resolve(run, "tt-dom.css"), '[data-injectra="injectra.test.tt.dom"] button { color: rgb(11, 22, 33); }');
+  await writeFile(ttDomManifest, JSON.stringify({
+    version: 1,
+    id: "injectra.test.tt.dom",
+    html_mode: "dom",
+    css: "tt-dom.css",
+    html: "tt-dom.html",
+    js: "tt-dom.js",
+  }));
+  await writeFile(resolve(run, "tt-dom.html"), '<button type="button" data-safe="yes">&lt;Safe&gt;</button><svg viewBox="0 0 10 10"><circle r="4"/></svg>');
+  await writeFile(resolve(run, "tt-dom.js"), 'const b=context.root.querySelector("button");const click=()=>document.documentElement.dataset.ttClicked="1";b.addEventListener("click",click);context.onCleanup(()=>{b.removeEventListener("click",click);delete document.documentElement.dataset.ttClicked;});');
+  assert.equal(cli(["apply", ...ttFlags, "--bundle", ttDomManifest]).status, "applied");
+  assert.equal(cli(["eval", ...ttFlags, "--expression", 'document.querySelector("[data-injectra] button").textContent']), "<Safe>");
+  assert.equal(cli(["eval", ...ttFlags, "--expression", 'getComputedStyle(document.querySelector("[data-injectra] button")).color']), "rgb(11, 22, 33)");
+  assert.equal(cli(["eval", ...ttFlags, "--expression", 'document.querySelector("[data-injectra] circle").namespaceURI']), "http://www.w3.org/2000/svg");
+  assert.equal(cli(["eval", ...ttFlags, "--expression", '(() => { document.querySelector("[data-injectra] button").click(); return document.documentElement.dataset.ttClicked; })()']), "1");
+  assert.equal(cli(["apply", ...ttFlags, "--bundle", ttDomManifest]).status, "updated");
+  assert.equal(cli(["eval", ...ttFlags, "--expression", 'document.querySelectorAll("[data-injectra]").length']), 2);
+  assert.equal(cli(["remove", ...ttFlags, "--id", "injectra.test.tt.dom"]).status, "removed");
+  assert.deepEqual(cli(["list", ...ttFlags]), { bundles: [] });
+  assert.equal(cli(["eval", ...ttFlags, "--expression", 'document.querySelectorAll("[data-injectra]").length']), 0);
+
   const appPath = resolve(electron, "../../..");
   const plan = cli(["launch-plan", "--app", appPath, "--port", String(port)]);
   assert.equal(plan.executable, electron);
@@ -171,7 +206,7 @@ try {
 
   const version = await fetch(`http://127.0.0.1:${port}/json/version`).then(r => r.json());
   const evidence = { passed: true, platform: process.platform, arch: process.arch, electron: requireTool("electron/package.json").version,
-    browser: version.Browser, checks: ["discovery", "CSS computed style", "HTML mount", "JS interaction", "replace without duplicates", "cleanup", "absent removal", "missing target rejection", "script failure cleanup", "macOS launch plan", "bundle list", "page eval", "machine contract", "inspect-app"] };
+    browser: version.Browser, checks: ["discovery", "CSS computed style", "HTML mount", "JS interaction", "replace without duplicates", "cleanup", "absent removal", "missing target rejection", "script failure cleanup", "macOS launch plan", "bundle list", "page eval", "machine contract", "inspect-app", "Trusted Types PolicyBlocked separation", "Trusted Types declarative DOM mount"] };
   await writeFile(resolve(run, "result.json"), JSON.stringify(evidence, null, 2));
   console.log(JSON.stringify({ ...evidence, evidenceDirectory: run }, null, 2));
 } finally {
