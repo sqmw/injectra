@@ -16,6 +16,7 @@ T-034继续：[启动观察器与自测](validation/startup-observer.md) · [阿
 | 要核对什么 | 权威入口 |
 | --- | --- |
 | 当前各应用、平台、内核及路线结果 | [兼容性总表](compatibility/current-matrix.md) |
+| M-003 代表商业宿主正式 CLI 实证回测（T-088） | [商业宿主正式 CLI 回测](validation/m3-commercial-cli.md) |
 | 长期架构重构的产品回归与独立构建 | [架构验收](validation/architecture-foundation.md) |
 | MVP用户验收和各批次原始摘要 | [历史验收正文](archive/validation-history.md) |
 | 版本与源码对应 | [交付映射](releases.md) |

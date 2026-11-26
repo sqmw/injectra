@@ -11,7 +11,7 @@
 {
   "id": "M-003",
   "name": "商业宿主正式 CLI 实证闭环与准备器减重收口",
-  "status": "pending",
+  "status": "in_progress",
   "goal": "将 M-002 已落地的通用底层注入引擎与正式 CLI 原语在代表性商业桌面宿主上完成端到端实证闭环，刷新全项目兼容性总表导航，并完成准备器纯 Rust ASAR 统一切换以移除 @electron/asar 依赖树。",
   "scope": "按 D-016 三阶段渐进推进：商业宿主 Trusted Types 与正式 CLI 真机回测（T-088）、兼容性总表刷新与正式 CLI 证据索引收口（T-089）、准备器纯 Rust ASAR 统一切换与 npm 依赖收口（T-090）。回测仅限受控隔离副本或显式隔离会话，不改写历史任务原证据；iframe/webview 子帧按需触发暂不纳入，重加壳/二进制补丁与上层产品/MCP/Agent 编排保持在范围外。",
   "acceptance": "所有成员任务均完成或获准收口：代表性商业宿主全程仅用 injectra 正式 CLI 完成诊断、接入、挂载/热更新、观测与清理（零实验脚本介入）；docs/compatibility/current-matrix.md 准确索引正式 CLI 能力与实测边界且不篡改历史行；setup-preparation 移除 @electron/asar 并通过 macOS 与 Windows 全布局实机回归，无应用品牌特判侵入核心。",
@@ -55,18 +55,23 @@
   "name": "商业宿主 Trusted Types 与正式 CLI 真机回测",
   "version": "v1",
   "mode": "staged",
-  "status": "pending",
+  "status": "done",
   "priority": "P0",
   "milestone": "M-003",
   "goal": "在真实商业桌面宿主上验证 M-002 正式 CLI 新能力（html_mode=\"dom\"、跨平台正式 prepare/dev 与 session attach-v8）可独立闭环，消除受控夹具与野生打包环境之间的实证缺口。",
   "scope": "在 macOS 与 Lenovo Windows 仓库外隔离副本或显式受控会话中，选取严格 Trusted Types 宿主（如 Cursor/Devin/Quark）、Electron ESM+PE INTEGRITY 宿主（如 Folo）、无调试端口 Windows GUI Electron 宿主（如 QQ/WorkBuddy）及架构边界样本，全程仅用 injectra 正式 CLI 执行诊断、接入、挂载/热更新、list/eval 与清理；若暴露通用宿主时序或路径缺陷则按正规分层修复，不写品牌硬编码、不触碰用户日常实例。",
   "acceptance": "四类代表边界均有可复核的正式 CLI 端到端运行记录与结构化证据（零 tests/windows 实验脚本或跨机测试控制端介入）；Trusted Types 样本验证 inner-html 精确报 PolicyBlocked 且 html_mode=\"dom\" 挂载清理成功；如有通用修复则双端 make check 全绿。",
-  "execution_ref": "",
-  "acceptance_evidence": []
+  "execution_ref": "archive/T-088.md#t-088",
+  "acceptance_evidence": [
+    "严格 Trusted Types 商业宿主双端正式 CLI 回测全部通过：macOS Devin.app（Electron 42.2.0，run macos-devin-1795718507）、Windows Devin 与 Windows Quark（run tt-20261127-024224）在默认 inner-html 下精确返回退出码 4（kind=PolicyBlocked, certainty=Executed, list=[], nodes=0）；切换 html_mode=\"dom\" 后 apply v1/v2、list、eval（CSS、按钮交互 0→1、SVG 命名空间）及 remove（nodes=0, cleanups=2）全部返回退出码 0。",
+    "Windows 正式 prepare/dev 与 session attach-v8 商业宿主实测全部通过（run formal-2026-11-26T18-50-50-176Z）：Folo（ESM + PE INTEGRITY）经原生 prepare（esm-delegate，原 exe 与 app.asar SHA-256 零变动）→ dev 完成 v1→v2 热更新；QQ（QQNT.dll）经原生 session attach-v8 --bootstrap-output（windows-v8-attach, hooks=3）→ dev 完成 v1→v2 热更新；Quark（7.5.4.1068\\quark.exe）、Douyin（douyin.exe, pe-x86）、Folo、QQ、notepad.exe（Unsupported 退出码 3）与 macOS Quark.app（Unsupported 退出码 3）诊断边界全部核验。",
+    "修复回测暴露的两项通用缺陷（crates/platform-windows 多版本目录降序与主 exe 排序过滤；crates/web 与 crates/application 可选 UTF-8 BOM 剥离，零品牌硬编码）并新增 4 项单元测试；macOS make check、Lenovo Windows 原生 build/clippy/test（Rust 57 passed / 0 failed / 4 ignored，Node 12/12）及 tracking_check.py 全部通过。",
+    "实证报告沉淀于 docs/validation/m3-commercial-cli.md 并在 docs/validation.md 建立入口；执行与步骤归档于 docs/archive/T-088.md。"
+  ]
 }
 ```
 
-关联规划：[M-003 阶段 1](plans/milestone-3-empirical-closure.md) · [D-016](DECISIONS.md#d-016)。
+关联规划：[M-003 阶段 1](plans/milestone-3-empirical-closure.md) · [D-016](DECISIONS.md#d-016) · [实证报告](validation/m3-commercial-cli.md) · [执行归档](archive/T-088.md#t-088)。
 
 <a id="t-089"></a>
 ### T-089 · 兼容性总表刷新与正式 CLI 证据索引收口
