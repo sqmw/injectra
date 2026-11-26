@@ -4,6 +4,23 @@
 
 ## 里程碑
 
+<a id="m-003"></a>
+### M-003 · 商业宿主正式 CLI 实证闭环与准备器减重收口
+
+```tracking-milestone
+{
+  "id": "M-003",
+  "name": "商业宿主正式 CLI 实证闭环与准备器减重收口",
+  "status": "pending",
+  "goal": "将 M-002 已落地的通用底层注入引擎与正式 CLI 原语在代表性商业桌面宿主上完成端到端实证闭环，刷新全项目兼容性总表导航，并完成准备器纯 Rust ASAR 统一切换以移除 @electron/asar 依赖树。",
+  "scope": "按 D-016 三阶段渐进推进：商业宿主 Trusted Types 与正式 CLI 真机回测（T-088）、兼容性总表刷新与正式 CLI 证据索引收口（T-089）、准备器纯 Rust ASAR 统一切换与 npm 依赖收口（T-090）。回测仅限受控隔离副本或显式隔离会话，不改写历史任务原证据；iframe/webview 子帧按需触发暂不纳入，重加壳/二进制补丁与上层产品/MCP/Agent 编排保持在范围外。",
+  "acceptance": "所有成员任务均完成或获准收口：代表性商业宿主全程仅用 injectra 正式 CLI 完成诊断、接入、挂载/热更新、观测与清理（零实验脚本介入）；docs/compatibility/current-matrix.md 准确索引正式 CLI 能力与实测边界且不篡改历史行；setup-preparation 移除 @electron/asar 并通过 macOS 与 Windows 全布局实机回归，无应用品牌特判侵入核心。",
+  "acceptance_evidence": []
+}
+```
+
+[规划与回测边界](plans/milestone-3-empirical-closure.md) · [D-016](DECISIONS.md#d-016)。
+
 <a id="m-002"></a>
 ### M-002 · 通用底层注入引擎与 CLI 底座夯实
 
@@ -28,6 +45,96 @@
 [规划与架构边界](plans/milestone-2-core-engine.md) · [D-015](DECISIONS.md#d-015) · [里程碑收口](archive/T-086.md#m-002)。
 
 ## 当前执行
+
+<a id="t-088"></a>
+### T-088 · 商业宿主 Trusted Types 与正式 CLI 真机回测
+
+```tracking-task
+{
+  "id": "T-088",
+  "name": "商业宿主 Trusted Types 与正式 CLI 真机回测",
+  "version": "v1",
+  "mode": "staged",
+  "status": "pending",
+  "priority": "P0",
+  "milestone": "M-003",
+  "goal": "在真实商业桌面宿主上验证 M-002 正式 CLI 新能力（html_mode=\"dom\"、跨平台正式 prepare/dev 与 session attach-v8）可独立闭环，消除受控夹具与野生打包环境之间的实证缺口。",
+  "scope": "在 macOS 与 Lenovo Windows 仓库外隔离副本或显式受控会话中，选取严格 Trusted Types 宿主（如 Cursor/Devin/Quark）、Electron ESM+PE INTEGRITY 宿主（如 Folo）、无调试端口 Windows GUI Electron 宿主（如 QQ/WorkBuddy）及架构边界样本，全程仅用 injectra 正式 CLI 执行诊断、接入、挂载/热更新、list/eval 与清理；若暴露通用宿主时序或路径缺陷则按正规分层修复，不写品牌硬编码、不触碰用户日常实例。",
+  "acceptance": "四类代表边界均有可复核的正式 CLI 端到端运行记录与结构化证据（零 tests/windows 实验脚本或跨机测试控制端介入）；Trusted Types 样本验证 inner-html 精确报 PolicyBlocked 且 html_mode=\"dom\" 挂载清理成功；如有通用修复则双端 make check 全绿。",
+  "execution_ref": "",
+  "acceptance_evidence": []
+}
+```
+
+关联规划：[M-003 阶段 1](plans/milestone-3-empirical-closure.md) · [D-016](DECISIONS.md#d-016)。
+
+<a id="t-089"></a>
+### T-089 · 兼容性总表刷新与正式 CLI 证据索引收口
+
+```tracking-task
+{
+  "id": "T-089",
+  "name": "兼容性总表刷新与正式 CLI 证据索引收口",
+  "version": "v1",
+  "mode": "lightweight",
+  "status": "pending",
+  "priority": "P1",
+  "milestone": "M-003",
+  "goal": "消除全项目唯一兼容性入口 docs/compatibility/current-matrix.md 的过时口径，建立 M-002/M-003 正式 CLI 路线与实测证据的清晰索引。",
+  "scope": "更新 current-matrix.md 更新日期与阅读口径（清理已过时的未推送与非正式 CLI 陈述），按新增分节汇总 M-002 宿主/架构基线与 T-088 商业宿主正式 CLI 回测证据，必要时同步 validation.md 与 README 导航；严禁回填或篡改 T-014/T-043/T-044 等历史行原始结论。",
+  "acceptance": "从 current-matrix.md 可直接查清各平台/引擎下正式 CLI（CDP/Gadget/WKWebView/prepare+dev/attach-v8/html_mode=\"dom\"）的已实测样本与明确限制；历史分节原证据零破坏，make doc-check 与 tracking 检查全绿。",
+  "execution_ref": "",
+  "acceptance_evidence": []
+}
+```
+
+关联规划：[M-003 阶段 2](plans/milestone-3-empirical-closure.md) · [D-016](DECISIONS.md#d-016)。
+
+<a id="t-090"></a>
+### T-090 · 准备器纯 Rust ASAR 统一切换与 npm 依赖收口
+
+```tracking-task
+{
+  "id": "T-090",
+  "name": "准备器纯 Rust ASAR 统一切换与 npm 依赖收口",
+  "version": "v1",
+  "mode": "lightweight",
+  "status": "pending",
+  "priority": "P1",
+  "milestone": "M-003",
+  "goal": "将 injectra-preparation 的 ASAR 读写与流重建统一切换至纯 Rust asar.rs，彻底移除外部准备工具中的 @electron/asar 及其 11 个间接 npm 包。",
+  "scope": "扩展 crates/preparation/src/asar.rs 支持完整目录与 macOS 符号链接条目流构建，更新 crates/preparation 与 helper/setup-preparation 移除对 @electron/asar 的安装与调用（保留零间接依赖的 acorn 及 Windows 按需 resedit），同步 docs/architecture/dependency-reduction.md 并在 macOS 与 Windows 跑通全部 Electron 布局实测。",
+  "acceptance": "setup-preparation 与 preparation helper 不再依赖 @electron/asar；macOS 与 Windows 下 directory/asar/nested_asar/esm/esm_asar 及符号链接/PE INTEGRITY 准备与 dev 实机回归全部通过，make check 全绿。",
+  "execution_ref": "",
+  "acceptance_evidence": []
+}
+```
+
+关联规划：[M-003 阶段 3](plans/milestone-3-empirical-closure.md) · [D-016](DECISIONS.md#d-016)。
+
+<a id="t-087"></a>
+### T-087 · 建立第三个里程碑与实证收口规划文档
+
+```tracking-task
+{
+  "id": "T-087",
+  "name": "建立第三个里程碑与实证收口规划文档",
+  "version": "v1",
+  "mode": "lightweight",
+  "status": "done",
+  "goal": "将用户确认的商业宿主正式 CLI 实证闭环与准备器纯 Rust ASAR 收口路线登记为第三个里程碑（M-003），同步决策、任务与导航文档并提交。",
+  "scope": "仅更新规划、决策、任务、需求与导航 Markdown 文档并在本地 main 提交；不改动产品源码、不推送远端、不改写历史证据。",
+  "acceptance": "M-003 规划文档、D-016 决策、TODO 里程碑与三个 pending 成员任务（T-088..T-090）、tasks/README/requirements 导航全部同步；make doc-check、tracking_check.py 与 git diff --check 通过并完成干净本地提交。",
+  "execution_ref": "archive/T-087.md#t-087",
+  "acceptance_evidence": [
+    "新增 docs/plans/milestone-3-empirical-closure.md 与 docs/archive/T-087.md，登记 D-016、M-003 及 T-088..T-090，同步 tasks.md、README.md 与 requirements.md。",
+    "本地 make doc-check、tracking_check.py 与 git diff --check 全部通过，无孤儿文档或产品源码改动。"
+  ],
+  "unplanned_reason": "2026-11-27 用户确认将对齐的商业宿主正式 CLI 回测与准备器减重收口路线作为第三个里程碑（M-003）落文档。"
+}
+```
+
+[执行归档](archive/T-087.md#t-087)
 
 <a id="t-083"></a>
 ### T-083 · CLI 机器契约与只读观测原语

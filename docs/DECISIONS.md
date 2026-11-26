@@ -410,3 +410,32 @@ D-006参考归档边界补充：接入、桥接与验证工具可以保留，可
 ```
 
 [M-002规划](plans/milestone-2-core-engine.md) · [M-002状态簿](TODO.md#m-002)。补充既有架构与产品边界，不覆盖历史交付或验证记录。
+
+<a id="d-016"></a>
+## D-016 · 第三个里程碑商业宿主实证闭环与准备器纯 Rust 收口路线
+
+```tracking-decision
+{
+  "id": "D-016",
+  "date": "2026-11-27",
+  "status": "accepted",
+  "conclusion": "第三个里程碑（M-003）优先将 M-002 正式 CLI 新能力放到代表性商业桌面宿主上完成端到端实证闭环，按“商业宿主 Trusted Types 与正式 CLI 真机回测（T-088）→兼容性总表刷新与正式 CLI 证据索引收口（T-089）→准备器纯 Rust ASAR 统一切换与 npm 依赖收口（T-090）”三阶段推进；显式子帧（SubFrame）列为有真实目标触发时再立项的后续扩展，上层插件库、交互工具与 Agent Skill/MCP 封装继续保持在核心仓库外。",
+  "trigger": "2026-11-27 M-002（475b977）发布后评估后续优先级，用户确认将商业宿主正式 CLI 回测、兼容性总表刷新与纯 Rust ASAR 收口写入文档立项为 M-003。",
+  "context": "承接 M-002（milestone/core-engine-cli-foundation）与 D-015；解决受控夹具机制验证与野生商业宿主初始化/打包边界之间的证据断层，以及 current-matrix.md 滞后和 @electron/asar 尾项依赖问题。",
+  "affects": [
+    "M-003里程碑范围与三阶段顺序",
+    "商业宿主回测证据边界与 current-matrix.md 导航口径",
+    "injectra-preparation 纯 Rust ASAR 切换与外部 npm 依赖收敛",
+    "SubFrame 按需触发条件与外部生态仓库隔离边界"
+  ],
+  "alternatives": [
+    "跳过商业宿主回测直接开发 iframe/webview 子帧或新协议后端：基础时序与野生打包边界未封口，排障易与新特性耦合",
+    "重跑全部38款历史应用普查：边际收益低且耗时长，选取覆盖 Trusted Types、ESM+PE INTEGRITY、GUI V8 attach 与架构边界的代表样本即可验证机制闭环",
+    "将面向弱模型的 Agent Skill/MCP 或插件工作台并入 Injectra 核心仓库：违背 D-015 底层引擎/CLI 单一职责边界"
+  ],
+  "commit": "本条所在提交",
+  "supersedes": []
+}
+```
+
+[M-003规划](plans/milestone-3-empirical-closure.md) · [M-003状态簿](TODO.md#m-003)。延续 D-015 核心边界，历史普查与阶段验证证据保持只读不回填。

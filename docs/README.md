@@ -5,7 +5,7 @@
 | 关键词 | 权威文档 |
 | --- | --- |
 | 产品定位、runtime/pre-runtime、责任边界、需求来源、非目标 | [需求](requirements.md) |
-| 第二个里程碑（M-002）、核心引擎演进路线与架构边界 | [M-002规划](plans/milestone-2-core-engine.md) · [M-002状态](TODO.md#m-002) |
+| 第三个里程碑（M-003）、第二个里程碑（M-002）与核心演进路线 | [M-003规划](plans/milestone-3-empirical-closure.md) · [M-003状态](TODO.md#m-003) · [M-002规划](plans/milestone-2-core-engine.md) · [M-002状态](TODO.md#m-002) |
 | 当前通用化方向、免重打包、外置增量、真实App反馈 | [dev模式边界](architecture/dev-mode.md) |
 | 架构分层、执行域契约、目标身份、能力与错误 | [架构](architecture/boundaries.md) · [多架构宿主机制](architecture/host-mechanisms.md) · [依赖减重评估](architecture/dependency-reduction.md) |
 | 模块、测试、符号检索 | [代码地图](architecture/code-map.md) |

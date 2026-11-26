@@ -12,6 +12,8 @@
 
 2026-11-25用户确认[第二个里程碑 M-002](TODO.md#m-002)（见[D-015](DECISIONS.md#d-015)与[规划](plans/milestone-2-core-engine.md)）：Injectra 锚定为通用底层注入引擎／SDK 与一等公民 CLI，上层 Agent、MCP 封装、插件管理器与日常持久化运行层建在其外；按宿主控制层区分 runtime 与 pre-runtime 互补分工，重加壳/原生二进制补丁明确 Unsupported，`iframe`/`<webview>` 子帧暂缓，渐进沉淀正式核心代码。
 
+2026-11-27用户确认[第三个里程碑 M-003](TODO.md#m-003)（见[D-016](DECISIONS.md#d-016)与[规划](plans/milestone-3-empirical-closure.md)）：承接已收口的 M-002 底座，按三阶段推进代表性商业宿主正式 CLI 真机回测（含 `html_mode="dom"` 与 Windows 正式 `prepare`/`dev`/`attach-v8`）、[兼容性总表](compatibility/current-matrix.md)口径刷新与准备器纯 Rust ASAR 切换收口；显式子帧列为有真实目标触发时再立项的后续演进，上层生态仓库隔离边界不变。
+
 面向以JS、HTML、CSS渲染界面的桌面应用，提供代码注入能力：运行期直接连接执行；pre-runtime可在派生副本中准备引导入口，用户增量保持外置，长期覆盖Electron之外的Web宿主。Web界面是目标类别，不意味着任何应用都已可接入或已验证兼容。
 
 | 方向 | 当前边界 |
