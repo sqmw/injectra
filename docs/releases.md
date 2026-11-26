@@ -1,5 +1,15 @@
 # 版本与交付映射
 
+## milestone/core-engine-cli-foundation · 2026-11-27
+
+- 对应 [M-002 · 通用底层注入引擎与 CLI 底座夯实](TODO.md#m-002)（[规划](plans/milestone-2-core-engine.md) · [D-015](DECISIONS.md#d-015) · [收口档案](archive/T-086.md#m-002)）的注解式里程碑 tag。能力与双端验证基线提交为 `e6b11dc`；本条目所属提交仅补充发布映射说明，不移动既有 tag、不改动产品源码或重跑已通过产物。CLI 包版本仍为 `0.1.0`，本标识仅对应源码 tag，不含预编译安装包或 GitHub Release。
+- 包含 `M-002` 四个已完成阶段：
+  1. [T-083](archive/T-083.md#t-083)（`64e00bb`）：`--machine` 单行 JSON 错误信封与 `0/2/3/4/5` 确定性退出码、`list` 与只读 `eval` 原语。
+  2. [T-084](archive/T-084.md#t-084)（`aa8e194`）：只读 `inspect-app`、通用 `launch-plan`（Electron/NW.js/CEF/WKWebView/WebView2 与未知目标 `Unsupported`）及非 CDP `session launch/register/verify` 收敛。
+  3. [T-085](archive/T-085.md#t-085)（`ad76b92`）：[多架构宿主机制基线](architecture/host-mechanisms.md)、无 `unsafe` 的 `injectra-platform-windows`、跨平台 `preparation`（支持 macOS 与 Windows x64/x86、Electron ESM `esm-delegate`、包内 Junction 重建与 PE `INTEGRITY`/`ELECTRONASAR` 更新）及正式 Windows MSVC V8 `session attach-v8`（在 macOS 5 布局与 Lenovo Windows `win-formal-0XELcm` 实机通过）。
+  4. [T-086](archive/T-086.md#t-086)（`e6b11dc`）：`ErrorKind::PolicyBlocked` 策略拦截分离、`manifest v1` 可选 `html_mode="dom"` 与纯 Rust 声明式 DOM 编译（Electron 45.2.1 `trusted-types 'none'` 实机通过）、纯 Rust `asar.rs` 与[外部依赖减重评估](architecture/dependency-reduction.md)。
+- 明确保留既有非目标边界：不支持 `.jsc` 字节码与原生二进制段改写、`iframe` / `<webview>` 子帧注入不在本里程碑范围内、不包含内置 MCP Server 或图形工作台。
+
 ## milestone/generic-cli-windows-validation · 2026-11-13
 
 - 已创建并推送的注解式里程碑，见[T-046](TODO.md#t-046)。tag精确指向`aaa254a3ddc0d48ff61bc3109cd2b736b45eb36e`；能力/实测基线134cf12，里程碑提交仅新增映射/任务元数据。远端tag对象`b4e82e3955c1d947cf583f903fc1881221c8033e`及解引用提交已核对一致。
