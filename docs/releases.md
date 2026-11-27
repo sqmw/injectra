@@ -1,5 +1,14 @@
 # 版本与交付映射
 
+## milestone/empirical-closure-and-rust-asar · 2026-11-27
+
+- 对应 [M-003 · 商业宿主正式 CLI 实证闭环与准备器减重收口](TODO.md#m-003)（[规划](plans/milestone-3-empirical-closure.md) · [D-016](DECISIONS.md#d-016) · [收口档案](archive/T-090.md#m-003)）的注解式里程碑 tag。能力与双端实测基线提交为 `74f3eb2`；本条目所属提交仅补充发布映射与 `T-091` 归档记录，不移动既有 tag、不改动产品源码或重跑已通过产物。CLI 包版本仍为 `0.1.0`，本标识仅对应源码 tag，不含预编译安装包或 GitHub Release。
+- 包含 `M-003` 三个已完成阶段：
+  1. [T-088](archive/T-088.md#t-088)（`9b76703`、`e471385`）：四类代表商业宿主双端正式 CLI 闭环回测（零实验脚本介入）——macOS `Devin.app`、Windows `Devin` 与 Windows `Quark` 验证 `PolicyBlocked` 分离与 `html_mode="dom"` 全链路通过；Windows `Folo`（ESM + PE `INTEGRITY`）经原生 `prepare`→`dev` 通过；Windows `QQ`（`QQNT.dll`）经原生 `session attach-v8 --bootstrap-output`→`dev` 通过；顺带修复 `platform-windows` 多版本主 exe 排序与 `web`/`application` UTF-8 BOM 剥离两项通用缺陷（零品牌代码），详见[M-003 商业宿主实证报告](validation/m3-commercial-cli.md)。
+  2. [T-089](archive/T-089.md#t-089)（`32e2458`）：刷新唯一兼容性总入口[current-matrix.md](compatibility/current-matrix.md)至 `2026-11-27` 正式 CLI 口径并同步双语 `README`，历史普查与阶段原证据零改写。
+  3. [T-090](archive/T-090.md#t-090)（`f96d020`、`74f3eb2`）：将 `prepare` 的 macOS `rebuild` 与 Windows `append_rewrite` 统一切换至纯 Rust [asar.rs](../crates/preparation/src/asar.rs)，移除 `@electron/asar` 与 `chromium-pickle-js`（外部准备工具 `16 → 3` 包，零弃用告警），通过 macOS 五布局（`preparation-fixtures-0ZNnlg`）与 Lenovo Windows 四布局（`win-formal-gCAie4`）实机全绿验收，见[依赖减重评估](architecture/dependency-reduction.md)。
+- 明确保留既有非目标边界：显式子帧（`PageContext::SubFrame`：`iframe` / `<webview>`）按真实目标触发另行立项；外部生态仓库（`web-ui-plugins`、`UI Annotation Lab`、Agent Skill/MCP 薄封装）保持核心仓库外隔离；`.jsc` 字节码、重加壳与原生二进制只读段改写继续报 `Unsupported`。
+
 ## milestone/core-engine-cli-foundation · 2026-11-27
 
 - 对应 [M-002 · 通用底层注入引擎与 CLI 底座夯实](TODO.md#m-002)（[规划](plans/milestone-2-core-engine.md) · [D-015](DECISIONS.md#d-015) · [收口档案](archive/T-086.md#m-002)）的注解式里程碑 tag。能力与双端验证基线提交为 `e6b11dc`；本条目所属提交仅补充发布映射说明，不移动既有 tag、不改动产品源码或重跑已通过产物。CLI 包版本仍为 `0.1.0`，本标识仅对应源码 tag，不含预编译安装包或 GitHub Release。

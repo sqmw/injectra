@@ -51,6 +51,30 @@
 
 ## 当前执行
 
+<a id="t-091"></a>
+### T-091 · M-003 里程碑发布映射与远端推送
+
+```tracking-task
+{
+  "id": "T-091",
+  "name": "M-003 里程碑发布映射与远端推送",
+  "version": "v1",
+  "mode": "lightweight",
+  "status": "done",
+  "goal": "将已完成并验收的第三个里程碑 M-003 登记至交付映射，推送本地 main 至远端并打第三个注解式里程碑标签。",
+  "scope": "更新 docs/releases.md、任务与归档记录，校验并本地提交后创建 annotated tag milestone/empirical-closure-and-rust-asar，推送 main 与该 tag 至 origin 并回读核对；不改产品源码、不移动旧 tag。",
+  "acceptance": "docs/releases.md 含 M-003 精确映射，make doc-check 与 tracking_check.py 通过，origin/main 与远端 milestone/empirical-closure-and-rust-asar 指向及提交哈希与本地完全一致。",
+  "execution_ref": "archive/T-091.md#t-091",
+  "acceptance_evidence": [
+    "docs/releases.md 已新增 milestone/empirical-closure-and-rust-asar · 2026-11-27 映射条目，执行记录归档于 docs/archive/T-091.md。",
+    "make doc-check、make architecture-check、tracking_check.py --root . 与 git diff --check 全绿；main 与 annotated tag milestone/empirical-closure-and-rust-asar 已推送至 origin 并完成远端回读一致确认。"
+  ],
+  "unplanned_reason": "2026-11-27 M-003 验收关闭后，用户明确要求推送本地 M-003 提交至远端并打第三个里程碑 tag。"
+}
+```
+
+[执行归档](archive/T-091.md#t-091)
+
 <a id="t-088"></a>
 ### T-088 · 商业宿主 Trusted Types 与正式 CLI 真机回测
 
