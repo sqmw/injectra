@@ -9,12 +9,12 @@ import path from 'node:path';
 import {finished} from 'node:stream/promises';
 import {pathToFileURL} from 'node:url';
 import {binary,cache,requireTool} from './test-env.mjs';
+import {builtinAsar as asar} from '../crates/preparation/helper/archive.mjs';
 
 if(process.platform!=='win32')throw Error('Windows acceptance script runs on win32 only');
 
 const toolsDir=process.env.INJECTRA_PREPARATION_TOOLS??path.resolve(cache,'preparation-tools');
 const tools=createRequire(path.join(toolsDir,'package.json'));
-const asar=tools('@electron/asar');
 const pe=await import(pathToFileURL(tools.resolve('resedit')).href);
 const sha=async p=>createHash('sha256').update(await readFile(p)).digest('hex');
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));

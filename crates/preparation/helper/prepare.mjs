@@ -6,18 +6,19 @@ import {createRequire} from 'node:module';
 import {execFileSync} from 'node:child_process';
 import {fileURLToPath,pathToFileURL} from 'node:url';
 import {inspectMain,delegateSource,esmDelegateSource} from './entry.mjs';
-import {rebuild,appendRewrite} from './archive.mjs';
+import {builtinAsar as asar} from './archive.mjs';
 import {copyTree} from './copy_tree.mjs';
 import {updateIntegrity,hasIntegrityResource} from './pe_integrity.mjs';
 
 const here=path.dirname(fileURLToPath(import.meta.url));
 const tools=createRequire(path.join(process.env.INJECTRA_PREPARATION_TOOLS,'package.json'));
-const asar=tools('@electron/asar'),acorn=tools('acorn');
+const acorn=tools('acorn');
 const input=JSON.parse(fs.readFileSync(0,'utf8'));
 const hash=b=>crypto.createHash('sha256').update(b).digest('hex');
 const fileHash=p=>hash(fs.readFileSync(p));
 const relative=p=>typeof p==='string'&&p.length>0&&!path.posix.isAbsolute(p)&&!p.includes('\\')&&!p.includes('\0')&&path.posix.normalize(p)===p&&!p.startsWith('../');
 const samePath=(a,b)=>process.platform==='win32'?path.resolve(a).toLowerCase()===path.resolve(b).toLowerCase():path.resolve(a)===path.resolve(b);
+const sameBaseline=(a,b)=>{const ak=Object.keys(a).sort(),bk=Object.keys(b).sort();return ak.length===bk.length&&ak.every((k,i)=>k===bk[i]&&a[k]===b[k]);};
 
 function platformMac(op,app,payload={}){
  try{
@@ -63,6 +64,19 @@ function buildReplacements(p,config){
   replacements.set(entry,Buffer.from(p.sourceText.slice(0,p.insert)+addition+p.sourceText.slice(p.insert)));
  }
  return replacements;
+}
+
+async function stageReplacements(dest,replacements){
+ const stageRoot=path.join(path.dirname(dest),'staged-replacements');
+ await fsp.mkdir(stageRoot,{recursive:true});
+ const list=[];
+ let idx=0;
+ for(const [rel,bytes]of replacements){
+  const stagedPath=path.join(stageRoot,`${idx++}.bin`);
+  await fsp.writeFile(stagedPath,bytes);
+  list.push({rel,staged_path:stagedPath,sha256:hash(bytes)});
+ }
+ return list;
 }
 
 function planPayload(p,dataMode,signingPolicy){
@@ -121,7 +135,7 @@ async function copySourceMac(probed,dest){
 // --- Windows directory / executable path ---
 function isAuxiliaryWinExe(name){
  const lower=name.toLowerCase();
- return lower.startsWith('unins')||lower.startsWith('uninstall')||lower==='update.exe'||lower==='squirrel.exe'||lower.endsWith('_executionstub.exe')||lower.includes('crashpad')||lower.includes('elevate');
+ return lower.startsWith('unins')||lower.startsWith('uninstall')||lower==='update.exe'||lower==='squirrel.exe'||lower.endsWith('_executionstub.exe')||lower.endsWith('_proxy.exe')||lower.endsWith('_helper.exe')||lower.endsWith('_launcher.exe')||lower.endsWith('_guard.exe')||lower.endsWith('_downloader.exe')||lower.endsWith('_doctor.exe')||lower.endsWith('cmd.exe')||lower.includes('updater')||lower.includes('crashpad')||lower.includes('crash_handler')||lower.includes('crash_reporter')||lower.includes('dump_reporter')||lower.includes('elevat');
 }
 
 function findWindowsPackages(rootDir){
@@ -147,12 +161,21 @@ function findWindowsPackages(rootDir){
 
 function selectWindowsExe(rootDir,componentDir,explicitExe){
  if(explicitExe)return explicitExe;
+ const rootStem=path.basename(rootDir).toLowerCase();
+ const ranked=[];
+ for(const [dirIdx,dir]of [componentDir,rootDir].entries()){
+  const exes=fs.readdirSync(dir,{withFileTypes:true}).filter(e=>e.isFile()&&/\.exe$/i.test(e.name)).map(e=>e.name);
+  for(const name of exes){
+   if(isAuxiliaryWinExe(name))continue;
+   const full=path.join(dir,name);
+   const stem=path.parse(name).name.toLowerCase();
+   ranked.push({full,name,match:stem===rootStem?1:0,inComp:dirIdx===0?1:0,size:fs.statSync(full).size});
+  }
+ }
+ ranked.sort((a,b)=>(b.match-a.match)||(b.inComp-a.inComp)||(b.size-a.size)||a.name.localeCompare(b.name));
+ if(ranked.length)return ranked[0].full;
  for(const dir of [componentDir,rootDir]){
-  const exes=fs.readdirSync(dir,{withFileTypes:true})
-   .filter(e=>e.isFile()&&/\.exe$/i.test(e.name))
-   .map(e=>e.name).sort();
-  const primary=exes.filter(n=>!isAuxiliaryWinExe(n));
-  if(primary.length)return path.join(dir,primary[0]);
+  const exes=fs.readdirSync(dir,{withFileTypes:true}).filter(e=>e.isFile()&&/\.exe$/i.test(e.name)).map(e=>e.name).sort();
   if(exes.length)return path.join(dir,exes[0]);
  }
  throw Error('Unsupported: no Windows host executable found');
@@ -227,28 +250,38 @@ try{
   }
   const dest=input.app,owner=JSON.parse(fs.readFileSync(path.join(path.dirname(dest),'ownership.json'),'utf8'));
   if(owner.owner!=='injectra.preparation.v1'||!samePath(owner.app,dest)||!samePath(owner.source_app,p.public.source_app)||samePath(dest,p.public.source_app))throw Error('Invalid owned destination');
-  if(fs.existsSync(dest))throw Error('Destination already exists');
-  const excluded=await copySourceMac(p,dest);
-  const signing=platformMac('sign-nested',dest);
-  const replacements=buildReplacements(p,input.config);
-  let asarHash=null;
-  if(p.public.layout==='asar'){
-   const src=path.join(dest,p.public.package_root),rebuilt=path.join(path.dirname(dest),'rebuilt.asar');
-   asarHash=await rebuild(asar,src,rebuilt,replacements);await fsp.copyFile(rebuilt,src);
-   if(fs.existsSync(rebuilt+'.unpacked'))await fsp.cp(rebuilt+'.unpacked',src+'.unpacked',{recursive:true,force:true,dereference:false,verbatimSymlinks:true});
+  if(input.operation==='prepare-stage'){
+   if(fs.existsSync(dest))throw Error('Destination already exists');
+   const excluded=await copySourceMac(p,dest);
+   const signing=platformMac('sign-nested',dest);
+   const replacements=buildReplacements(p,input.config);
+   if(p.public.layout==='asar'){
+    const staged=await stageReplacements(dest,replacements);
+    console.log(JSON.stringify({ok:true,value:{replacements:staged,signing_nested:signing.signed,excluded_unsealed:excluded,baseline:p.public.baseline,package_hash:p.packageHash}}));
+   }else{
+    const list=[];
+    for(const [file,bytes]of replacements){
+     const out=path.join(dest,p.public.package_root,file);
+     await fsp.mkdir(path.dirname(out),{recursive:true});
+     await fsp.writeFile(out,bytes);
+     list.push({rel:file,sha256:hash(bytes)});
+    }
+    console.log(JSON.stringify({ok:true,value:{replacements:list,signing_nested:signing.signed,excluded_unsealed:excluded,baseline:p.public.baseline,package_hash:p.packageHash}}));
+   }
+  }else if(input.operation==='prepare-finish'){
+   const signed=platformMac('finish',dest,{asar_hash:input.asar_hash??null});
+   const again=probeMac(input.source_app).public;
+   if(!sameBaseline(again.baseline,input.staged.baseline))throw Error('Source application changed during preparation');
+   const entry=p.public.main_entry;
+   const changes=input.staged.replacements.map(({rel,sha256})=>({path:p.public.package_root+'/'+rel,origin:'injectra',reason:rel===entry?'Bootstrap insertion after CJS directives':'Owned preparation resource',before:rel==='package.json'?input.staged.package_hash:rel===entry?input.staged.baseline['entry:'+entry]:null,after:sha256}));
+   for(const signedPath of input.staged.signing_nested)changes.push({path:signedPath,origin:'injectra',reason:'Local test signing of nested native code',before:null,after:null});
+   changes.push({path:'Contents/MacOS/'+p.description.info.CFBundleExecutable,origin:'injectra',reason:'Local test signing of app executable',before:input.staged.baseline['Contents/MacOS/'+p.description.info.CFBundleExecutable],after:fileHash(path.join(dest,'Contents/MacOS',p.description.info.CFBundleExecutable))});
+   changes.push({path:'Contents/Info.plist',origin:'injectra',reason:'Derived identity and integrity metadata',before:input.staged.baseline['Contents/Info.plist'],after:fileHash(path.join(dest,'Contents/Info.plist'))});
+   changes.push({path:'Contents/_CodeSignature',origin:'injectra',reason:'Local signing of outer and nested code; does not preserve vendor identity',before:null,after:null});
+   console.log(JSON.stringify({ok:true,value:{probe:p.public,changes,signing:signed,excluded_unsealed:input.staged.excluded_unsealed}}));
   }else{
-   for(const [file,bytes]of replacements){const out=path.join(dest,p.public.package_root,file);await fsp.mkdir(path.dirname(out),{recursive:true});await fsp.writeFile(out,bytes);}
+   throw Error('Unsupported preparation operation: '+input.operation);
   }
-  const signed=platformMac('finish',dest,{asar_hash:asarHash});
-  const again=probeMac(input.source_app).public;
-  if(JSON.stringify(again.baseline)!==JSON.stringify(p.public.baseline))throw Error('Source application changed during preparation');
-  const entry=p.public.main_entry;
-  const changes=[...replacements].map(([file,bytes])=>({path:p.public.package_root+'/'+file,origin:'injectra',reason:file===entry?'Bootstrap insertion after CJS directives':'Owned preparation resource',before:file==='package.json'?p.packageHash:file===entry?p.public.baseline['entry:'+entry]:null,after:hash(bytes)}));
-  for(const signedPath of signing.signed)changes.push({path:signedPath,origin:'injectra',reason:'Local test signing of nested native code',before:null,after:null});
-  changes.push({path:'Contents/MacOS/'+p.description.info.CFBundleExecutable,origin:'injectra',reason:'Local test signing of app executable',before:p.public.baseline['Contents/MacOS/'+p.description.info.CFBundleExecutable],after:fileHash(path.join(dest,'Contents/MacOS',p.description.info.CFBundleExecutable))});
-  changes.push({path:'Contents/Info.plist',origin:'injectra',reason:'Derived identity and integrity metadata',before:p.public.baseline['Contents/Info.plist'],after:fileHash(path.join(dest,'Contents/Info.plist'))});
-  changes.push({path:'Contents/_CodeSignature',origin:'injectra',reason:'Local signing of outer and nested code; does not preserve vendor identity',before:null,after:null});
-  console.log(JSON.stringify({ok:true,value:{probe:p.public,changes,signing:signed,excluded_unsealed:excluded}}));
  }else if(process.platform==='win32'&&['x64','ia32'].includes(process.arch)){
   const p=await probeWindows(input.source_app);
   if(input.operation==='probe'){console.log(JSON.stringify({ok:true,value:p.public}));process.exit(0);}
@@ -258,49 +291,60 @@ try{
   }
   const dest=input.app,owner=JSON.parse(fs.readFileSync(path.join(path.dirname(dest),'ownership.json'),'utf8'));
   if(owner.owner!=='injectra.preparation.v1'||!samePath(owner.app,dest)||!samePath(owner.source_app,p.public.source_app)||samePath(dest,p.public.source_app))throw Error('Invalid owned destination');
-  if(fs.existsSync(dest))throw Error('Destination already exists');
-  const excluded=[];
-  await copyTree(p.public.source_app,dest,item=>{
-   const rel=path.relative(p.public.source_app,item);
-   if(!rel)return true;
-   const top=rel.split(path.sep)[0];
-   if(['Files','User Data','userdata','Crashpad','Cache','logs'].includes(top)&&!p.public.package_root.startsWith(top+'/')){excluded.push(rel);return false;}
-   if(rel.toLowerCase().endsWith('.log')){excluded.push(rel);return false;}
-   return true;
-  });
-  const replacements=buildReplacements(p,input.config);
-  const pe=await import(pathToFileURL(tools.resolve('resedit')).href);
-  const nativeChanges=[];
-  if(p.public.layout==='asar'){
-   const archive=path.join(dest,p.public.package_root);
-   const oldHash=hash(asar.getRawHeader(archive).headerString);
-   const rebuilt=path.join(path.dirname(dest),'rebuilt.asar');
-   const nextHash=await appendRewrite({asar,source:archive,destination:rebuilt,replacements});
-   await fsp.copyFile(rebuilt,archive);
-   if(fs.existsSync(rebuilt+'.unpacked'))await fsp.cp(rebuilt+'.unpacked',archive+'.unpacked',{recursive:true,force:true,dereference:false});
-   const destComponent=path.dirname(path.dirname(archive));
-   for(const name of fs.readdirSync(destComponent).filter(n=>/\.(exe|dll)$/i.test(n))){
-    const binary=path.join(destComponent,name);
-    let result;
-    try{result=updateIntegrity({library:pe,binary,archive,before:oldHash,after:nextHash,ownedRoot:dest});}
-    catch(error){if(/baseline|Unsupported/.test(error.message))throw error;continue;}
-    if(result.updates)nativeChanges.push({path:path.relative(dest,binary).split(path.sep).join('/'),...result});
+  if(input.operation==='prepare-stage'){
+   if(fs.existsSync(dest))throw Error('Destination already exists');
+   const excluded=[];
+   await copyTree(p.public.source_app,dest,item=>{
+    const rel=path.relative(p.public.source_app,item);
+    if(!rel)return true;
+    const top=rel.split(path.sep)[0];
+    if(['Files','User Data','userdata','Crashpad','Cache','logs'].includes(top)&&!p.public.package_root.startsWith(top+'/')){excluded.push(rel);return false;}
+    if(rel.toLowerCase().endsWith('.log')){excluded.push(rel);return false;}
+    return true;
+   });
+   const replacements=buildReplacements(p,input.config);
+   if(p.public.layout==='asar'){
+    const staged=await stageReplacements(dest,replacements);
+    console.log(JSON.stringify({ok:true,value:{replacements:staged,excluded_unsealed:excluded,baseline:p.public.baseline,package_hash:p.packageHash}}));
+   }else{
+    const list=[];
+    for(const [file,bytes]of replacements){
+     const out=path.join(dest,p.public.package_root,file);
+     await fsp.mkdir(path.dirname(out),{recursive:true});
+     await fsp.writeFile(out,bytes);
+     list.push({rel:file,sha256:hash(bytes)});
+    }
+    if(p.archive){
+     const relArch=path.relative(p.public.source_app,p.archive).split(path.sep).join('/');
+     if(fileHash(path.join(dest,relArch))!==p.public.baseline[relArch])throw Error('Original nested archive changed');
+    }
+    console.log(JSON.stringify({ok:true,value:{replacements:list,excluded_unsealed:excluded,baseline:p.public.baseline,package_hash:p.packageHash}}));
    }
+  }else if(input.operation==='prepare-finish'){
+   const pe=await import(pathToFileURL(tools.resolve('resedit')).href);
+   const nativeChanges=[];
+   if(p.public.layout==='asar'){
+    const archive=path.join(dest,p.public.package_root);
+    const destComponent=path.dirname(path.dirname(archive));
+    for(const name of fs.readdirSync(destComponent).filter(n=>/\.(exe|dll)$/i.test(n))){
+     const binary=path.join(destComponent,name);
+     let result;
+     try{result=updateIntegrity({library:pe,binary,archive,before:input.asar_old_hash,after:input.asar_hash,ownedRoot:dest});}
+     catch(error){if(/baseline|Unsupported/.test(error.message))throw error;continue;}
+     if(result.updates)nativeChanges.push({path:path.relative(dest,binary).split(path.sep).join('/'),...result});
+    }
+   }
+   const again=(await probeWindows(input.source_app)).public;
+   if(!sameBaseline(again.baseline,input.staged.baseline))throw Error('Source application changed during preparation');
+   const entry=p.public.main_entry;
+   const changes=input.staged.replacements.map(({rel,sha256})=>({path:p.public.package_root+'/'+rel,origin:'injectra',reason:rel===entry?'Bootstrap insertion after CJS directives':'Owned preparation resource',before:rel==='package.json'?input.staged.package_hash:rel===entry?input.staged.baseline['entry:'+entry]:null,after:sha256}));
+   for(const nc of nativeChanges){
+    changes.push({path:nc.path,origin:'injectra',reason:'Updated Windows PE INTEGRITY/ELECTRONASAR header digest',before:input.staged.baseline[nc.path]??null,after:fileHash(path.join(dest,nc.path))});
+   }
+   console.log(JSON.stringify({ok:true,value:{probe:p.public,changes,signing:{signature_preserved:nativeChanges.length===0,pe_updates:nativeChanges.length},excluded_unsealed:input.staged.excluded_unsealed}}));
   }else{
-   for(const [file,bytes]of replacements){const out=path.join(dest,p.public.package_root,file);await fsp.mkdir(path.dirname(out),{recursive:true});await fsp.writeFile(out,bytes);}
-   if(p.archive){
-    const relArch=path.relative(p.public.source_app,p.archive).split(path.sep).join('/');
-    if(fileHash(path.join(dest,relArch))!==p.public.baseline[relArch])throw Error('Original nested archive changed');
-   }
+   throw Error('Unsupported preparation operation: '+input.operation);
   }
-  const again=(await probeWindows(input.source_app)).public;
-  if(JSON.stringify(again.baseline)!==JSON.stringify(p.public.baseline))throw Error('Source application changed during preparation');
-  const entry=p.public.main_entry;
-  const changes=[...replacements].map(([file,bytes])=>({path:p.public.package_root+'/'+file,origin:'injectra',reason:file===entry?'Bootstrap insertion after CJS directives':'Owned preparation resource',before:file==='package.json'?p.packageHash:file===entry?p.public.baseline['entry:'+entry]:null,after:hash(bytes)}));
-  for(const nc of nativeChanges){
-   changes.push({path:nc.path,origin:'injectra',reason:'Updated Windows PE INTEGRITY/ELECTRONASAR header digest',before:p.public.baseline[nc.path]??null,after:fileHash(path.join(dest,nc.path))});
-  }
-  console.log(JSON.stringify({ok:true,value:{probe:p.public,changes,signing:{signature_preserved:nativeChanges.length===0,pe_updates:nativeChanges.length},excluded_unsealed:excluded}}));
  }else{
   throw Error('Unsupported: preparation requires macOS arm64 or Windows x64/x86');
  }

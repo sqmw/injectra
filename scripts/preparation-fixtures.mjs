@@ -2,10 +2,8 @@
 import {mkdir,mkdtemp,writeFile,readdir} from 'node:fs/promises';
 import {execFileSync} from 'node:child_process';
 import {resolve} from 'node:path';
-import {createRequire} from 'node:module';
-import {finished} from 'node:stream/promises';
 import {cache,requireTool} from './test-env.mjs';
-const asar=createRequire(resolve(cache,'preparation-tools/package.json'))('@electron/asar');
+import {builtinAsar as asar} from '../crates/preparation/helper/archive.mjs';
 await mkdir(resolve(cache,'runs'),{recursive:true});
 const run=await mkdtemp(resolve(cache,'runs/preparation-fixtures-'));
 const electron=requireTool('electron'),original=resolve(electron,'../../..');

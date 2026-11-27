@@ -155,10 +155,7 @@ fn run<T: DeserializeOwned>(request: Value) -> Result<T> {
     let tools = std::env::var_os("INJECTRA_PREPARATION_TOOLS")
         .map(PathBuf::from)
         .unwrap_or(cache()?.join("preparation-tools"));
-    let base_ok = tools
-        .join("node_modules/@electron/asar/package.json")
-        .is_file()
-        && tools.join("node_modules/acorn/package.json").is_file();
+    let base_ok = tools.join("node_modules/acorn/package.json").is_file();
     let win_ok = !cfg!(windows) || tools.join("node_modules/resedit/package.json").is_file();
     if !base_ok || !win_ok {
         return Err(Error::prepare(
@@ -256,8 +253,47 @@ pub fn prepare(request: &PrepareRequest) -> Result<PreparedArtifact> {
         &root.join("pairing.json"),
         &serde_json::to_vec(&json!({"artifact":id,"key":key})).unwrap(),
     )?;
+    let staged: Value = run(
+        json!({"operation":"prepare-stage","source_app":source,"app":app,"data_mode":request.data_mode,"config":{"version":1,"artifact":id,"key":key,"controller_origin":origin}}),
+    )?;
+    let (asar_old_hash, asar_hash) = if plan.probe.layout == "asar" {
+        let mut replacements = BTreeMap::new();
+        if let Some(items) = staged["replacements"].as_array() {
+            for item in items {
+                let rel = item["rel"]
+                    .as_str()
+                    .ok_or_else(|| invalid("Missing staged replacement relative path"))?;
+                let staged_path = item["staged_path"]
+                    .as_str()
+                    .ok_or_else(|| invalid("Missing staged replacement file path"))?;
+                replacements.insert(rel.to_owned(), fs::read(staged_path)?);
+            }
+        }
+        let archive_path = app.join(&plan.probe.package_root);
+        let old_hash = sha(asar::read_header(&archive_path)?.header_json.as_bytes());
+        let rebuilt = root.join("rebuilt.asar");
+        let next_hash = if cfg!(target_os = "macos") {
+            asar::rebuild(&archive_path, &rebuilt, &replacements)?
+        } else {
+            asar::append_rewrite(&archive_path, &rebuilt, &replacements)?
+        };
+        fs::copy(&rebuilt, &archive_path)?;
+        let rebuilt_unpacked = asar::unpacked_dir(&rebuilt);
+        if rebuilt_unpacked.is_dir() {
+            let dest_unpacked = asar::unpacked_dir(&archive_path);
+            if dest_unpacked.exists() {
+                fs::remove_dir_all(&dest_unpacked)?;
+            }
+            fs::rename(&rebuilt_unpacked, &dest_unpacked)?;
+        }
+        let _ = fs::remove_file(&rebuilt);
+        let _ = fs::remove_dir_all(root.join("staged-replacements"));
+        (Some(old_hash), Some(next_hash))
+    } else {
+        (None, None)
+    };
     let result: Value = run(
-        json!({"operation":"prepare","source_app":source,"app":app,"data_mode":request.data_mode,"config":{"version":1,"artifact":id,"key":key,"controller_origin":origin}}),
+        json!({"operation":"prepare-finish","source_app":source,"app":app,"data_mode":request.data_mode,"config":{"version":1,"artifact":id,"key":key,"controller_origin":origin},"asar_old_hash":asar_old_hash,"asar_hash":asar_hash,"staged":staged}),
     )?;
     let artifact = PreparedArtifact {
         platform,

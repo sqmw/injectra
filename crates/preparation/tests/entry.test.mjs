@@ -6,8 +6,9 @@ import {resolve} from 'node:path';
 import {execFileSync} from 'node:child_process';
 import {createRequire} from 'node:module';
 import {inspectMain,delegateSource,esmDelegateSource} from '../helper/entry.mjs';
+import {builtinAsar as asar} from '../helper/archive.mjs';
 const tools=createRequire(resolve(process.env.INJECTRA_PREPARATION_TOOLS??resolve(process.env.INJECTRA_CACHE_DIR??resolve(homedir(),'.cache/injectra'),'preparation-tools'),'package.json'));
-const asar=tools('@electron/asar'),acorn=tools('acorn');
+const acorn=tools('acorn');
 const root=()=>mkdtemp(resolve(tmpdir(),'injectra-entry-'));
 test('delegated original main keeps identity, argv, sibling resolution and bootstrap order',async()=>{
  const base=await root();await mkdir(resolve(base,'.injectra'));await mkdir(resolve(base,'lib'));

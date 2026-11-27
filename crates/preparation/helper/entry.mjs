@@ -1,7 +1,8 @@
 // Electron/Node package-entry semantics (CommonJS & ESM). No application names or user payloads.
 import fs from 'node:fs';
 import path from 'node:path';
-export function inspectMain(base,layout,pkg,{asar,acorn}) {
+import {builtinAsar} from './archive.mjs';
+export function inspectMain(base,layout,pkg,{asar=builtinAsar,acorn}) {
  let main=pkg.main??'index.js';if(typeof main!=='string')throw Error('Unsupported: main must be a string');main=main.replaceAll('\\','/').replace(/^\.\//,'');
  const safe=p=>p&&!path.posix.isAbsolute(p)&&!p.includes('\\')&&!p.includes('\0')&&path.posix.normalize(p)===p&&!p.startsWith('../');
  if(!safe(main))throw Error('Unsupported: main escapes package');
