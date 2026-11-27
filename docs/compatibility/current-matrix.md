@@ -1,20 +1,47 @@
 # 应用平台与内核兼容性总表
 
-更新时间：2026-11-13。历史应用矩阵来自[T-014](../TODO.md#t-014)（ee5640c）；后续T-017、T-021与T-022证据分别列在新增分节，不重算历史普查。**以后查看兼容性以本表为入口；旧普查和单项报告仅承担证据职责，不再各自表示全项目最新状态。**
+更新时间：2026-11-27。历史应用矩阵来自[T-014](../TODO.md#t-014)（ee5640c）；后续 T-017、T-021、T-022、T-032、T-043/T-044、`M-002` 与 `T-088` 证据分别列在独立分节，不重算或回填历史普查。**以后查看兼容性以本表为入口；旧普查和单项报告仅承担证据职责，不再各自表示全项目最新状态。**
 
 ## 阅读口径
 
-- 当前macOS硬件范围仅Apple Silicon；2026-11-11用户明确排除Intel Mac，不再把Intel硬件列作后续验证缺口，见[D-011](../DECISIONS.md#d-011)。历史记录不改写。
-- 每行是“应用＋平台＋应用版本＋运行时/内核＋接入路线”的独立组合，同软件不同版本或路线分别列出。优先展示豆包和抖音等后续成果，历史失败不覆盖新成功。
-- 现有本机记录均为macOS，主机为arm64；未逐应用推断目标进程架构。Windows已启动真实页面复验，阶段证据见下文独立入口；Linux及其他平台仍无实测，不套用macOS结果。
+- 当前 macOS 硬件范围仅 Apple Silicon；2026-11-11 用户明确排除 Intel Mac，不再把 Intel 硬件列作后续验证缺口，见[D-011](../DECISIONS.md#d-011)。历史记录不改写。
+- 每行是“应用＋平台＋应用版本＋运行时/内核＋接入路线”的独立组合，同软件不同版本或路线分别列出。新增正式 CLI 实测列在上方独立分节，历史失败不覆盖新成功，也不改写旧批次原记录。
+- 正式 CLI 现已在 macOS（Apple Silicon `arm64`）与 Windows（`x64` 主机，PE 解析识别 `pe-x64` / `pe-x86`）完成夹具与代表商业宿主实测；Linux 及移动端仍无实测，不套用桌面结果。下方“历史应用矩阵”仍保持 `T-014` 时的 macOS 历史口径。
 - “通过”只覆盖该行版本/页面/受控载荷；“部分通过”不等于完整基线；“仅入口”不等于执行通过；“未验证/未取得页面”不等于不支持。
-- Chromium内核列沿用协议报告或明确运行时读回；未连接的应用只列已识别引擎族，不从宿主版本推算内核版本。
-- 本工作树的T-017已将Electron Gadget与WKWebView接入正式CLI；旧探针/参考实现证据仍单独保留，新增产品证据见下表。本地main已通过T-018接收本次成果，尚未推送。
+- Chromium 内核列沿用协议报告或明确运行时读回；未连接的应用只列已识别引擎族，不从宿主版本推算内核版本。
+- 正式 CLI 已收口默认 CDP、可选 Electron Gadget / WKWebView、跨平台 `prepare`/`dev`（含 Electron ESM 与 Windows PE `INTEGRITY`）、Windows `session attach-v8`、`inspect-app`/`launch-plan`、`--machine`（`0/2/3/4/5` 确定性退出码）、`list`/`eval` 及 `html_mode="dom"` / `PolicyBlocked` 分离（`M-002` 标签 `milestone/core-engine-cli-foundation`，见[交付记录](../releases.md)）；早期探针、参考实现与实验脚本证据仍单独保留为历史记录。
 
+## M-002 / M-003 正式 CLI 路线总览与商业宿主实证（2026-11-27）
 
-## Windows复验（进行中）
+权威机制边界见[多架构宿主机制](../architecture/host-mechanisms.md)与[依赖减重评估](../architecture/dependency-reduction.md)；代表商业宿主正式 CLI 回测详见[M-003 商业宿主实证报告](../validation/m3-commercial-cli.md)（[T-088](../archive/T-088.md#t-088)）。
 
-[首轮清单](../validation/windows-apps.md) · [九项复验](../validation/windows-retries.md)。当前累计35/38取得页面证据，尚余3款；包含Windows原生CLI/CDP、Gecko和实验Bootstrap/V8等不同口径，不表示34款均已拥有正式CLI后端。Windows目标与控制端平台分开记录。
+### 正式 CLI 能力与平台实测矩阵
+
+| 正式 CLI 路线 | 实测平台 | 已验证夹具与代表商业宿主 | 明确限制与未覆盖范围 |
+| --- | --- | --- | --- |
+| 运行期 CDP（`targets`/`apply`/`remove`/`list`/`eval`，含 `html_mode="dom"` 与 `PolicyBlocked`） | macOS `arm64`、Windows `x64` | Electron `45.2.1` 严格 Trusted Types 夹具（`trusted-types 'none'`，`16/16`）；`T-088` 商业宿主 macOS `Devin.app`（Electron `42.2.0`）、Windows `Devin`、Windows `Quark`（均验证 `inner-html` 报 `PolicyBlocked` 零残留、`html_mode="dom"` 全链路通过）；`T-017` 官方 CEF `156` / NW.js `0.119.2`；既有 macOS/Windows CDP 商业软件证据 | 仅限顶层 `MainFrame`（`iframe`/`<webview>` 子帧暂缓）；宿主须开放获授权回环调试端口 |
+| 非 CDP Electron Gadget（`session launch/register/verify` + `--backend electron-gadget`） | macOS `arm64` | 独立 Electron `36.4.0` 夹具、抖音 `8.7.0` 隔离实例 | 需可选 Python/Frida 与 `FridaGadget.dylib`；受 Hardened Runtime 无调试权限或缺少 V8 `HandleScope` 导出符号限制时由 `inspect-app` 报阻塞 |
+| 非 CDP WKWebView（`session launch/register/verify` + `--backend webkit`） | macOS `arm64` | 独立 Swift WKWebView 宿主、Codex Switcher `0.2.11`（Tauri）空目录实例 | 需可选 Python/Frida 与授权会话；不覆盖 iOS 或受系统签名保护拒载的原包 |
+| Pre-runtime 准备与外置热更新（`prepare` → `dev`） | macOS `arm64`、Windows `x64` | macOS Electron `45.2.1` 五布局（`directory`/`asar`/`nested_asar`/`esm`/`esm_asar`）、Claude `4.23118.1`、QQ `6.9.86`；Windows 四布局（含 Junction 与 PE `INTEGRITY`）及 `T-088` 真实商业宿主 Windows `Folo`（`app-1.17.0`，`esm-delegate` + PE `INTEGRITY` + UTF-8 BOM manifest `v1→v2` 热更新） | V8 字节码（`.jsc`）、自定义加密加壳及原生编译内嵌资源（如 Tauri 生产包）明确报 `Unsupported`；当前准备器外部工具仍待 `T-090` 移除 `@electron/asar` |
+| Windows V8 运行期桥接（`session attach-v8 --bootstrap-output` → `dev`） | Windows `x64`（ABI 支持 `x64`/`ia32`） | 自有 Windows `node.exe` 夹具；`T-088` 真实商业宿主 Windows `QQ`（`QQ.exe` + `versions\9.9.37-54395\QQNT.dll`，`windows-v8-attach` 承接 `dev` 完成 `v1→v2` 热更新） | 需可选 Windows Python/Frida 与导出 MSVC V8 符号；`--module` 强制完整模块绝对路径匹配以防同名 DLL 欺骗 |
+| 只读宿主诊断与启动规划（`inspect-app` / `launch-plan`，含 `--machine`） | macOS `arm64`、Windows `x64` | 跨宿主识别 Electron（CJS/ESM/字节码/嵌套 ASAR/PE `INTEGRITY`）、NW.js、CEF、WKWebView、WebView2；`T-088` 核验 Windows `Quark`（最新 `7.5.4.1068\quark.exe`）、`Douyin`（`pe-x86`）、`Folo`、`QQ` 及 `notepad.exe`/macOS `Quark.app` `Unsupported`（退出码 `3`） | 非标准自定义框架（如 macOS `Quark.app` 的 `Quark Framework.framework`）与无 Web UI 原生程序明确报 `Unsupported`，不做应用品牌特判 |
+| Gecko（Firefox BiDi / Thunderbird Marionette） | macOS `arm64`、Windows `x64`（测试客户端） | Firefox `160.0`、Thunderbird `159.0` 独立测试客户端证据（见下方 `T-021`/`T-022`/`T-024`） | **尚无正式 CLI Gecko 后端**，保持测试客户端口径 |
+
+### T-088 商业宿主正式 CLI 回测摘要（2026-11-27，零实验脚本）
+
+| 商业宿主与平台 | 正式 CLI 路线 | 实测结果与范围 | 证据入口 |
+| --- | --- | --- | --- |
+| `Devin.app`（macOS `arm64`，Electron `42.2.0`） | `injectra --machine` CDP（`inner-html` 对照 + `html_mode="dom"`） | `inner-html` 精确报 `PolicyBlocked`（退出码 `4`，零残留）；`html_mode="dom"` 完成 `apply` v1/v2、`list`、`eval`（CSS、按钮 `0→1`、SVG）与 `remove`（`nodes=0, cleanups=2`） | [M-003 实证报告](../validation/m3-commercial-cli.md) |
+| `Devin`（Windows `x64`） | `injectra.exe --machine` CDP（`inner-html` 对照 + `html_mode="dom"`） | 同上全链路通过，解除 `T-043` 原 HTML 字符串受限口径（原 `T-043` 记录保留） | [M-003 实证报告](../validation/m3-commercial-cli.md) |
+| `Quark`（Windows `x64`，`7.5.4.1068`） | `injectra.exe --machine` CDP（`inner-html` 对照 + `html_mode="dom"`） | `chrome://new-tab-page/` 同上全链路通过，解除 `T-043` 原 HTML 字符串受限口径；`inspect-app` 准确选定最新 `7.5.4.1068\quark.exe` | [M-003 实证报告](../validation/m3-commercial-cli.md) |
+| `Folo`（Windows `x64`，`app-1.17.0`，ESM + PE `INTEGRITY`） | `injectra.exe --machine prepare` → `dev` | `esm-delegate` 派生副本完成 UTF-8 BOM manifest + `html_mode="dom"` 的 `v1→v2` 热更新，原 `Folo.exe` 与 `app.asar` SHA-256 零变动 | [M-003 实证报告](../validation/m3-commercial-cli.md) |
+| `QQ`（Windows `x64`，`9.9.37-54395`，`QQNT.dll`） | `injectra.exe --machine session attach-v8 --bootstrap-output` → `dev` | `windows-v8-attach`（`hooks=3`）直接承接 `dev` 完成 `v1→v2` 热更新，替代原 `T-044` 实验脚本与跨机控制端 | [M-003 实证报告](../validation/m3-commercial-cli.md) |
+| `Douyin`（Windows `ia32` / `pe-x86`） | `injectra.exe --machine inspect-app` / `launch-plan` | 准确选定根 `douyin.exe` 并识别 `pe-x86` 与 `app.asar`（只读诊断核对） | [M-003 实证报告](../validation/m3-commercial-cli.md) |
+| `notepad.exe`（Windows）/ `Quark.app`（macOS） | `injectra --machine inspect-app` | 确定性返回 `Unsupported`（退出码 `3`，`NotExecuted`），不做品牌特判 | [M-003 实证报告](../validation/m3-commercial-cli.md) |
+
+## Windows复验（历史批次：T-043 / T-044）
+
+[首轮清单](../validation/windows-apps.md) · [九项复验](../validation/windows-retries.md)。该历史批次（2026-11-12/13）累计 35/38 取得页面证据，尚余 3 款（优酷、百度网盘、企业微信）；该批次包含 Windows 原生 CLI/CDP、Gecko 测试客户端和早期实验 Bootstrap/V8 等不同口径，原始计数与行记录保持不变。后续已由正式 CLI 替代并实测的代表样本（如 `Devin`/`Quark` 的 `html_mode="dom"`、`Folo` 的正式 `prepare`/`dev` 与 `QQ` 的正式 `session attach-v8` → `dev`）见上方 `2026-11-27` 独立分节。Windows 目标与控制端平台分开记录。
 
 [Windows豆包双插件应用](doubao.md#windows-plugins)：本机CLI分别应用快捷窗口主题与论文插件；主题色值已核对，论文等待PDF，不外推PDF布局适配。
 

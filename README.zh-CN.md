@@ -56,15 +56,16 @@ flowchart TD
 | 方向 | 当前证据与边界 |
 | --- | --- |
 | macOS | 仅 Apple Silicon。CDP、Electron Gadget、WKWebView 有指定版本与接入条件下的夹具或应用验证；Intel Mac 不在当前范围。 |
-| CLI `prepare` / `dev` | macOS Electron CommonJS 与 ESM（目录、ASAR、嵌套 ASAR、ESM 目录、ESM ASAR）夹具，以及 QQ 主页面和 Claude 本地壳；Windows x64 Electron `prepare` / `dev`（目录含包内 Junction、ASAR 含 PE `INTEGRITY`、嵌套 ASAR、ESM）与 `session attach-v8` 已在 Windows 宿主自有夹具完成 `make test-windows` 实机验收。未支持布局（如 `.jsc` 字节码）明确拒绝。 |
-| Windows | 既有验证批次的 **38 款安装应用中，35 款取得页面注入证据**。包含本机 CLI/CDP、Gecko 测试客户端和实验 Bootstrap/V8，不等于 35 个正式 Windows CLI 后端或无条件兼容率。3 项仍有 HTML 字符串限制，使用 JS/DOM 替代路线。 |
+| CLI `prepare` / `dev` | macOS Electron CommonJS 与 ESM（目录、ASAR、嵌套 ASAR、ESM 目录、ESM ASAR）夹具，以及 QQ 主页面和 Claude 本地壳；Windows x64 Electron `prepare` / `dev`（目录含包内 Junction、ASAR 含 PE `INTEGRITY`、嵌套 ASAR、ESM）与 `session attach-v8` 已在自有夹具（`make test-windows`）及代表商业宿主（Windows `Folo` `esm-delegate` + PE `INTEGRITY` `prepare`/`dev`、Windows `QQ` `session attach-v8 --bootstrap-output` → `dev`）完成实机验收。未支持布局（如 `.jsc` 字节码）明确拒绝。 |
+| Trusted Types / CSP | 声明式安全 DOM 挂载（`html_mode: "dom"`）与 `PolicyBlocked` 策略错误分离已在严格 Trusted Types 夹具（`trusted-types 'none'`）及真实商业宿主（macOS `Devin.app`、Windows `Devin`、Windows `Quark`）完成实机验收。 |
+| Windows | 既有历史批次（`T-043`/`T-044`）的 **38 款安装应用中，35 款取得页面注入证据**（包含本机 CLI/CDP、Gecko 测试客户端与早期实验 Bootstrap/V8，历史计数原样保留）。后续以正式 CLI 完成的代表商业宿主回测单列于 `T-088`。 |
 | Windows 缺口 | 优酷：启动/Widevine 依赖失败；百度网盘、企业微信：观测到原生欢迎/登录窗口时仍未取得 Web 入口。FlowUs、Manus 按用户要求另行跳过。 |
 | Gecko | Firefox/Thunderbird 使用独立测试客户端与宿主 API，尚未成为正式 Gecko CLI 后端。 |
 | Linux 与原生内存 | 没有 Linux 真实应用兼容性声明；原生内存操作仅有自有缓冲区合同测试。 |
 
 验证单位是**版本 × 平台 × 路线 × 页面 × 验证合同**。存在 DLL、开放端口、附加成功或测试替身通过，都不等于页面执行成功。不同历史批次不合并成一次实验；本页不宣称一个统一的 macOS 成功率。
 
-证据入口：[当前矩阵](docs/compatibility/current-matrix.md)、[Windows 复验](docs/validation/windows-retries.md)、[CLI dev 验收](docs/validation/cli-dev.md)。
+证据入口：[当前矩阵](docs/compatibility/current-matrix.md)、[M-003 商业宿主正式 CLI 回测](docs/validation/m3-commercial-cli.md)、[Windows 复验](docs/validation/windows-retries.md)、[CLI dev 验收](docs/validation/cli-dev.md)。
 
 ## 快速开始
 
@@ -111,7 +112,7 @@ CDP 不等于应用框架。Electron、CEF 或定制 Chromium 必须实际提供
 
 ### pre-runtime：准备一次，修改外部增量
 
-当前流程针对已支持的 **macOS Electron** 布局：
+当前流程针对已支持的 **macOS 与 Windows Electron** 布局（`directory`、`asar`、`nested-asar`、`esm`、`esm-asar`）：
 
 ```sh
 make setup-preparation

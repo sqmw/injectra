@@ -82,18 +82,22 @@
   "name": "兼容性总表刷新与正式 CLI 证据索引收口",
   "version": "v1",
   "mode": "lightweight",
-  "status": "pending",
+  "status": "done",
   "priority": "P1",
   "milestone": "M-003",
   "goal": "消除全项目唯一兼容性入口 docs/compatibility/current-matrix.md 的过时口径，建立 M-002/M-003 正式 CLI 路线与实测证据的清晰索引。",
   "scope": "更新 current-matrix.md 更新日期与阅读口径（清理已过时的未推送与非正式 CLI 陈述），按新增分节汇总 M-002 宿主/架构基线与 T-088 商业宿主正式 CLI 回测证据，必要时同步 validation.md 与 README 导航；严禁回填或篡改 T-014/T-043/T-044 等历史行原始结论。",
   "acceptance": "从 current-matrix.md 可直接查清各平台/引擎下正式 CLI（CDP/Gadget/WKWebView/prepare+dev/attach-v8/html_mode=\"dom\"）的已实测样本与明确限制；历史分节原证据零破坏，make doc-check 与 tracking 检查全绿。",
-  "execution_ref": "",
-  "acceptance_evidence": []
+  "execution_ref": "archive/T-089.md#t-089",
+  "acceptance_evidence": [
+    "docs/compatibility/current-matrix.md 已刷新至 2026-11-27 口径，清除过时的未推送与非正式 CLI 陈述，并新增 M-002/M-003 正式 CLI 能力矩阵与 T-088 代表商业宿主回测摘要分节，T-014/T-043/T-044 等历史分节与原证据行保持零改写。",
+    "README.md 与 README.zh-CN.md 同步更新验证范围表（新增 Trusted Types / CSP 商业宿主实测与 Windows Folo/QQ 正式 CLI 证据）、pre-runtime 跨平台说明与 M-003 实证报告入口。",
+    "make doc-check、make architecture-check、tracking_check.py --root . 与 git diff --check 全部通过，执行记录归档于 docs/archive/T-089.md。"
+  ]
 }
 ```
 
-关联规划：[M-003 阶段 2](plans/milestone-3-empirical-closure.md) · [D-016](DECISIONS.md#d-016)。
+关联规划：[M-003 阶段 2](plans/milestone-3-empirical-closure.md) · [D-016](DECISIONS.md#d-016) · [兼容性总表](compatibility/current-matrix.md) · [执行归档](archive/T-089.md#t-089)。
 
 <a id="t-090"></a>
 ### T-090 · 准备器纯 Rust ASAR 统一切换与 npm 依赖收口

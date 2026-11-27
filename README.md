@@ -56,15 +56,16 @@ The common `core` contains identity, capabilities, errors, and execution certain
 | Area | Current evidence and boundary |
 | --- | --- |
 | macOS | Apple Silicon only. CDP, Electron Gadget, and WKWebView have recorded fixture/application results under specific versions and access conditions. Intel Mac is outside the current scope. |
-| CLI `prepare` / `dev` | macOS Electron CommonJS & ESM (`directory`, `asar`, `nested-asar`, `esm`, `esm-asar`) fixtures, plus QQ main page and Claude local shell; Windows x64 Electron `prepare` / `dev` (`directory` + junction, `asar` + PE `INTEGRITY`, `nested-asar`, `esm`) and `session attach-v8` verified on owned Windows fixtures via `make test-windows`. Unsupported layouts (such as `.jsc` bytecode) are rejected. |
-| Windows | **35 of 38 installed applications obtained page-injection evidence** in the recorded campaign. This combines native CLI/CDP, Gecko test clients, and experimental Bootstrap/V8 routes; it is not 35 formal Windows CLI backends or an unrestricted compatibility rate. Three results retain HTML-string limitations with JS/DOM alternatives. |
+| CLI `prepare` / `dev` | macOS Electron CommonJS & ESM (`directory`, `asar`, `nested-asar`, `esm`, `esm-asar`) fixtures, plus QQ main page and Claude local shell; Windows x64 Electron `prepare` / `dev` (`directory` + junction, `asar` + PE `INTEGRITY`, `nested-asar`, `esm`) and `session attach-v8` verified on owned Windows fixtures (`make test-windows`) and representative commercial hosts (Windows Folo `esm-delegate` + PE `INTEGRITY` `prepare`/`dev`, Windows QQ `session attach-v8 --bootstrap-output` → `dev`). Unsupported layouts (such as `.jsc` bytecode) are rejected. |
+| Trusted Types / CSP | Declarative DOM mounting (`html_mode: "dom"`) and `PolicyBlocked` error separation verified on Chromium strict Trusted Types fixtures (`trusted-types 'none'`) and commercial hosts (macOS `Devin.app`, Windows `Devin`, Windows `Quark`). |
+| Windows | **35 of 38 installed applications obtained page-injection evidence** in the recorded `T-043`/`T-044` campaign (combining native CLI/CDP, Gecko test clients, and experimental Bootstrap/V8 routes; preserved read-only without rewriting historical counts). Subsequent formal Windows CLI commercial proofs are recorded separately in `T-088`. |
 | Windows gaps | Youku: startup/Widevine dependency failure. Baidu Netdisk and WeCom: Web entry not obtained in the observed native welcome/login state. FlowUs and Manus were skipped separately by user request. |
 | Gecko | Firefox/Thunderbird experiments use separate test clients and host APIs. They are not formal Gecko CLI backends. |
 | Linux and native memory | No real-application compatibility claim for Linux; native memory operations remain contract tests using owned buffers. |
 
 These are **version × platform × route × page × validation-contract** results. A DLL, an open port, successful attachment, or a test double is not proof of page execution. Different historical batches are not merged into one experiment; this page does not assert a consolidated macOS success rate.
 
-Start with the [current matrix](docs/compatibility/current-matrix.md), [Windows follow-up](docs/validation/windows-retries.md), and [CLI dev acceptance](docs/validation/cli-dev.md).
+Start with the [current matrix](docs/compatibility/current-matrix.md), [M-003 commercial CLI validation](docs/validation/m3-commercial-cli.md), [Windows follow-up](docs/validation/windows-retries.md), and [CLI dev acceptance](docs/validation/cli-dev.md).
 
 ## Getting started
 
@@ -112,7 +113,7 @@ CDP is not the same as the application framework: an Electron/CEF/custom Chromiu
 
 ### Pre-runtime: prepare once, edit external increments
 
-The following workflow currently targets supported **macOS Electron** layouts:
+The following workflow targets supported **macOS and Windows Electron** layouts (`directory`, `asar`, `nested-asar`, `esm`, `esm-asar`):
 
 ```sh
 make setup-preparation
