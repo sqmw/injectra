@@ -11,15 +11,20 @@
 {
   "id": "M-003",
   "name": "商业宿主正式 CLI 实证闭环与准备器减重收口",
-  "status": "in_progress",
+  "status": "done",
   "goal": "将 M-002 已落地的通用底层注入引擎与正式 CLI 原语在代表性商业桌面宿主上完成端到端实证闭环，刷新全项目兼容性总表导航，并完成准备器纯 Rust ASAR 统一切换以移除 @electron/asar 依赖树。",
   "scope": "按 D-016 三阶段渐进推进：商业宿主 Trusted Types 与正式 CLI 真机回测（T-088）、兼容性总表刷新与正式 CLI 证据索引收口（T-089）、准备器纯 Rust ASAR 统一切换与 npm 依赖收口（T-090）。回测仅限受控隔离副本或显式隔离会话，不改写历史任务原证据；iframe/webview 子帧按需触发暂不纳入，重加壳/二进制补丁与上层产品/MCP/Agent 编排保持在范围外。",
   "acceptance": "所有成员任务均完成或获准收口：代表性商业宿主全程仅用 injectra 正式 CLI 完成诊断、接入、挂载/热更新、观测与清理（零实验脚本介入）；docs/compatibility/current-matrix.md 准确索引正式 CLI 能力与实测边界且不篡改历史行；setup-preparation 移除 @electron/asar 并通过 macOS 与 Windows 全布局实机回归，无应用品牌特判侵入核心。",
-  "acceptance_evidence": []
+  "closure_ref": "archive/T-090.md#m-003",
+  "acceptance_evidence": [
+    "阶段 1（T-088，9b76703/e471385）：四类代表商业宿主双端正式 CLI 闭环全部实机通过（macOS Devin.app、Windows Devin/Quark Trusted Types html_mode=\"dom\" 与 PolicyBlocked 分离；Windows Folo ESM+PE INTEGRITY prepare→dev；Windows QQ session attach-v8 --bootstrap-output→dev；Quark/Douyin pe-x86/notepad/macOS Quark.app 诊断边界），并收敛 platform-windows 主 exe 排序与 UTF-8 BOM 剥离两项通用缺陷。",
+    "阶段 2（T-089，32e2458）：docs/compatibility/current-matrix.md 刷新至 2026-11-27 正式 CLI 口径并同步双语 README，保留全部 T-014/T-043/T-044 历史原证据零篡改。",
+    "阶段 3（T-090）：prepare 的 macOS rebuild 与 Windows append_rewrite 统一切换至纯 Rust crates/preparation/src/asar.rs，移除 @electron/asar 与 chromium-pickle-js（setup-preparation 外部依赖 16 包→3 包，零弃用告警），通过 macOS 五布局（preparation-fixtures-0ZNnlg）与 Lenovo Windows 四布局（win-formal-gCAie4，Rust 59 passed/Node 12/12）实机全绿验收。"
+  ]
 }
 ```
 
-[规划与回测边界](plans/milestone-3-empirical-closure.md) · [D-016](DECISIONS.md#d-016)。
+[规划与回测边界](plans/milestone-3-empirical-closure.md) · [D-016](DECISIONS.md#d-016) · [里程碑收口](archive/T-090.md#m-003)。
 
 <a id="m-002"></a>
 ### M-002 · 通用底层注入引擎与 CLI 底座夯实
@@ -108,18 +113,23 @@
   "name": "准备器纯 Rust ASAR 统一切换与 npm 依赖收口",
   "version": "v1",
   "mode": "lightweight",
-  "status": "pending",
+  "status": "done",
   "priority": "P1",
   "milestone": "M-003",
   "goal": "将 injectra-preparation 的 ASAR 读写与流重建统一切换至纯 Rust asar.rs，彻底移除外部准备工具中的 @electron/asar 及其 11 个间接 npm 包。",
   "scope": "扩展 crates/preparation/src/asar.rs 支持完整目录与 macOS 符号链接条目流构建，更新 crates/preparation 与 helper/setup-preparation 移除对 @electron/asar 的安装与调用（保留零间接依赖的 acorn 及 Windows 按需 resedit），同步 docs/architecture/dependency-reduction.md 并在 macOS 与 Windows 跑通全部 Electron 布局实测。",
   "acceptance": "setup-preparation 与 preparation helper 不再依赖 @electron/asar；macOS 与 Windows 下 directory/asar/nested_asar/esm/esm_asar 及符号链接/PE INTEGRITY 准备与 dev 实机回归全部通过，make check 全绿。",
-  "execution_ref": "",
-  "acceptance_evidence": []
+  "execution_ref": "archive/T-090.md#t-090",
+  "acceptance_evidence": [
+    "crates/preparation/src/asar.rs 补齐 stat_entry、create_package、streaming rebuild（保留符号链接/可执行位/.unpacked 及 0 字节与 4 MiB 块完整性）与 2 项新单测；crates/preparation/src/lib.rs 在 prepare 阶段直接调用纯 Rust asar::rebuild（macOS）与 asar::append_rewrite（Windows）。",
+    "crates/preparation/helper/archive.mjs 改为零外部依赖内置实现；crates/preparation/tools 与 tests/windows/tools 移除 @electron/asar 与 chromium-pickle-js，外部准备工具包数由 16 收敛为 3（acorn、resedit、pe-library），零 npm 弃用告警。",
+    "macOS 全量验证通过：make setup-preparation（3 packages）、make check、make test-windows-format（7/7）与 make test-preparation（Electron 45.2.1 五布局及 .jsc 拒绝，run preparation-fixtures-0ZNnlg）。",
+    "Lenovo Windows（DESKTOP-F4B6E6C，rustc 1.96.1 MSVC，快照 89ca0dd）清空重装精简工具（3 packages）后原生 build/clippy/test（59 passed / 0 failed / 4 ignored）、Node 12/12 与 scripts/windows-formal-smoke.mjs（run win-formal-gCAie4，四布局+Junction+PE INTEGRITY+Folo+attach-v8+.jsc 拒绝）全部通过；文档与归档同步于 docs/archive/T-090.md。"
+  ]
 }
 ```
 
-关联规划：[M-003 阶段 3](plans/milestone-3-empirical-closure.md) · [D-016](DECISIONS.md#d-016)。
+关联规划：[M-003 阶段 3](plans/milestone-3-empirical-closure.md) · [D-016](DECISIONS.md#d-016) · [依赖减重评估](architecture/dependency-reduction.md) · [执行归档](archive/T-090.md#t-090)。
 
 <a id="t-087"></a>
 ### T-087 · 建立第三个里程碑与实证收口规划文档

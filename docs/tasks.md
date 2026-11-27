@@ -4,13 +4,11 @@
 
 ## 里程碑
 
-[M-003 · 商业宿主正式 CLI 实证闭环与准备器减重收口](TODO.md#m-003)（**进行中**）：按三阶段推进商业宿主正式 CLI 真机回测、兼容性总表刷新与纯 Rust ASAR 切换收口，见[M-003 规划](plans/milestone-3-empirical-closure.md)与[D-016](DECISIONS.md#d-016)。
+[M-003 · 商业宿主正式 CLI 实证闭环与准备器减重收口](TODO.md#m-003)（**已完成**）：三个阶段（`T-088`..`T-090`）均已验收关闭，见[M-003 规划](plans/milestone-3-empirical-closure.md)与[D-016](DECISIONS.md#d-016)。
 
 [M-002 · 通用底层注入引擎与 CLI 底座夯实](TODO.md#m-002)（**已完成**）：四个阶段（`T-083`..`T-086`）均已验收关闭，见[M-002 规划](plans/milestone-2-core-engine.md)与[D-015](DECISIONS.md#d-015)。
 
 ## 当前任务
-
-[T-090 · 准备器纯 Rust ASAR 统一切换与 npm 依赖收口 @v1](TODO.md#t-090)：M-003 阶段 3，待启动。
 
 [T-072 · README 中英文状态段落全历史清理 @v2](TODO.md#t-072)：受控历史已清理并推送；GitHub旧SHA保留对象仍可读，见执行证据。
 
@@ -28,6 +26,7 @@
 
 | 任务 | 标准名称 | 定义版本 |
 | --- | --- | --- |
+| <a id="t-090"></a>[T-090](TODO.md#t-090) | 准备器纯 Rust ASAR 统一切换与 npm 依赖收口 | v1 |
 | <a id="t-089"></a>[T-089](TODO.md#t-089) | 兼容性总表刷新与正式 CLI 证据索引收口 | v1 |
 | <a id="t-088"></a>[T-088](TODO.md#t-088) | 商业宿主 Trusted Types 与正式 CLI 真机回测 | v1 |
 | <a id="t-087"></a>[T-087](TODO.md#t-087) | 建立第三个里程碑与实证收口规划文档 | v1 |
