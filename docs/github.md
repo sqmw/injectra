@@ -13,10 +13,10 @@
 
 | 文件 | 验证范围 |
 | --- | --- |
-| [Repository checks](../.github/workflows/ci.yml) | Ubuntu与macOS Apple Silicon的Rust/Web/架构/文档检查；Windows独立执行域/CDP合同；GitHub YAML与CFF元数据 |
+| [Repository checks](../.github/workflows/ci.yml) | Ubuntu与macOS Apple Silicon的Rust/Web/架构/文档检查；Windows独立执行域/CDP合同；GitHub YAML与CFF元数据（仅 `workflow_dispatch` 手动触发，不随 `push`/PR 自动运行） |
 | [Dependabot](../.github/dependabot.yml) | 每月提出GitHub Actions/Cargo依赖更新PR，不自动合并 |
 
-工作流使用只读contents权限和不可变Action SHA，无发布/部署密钥，不启动个人App。`macos-15`按[GitHub官方runner表](https://github.com/actions/runner-images)选用arm64，并在job中检查架构；Linux核心检查不构成Linux应用兼容证明。
+工作流使用只读contents权限和不可变Action SHA，无发布/部署密钥，不启动个人App；日常验证以本机 `make check` 与 Windows 实机脚本为主，已通过 [T-092](TODO.md#t-092) 移除 `push` 与 `pull_request` 自动触发以避免账户账单锁定产生重复失败通知。`macos-15`按[GitHub官方runner表](https://github.com/actions/runner-images)选用arm64，并在job中检查架构；Linux核心检查不构成Linux应用兼容证明。
 
 `make doc-check`覆盖根目录所有Markdown及.github的Markdown。额外[GitHub检查器](../scripts/check-github.py)用[可选锁定依赖](../.github/requirements-validation.txt)解析工作流/表单并校验官方CFF 1.2 schema；schema来源为[固定提交与SHA256](../.github/cff-schema-source.json)，读取需要网络。本地可在专用环境运行：
 

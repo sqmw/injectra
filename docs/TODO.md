@@ -51,6 +51,30 @@
 
 ## 当前执行
 
+<a id="t-092"></a>
+### T-092 · 切换 GitHub Actions 检查为仅手动触发
+
+```tracking-task
+{
+  "id": "T-092",
+  "name": "切换 GitHub Actions 检查为仅手动触发",
+  "version": "v1",
+  "mode": "lightweight",
+  "status": "done",
+  "goal": "移除 GitHub Actions 工作流的 push 与 pull_request 自动触发条件，避免受账户级计费锁定影响每次推送产生失败告警，保留手动触发入口。",
+  "scope": "调整 .github/workflows/ci.yml 仅保留 workflow_dispatch，同步 docs/github.md 与任务归档并校验推送；不改动产品源码，不移动既有里程碑 tag，不篡改 T-070 历史。",
+  "acceptance": ".github/workflows/ci.yml 仅保留 workflow_dispatch，docs/github.md 口径一致，本地文档/YAML/tracking 校验全部通过，推送 origin/main 后确认不触发新的失败 workflow run。",
+  "execution_ref": "archive/T-092.md#t-092",
+  "acceptance_evidence": [
+    ".github/workflows/ci.yml 已移除 push 与 pull_request 自动触发，保留 workflow_dispatch；docs/github.md 已同步更新。",
+    "本地 make doc-check、make architecture-check、tracking_check.py --root .、scripts/check-github.py 与 git diff --check 全部通过，推送 origin/main 后确认未新增失败 run。"
+  ],
+  "unplanned_reason": "2026-11-27 用户授权按方案 A 关闭 GitHub Actions 自动推送报错。"
+}
+```
+
+[执行归档](archive/T-092.md#t-092)
+
 <a id="t-091"></a>
 ### T-091 · M-003 里程碑发布映射与远端推送
 
